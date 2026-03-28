@@ -478,17 +478,95 @@
       font-size: .72rem; color: var(--muted);
     }
 
+    /* ─── Mobile nav CTA ────────────────────────────────────────── */
+    .nav-mobile-cta { display: none; }
+
+    /* ─── Table scroll wrapper ───────────────────────────────────── */
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 48px; }
+    .table-scroll .compare-table { margin-top: 0; }
+
     /* ─── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 768px) {
+      /* Nav */
       .nav-links { display: none; }
+      .nav-mobile-cta {
+        display: inline-flex;
+        font-family: var(--font-mono);
+        font-size: .8rem; font-weight: 700;
+        color: var(--black);
+        background: var(--green);
+        padding: 7px 16px; border-radius: 4px;
+        transition: background .15s;
+        white-space: nowrap;
+      }
+      .nav-mobile-cta:hover { background: var(--green-dim); opacity: 1; }
+
+      /* Section spacing */
+      section { padding: 56px 0; }
+      .hero { padding-top: 100px; padding-bottom: 56px; }
+      .stats { padding: 32px 0; }
+      .cta-section { padding: 56px 0; }
+
+      /* Stats */
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .stat-item:nth-child(2) { border-right: none; }
-      .features-grid { grid-template-columns: 1fr; }
+      .stat-num { font-size: 1.8rem; }
+      .stat-item { padding: 20px 16px; }
+
+      /* Hero */
+      .hero-actions { flex-direction: column; gap: 10px; }
+      .btn-primary, .btn-ghost { width: 100%; text-align: center; display: block; }
+      .hero-sub { font-size: 1rem; }
+
+      /* Terminal */
+      .terminal-wrap { margin-top: 36px; }
+      .terminal-body {
+        padding: 16px;
+        font-size: .72rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Install */
+      .install-step { padding: 20px 16px; gap: 12px; flex-direction: column; }
+      .step-num { width: 28px; height: 28px; font-size: .72rem; }
+      .chat-bubble { max-width: 100%; font-size: .82rem; }
+      .code-block { font-size: .75rem; overflow-x: auto; }
+
+      /* Daily use */
       .usage-grid { grid-template-columns: 1fr; }
-      .compare-table { font-size: .8rem; }
-      .compare-table td, .compare-table th { padding: 12px 14px; }
-      .community-card { padding: 32px 24px; }
-      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .usage-block { padding: 20px; }
+      .golden-rule { padding: 20px; gap: 12px; }
+
+      /* Features */
+      .features-grid { grid-template-columns: 1fr; }
+      .feat-card { padding: 24px; }
+
+      /* Compare table */
+      .compare-table { font-size: .78rem; min-width: 480px; }
+      .compare-table td, .compare-table th { padding: 12px 12px; }
+
+      /* Community */
+      .community-card { padding: 32px 20px; }
+
+      /* Footer */
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.4rem; }
+      .hero-badge { font-size: .7rem; }
+      .terminal-body { font-size: .68rem; }
+      .section-title { font-size: 1.4rem; }
+      .compare-table { font-size: .72rem; }
+      .compare-table td, .compare-table th { padding: 10px 10px; }
+      .tag { font-size: .68rem; }
+      .stat-num { font-size: 1.6rem; }
+      .community-card { padding: 24px 16px; }
+      .cta-section h2 { font-size: 1.5rem; }
     }
   </style>
 </head>
@@ -504,6 +582,7 @@
       <a href="#community">Comunidade</a>
       <a href="https://github.com/Empire-Business/omnx-code" target="_blank" rel="noopener" class="nav-cta">GitHub →</a>
     </div>
+    <a href="#install" class="nav-mobile-cta">Instalar grátis</a>
   </div>
 </nav>
 
@@ -713,6 +792,7 @@
     <p class="section-tag">// comparativo</p>
     <h2 class="section-title">Com e sem OMNX Code.</h2>
 
+    <div class="table-scroll">
     <table class="compare-table">
       <thead>
         <tr>
@@ -749,6 +829,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </section>
 
