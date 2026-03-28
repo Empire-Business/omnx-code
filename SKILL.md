@@ -23,7 +23,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.3** |
+| Versão da skill | **1.4** |
 | Security-auditor mínimo requerido | **v1.5** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -68,7 +68,8 @@ Se o usuário pediu explicitamente "verificar atualizações" ou "atualizar skil
 Task 1: Inicializar state document (.empire/state.json)
 Task 2: Verificar e instalar/mesclar CLAUDE.md
 Task 3: Verificar e instalar/atualizar skill /security-auditor
-Task 4: Finalizar setup — marcar setup_complete: true
+Task 4: Verificar e criar repositório GitHub privado
+Task 5: Finalizar setup — marcar setup_complete: true
 ```
 
 ### Task 1 — State document
@@ -77,12 +78,14 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
 
 ```json
 {
-  "omnx_version": "1.2",
+  "omnx_version": "1.4",
   "setup_complete": false,
   "claude_md_installed": false,
   "claude_md_merged_at": null,
   "security_auditor_installed": false,
   "security_auditor_version": null,
+  "github_repo": null,
+  "github_repo_private": null,
   "last_update_check": null
 }
 ```
@@ -162,7 +165,132 @@ Após concluir, atualize no state:
 "security_auditor_version": "<versão instalada>"
 ```
 
-### Task 4 — Finalizar setup
+### Task 4 — GitHub: verificar e criar repositório privado
+
+> **Regra absoluta: repositórios criados por esta skill são SEMPRE privados.**
+> Nunca crie um repositório público, mesmo que o usuário peça explicitamente.
+> Se o usuário insistir em público, explique o risco, recuse-se e oriente-o a mudar a visibilidade manualmente após a criação.
+
+#### Passo 1 — Verificar se já existe remote `origin`
+
+```bash
+git remote get-url origin 2>/dev/null
+```
+
+| Resultado | Ação |
+|-----------|------|
+| URL retornada | Remote já existe → registrar no state e pular criação |
+| Erro / vazio | Nenhum remote → seguir para Passo 2 |
+
+Se o remote já existe, extraia o nome do repo e registre no state:
+```json
+"github_repo": "<owner>/<repo>",
+"github_repo_private": null
+```
+(O campo `github_repo_private` fica `null` pois não é possível confirmar visibilidade sem chamar a API — deixe para o usuário verificar se necessário.)
+
+#### Passo 2 — Verificar se `gh` CLI está disponível
+
+```bash
+gh --version 2>/dev/null
+```
+
+Se `gh` **não estiver disponível**, informe ao usuário:
+
+```
+⚠️ GitHub CLI (gh) não encontrado.
+Para criar o repositório, instale o gh CLI:
+  macOS:   brew install gh
+  Linux:   https://cli.github.com/
+  Windows: winget install GitHub.cli
+
+Após instalar, execute: gh auth login
+Depois chame /omnx-code novamente para concluir o setup.
+```
+
+Encerre esta task e registre no state:
+```json
+"github_repo": null,
+"github_repo_private": null
+```
+
+#### Passo 3 — Verificar autenticação
+
+```bash
+gh auth status 2>/dev/null
+```
+
+Se não estiver autenticado, instrua o usuário:
+
+```
+⚠️ gh CLI não está autenticado.
+Execute: gh auth login
+Depois chame /omnx-code novamente para concluir o setup.
+```
+
+#### Passo 4 — Determinar nome do repositório
+
+Use o nome da pasta atual como sugestão:
+
+```bash
+basename "$PWD"
+```
+
+Mostre ao usuário:
+
+```
+Vou criar o repositório GitHub privado com o nome: <nome-da-pasta>
+Confirma esse nome? (Responda com o nome desejado ou "sim" para confirmar)
+```
+
+Aguarde a confirmação antes de criar. Se o usuário fornecer um nome diferente, use o nome informado.
+
+#### Passo 5 — Criar repositório PRIVADO
+
+```bash
+gh repo create <nome-confirmado> \
+  --private \
+  --source=. \
+  --remote=origin \
+  --push \
+  --description "Projeto criado com OMNX Code"
+```
+
+> **Flags obrigatórias:** `--private` é não-negociável. Nunca use `--public`.
+
+Se o repositório já existir no GitHub com esse nome, o comando vai falhar. Nesse caso:
+
+```bash
+# Tentar adicionar o remote manualmente
+gh repo view <owner>/<nome> --json sshUrl,url 2>/dev/null
+git remote add origin <url-retornada>
+git push -u origin main 2>/dev/null || git push -u origin master
+```
+
+#### Passo 6 — Confirmar visibilidade
+
+Após criar, verifique que o repo é realmente privado:
+
+```bash
+gh repo view --json isPrivate -q '.isPrivate'
+```
+
+Se retornar `false` (público), torne-o privado imediatamente:
+
+```bash
+gh repo edit --visibility private
+```
+
+#### Passo 7 — Registrar no state
+
+```json
+"github_repo": "<owner>/<nome-do-repo>",
+"github_repo_private": true
+```
+
+---
+
+### Task 5 — Finalizar setup
 
 Marque o setup como concluído:
 
@@ -177,6 +305,7 @@ Apresente ao usuário um resumo do que foi feito:
 
 - CLAUDE.md: [instalado / mesclado com projeto existente]
 - /security-auditor: [instalado v1.5 / já estava atualizado v1.X]
+- GitHub: [criado <owner>/<repo> (privado) / remote já existia / gh não disponível]
 - State document: .empire/state.json criado
 
 Agora você pode usar esta skill a qualquer momento para codar,
@@ -212,7 +341,10 @@ Ao remover uma feature ou componente:
 **5. Seguir a stack obrigatória**
 React 18 + TypeScript strict + Vite + Tailwind + shadcn/ui + Supabase + Vercel. Não introduza dependências fora desta stack sem aprovar com o usuário e documentar a decisão em `docs/ARQUITETURA.md`.
 
-**6. Seguir as fases do CLAUDE.md**
+**6. Repositório GitHub sempre privado**
+Nunca execute `gh repo edit --visibility public` nem qualquer variante que torne o repositório público. Se o usuário pedir explicitamente para tornar o repo público, explique o risco (exposição de variáveis de ambiente, chaves, segredos) e recuse-se. Oriente-o a fazer isso manualmente via GitHub Settings se ainda assim quiser. Ao criar qualquer repo novo durante o trabalho normal (fora do setup), aplique as mesmas regras da Task 4 do setup.
+
+**7. Seguir as fases do CLAUDE.md**
 Se o projeto ainda não tem PRD, ROADMAP ou ARQUITETURA aprovados → não comece a codar. Siga a trilha obrigatória descrita no CLAUDE.md.
 
 ### Quando usar agentes em time

@@ -4,6 +4,23 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.4 — 2026-03-28
+
+### Adicionado
+- **Task 4 — GitHub Setup**: novo passo obrigatório no setup que verifica se o projeto já possui remote `origin` e, caso contrário, cria o repositório GitHub via `gh` CLI
+- **Repositório sempre privado**: regra absoluta — todo repositório criado pela skill usa `--private`. A skill se recusa a criar repos públicos mesmo se o usuário pedir explicitamente, e orienta a mudança manual se necessário
+- **Verificação de visibilidade pós-criação**: após criar o repo, confirma `isPrivate: true` via `gh repo view --json isPrivate`. Se por algum motivo estiver público, executa `gh repo edit --visibility private` imediatamente
+- **Campos no state document**: `github_repo` e `github_repo_private` adicionados ao `.empire/state.json`
+- **Regra 6 no Modo de Trabalho Normal**: proíbe qualquer comando que torne o repo público durante o trabalho normal, não só no setup
+- **Detecção de `gh` CLI**: se não instalado ou não autenticado, exibe instruções claras e aguarda o usuário resolver antes de continuar
+
+### Modificado
+- `omnx_version` no state document: `1.2` → `1.4`
+- Summary do setup inclui linha de status do GitHub (criado / já existia / gh não disponível)
+- Task 4 (antiga "Finalizar setup") renumerada para Task 5
+
+---
+
 ## v1.3 — 2026-03-28
 
 ### Modificado
