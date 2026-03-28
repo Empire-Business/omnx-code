@@ -4,6 +4,16 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.1 — 2026-03-28
+
+### Modificado
+- **Security-auditor agora tem repo próprio**: `https://github.com/Empire-Business/security-auditor`. Instalação e atualização usam `git clone` / `git pull` deste repo como fonte primária
+- **Verificação de versão remota**: durante setup e auto-update, consulta o CHANGELOG.md remoto via `curl` para comparar com a versão instalada antes de atualizar
+- **Fallback bundled mantido**: se git/curl não estiverem disponíveis, usa `bundled-skills/security-auditor/` como fallback offline
+- **Auto-atualização aprimorada**: atualiza empire-vibe-coding e security-auditor de forma independente, cada uma pelo seu próprio repo
+
+---
+
 ## v1.0 — 2026-03-28
 
 ### Inicial

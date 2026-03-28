@@ -23,9 +23,10 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.0** |
+| Versão da skill | **1.1** |
 | Security-auditor mínimo requerido | **v1.5** |
-| GitHub | https://github.com/Empire-Business/empire-vibe-coding |
+| GitHub (esta skill) | https://github.com/Empire-Business/empire-vibe-coding |
+| GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
 | State document | `.empire/state.json` (na raiz do projeto do usuário) |
 
 ---
@@ -122,32 +123,47 @@ Após concluir, atualize no state:
 
 ### Task 3 — Security Auditor
 
-Verifique se a skill está instalada globalmente e na versão correta:
+A skill `/security-auditor` tem seu próprio repositório público:
+`https://github.com/Empire-Business/security-auditor`
+
+**Passo 1 — Verificar se está instalada:**
 
 ```bash
-# Verificar se existe
-cat ~/.claude/skills/security-auditor/CHANGELOG.md | head -5
+cat ~/.claude/skills/security-auditor/CHANGELOG.md 2>/dev/null | head -5
 ```
 
-**Lógica de versão:**
+**Passo 2 — Determinar versão instalada:**
 
-1. Se o arquivo não existe → a skill não está instalada
-2. Leia a primeira linha `## vX.Y` do CHANGELOG.md para obter a versão instalada
-3. Compare com a versão mínima requerida: **v1.5**
+Leia a primeira linha `## vX.Y` do CHANGELOG.md local. Se o arquivo não existir, a skill não está instalada.
+
+**Passo 3 — Obter versão mais recente do GitHub:**
+
+```bash
+# Busca a versão mais recente direto do repositório remoto
+curl -s https://raw.githubusercontent.com/Empire-Business/security-auditor/main/CHANGELOG.md | head -5
+```
+
+Leia a primeira linha `## vX.Y` do resultado para obter a versão mais recente disponível.
+
+**Passo 4 — Agir conforme a comparação:**
 
 | Situação | Ação |
 |----------|------|
-| Não instalada | Copiar de `bundled-skills/security-auditor/` para `~/.claude/skills/security-auditor/` |
-| Versão < v1.5 | Substituir `~/.claude/skills/security-auditor/` com o conteúdo bundled |
-| Versão >= v1.5 | Nada a fazer — reportar versão encontrada |
+| Não instalada | `git clone https://github.com/Empire-Business/security-auditor ~/.claude/skills/security-auditor` |
+| Versão instalada < versão remota | `cd ~/.claude/skills/security-auditor && git pull` |
+| Versão instalada < v1.5 (mínimo) e git pull não ajudou | Reinstalar via clone (ver fallback abaixo) |
+| Versão instalada >= versão remota | Nada a fazer — reportar versão encontrada |
 
-Instalação:
+**Fallback — se git/curl não estiver disponível:**
+
 ```bash
 mkdir -p ~/.claude/skills/security-auditor/references
 cp bundled-skills/security-auditor/SKILL.md ~/.claude/skills/security-auditor/
 cp bundled-skills/security-auditor/CHANGELOG.md ~/.claude/skills/security-auditor/
 cp bundled-skills/security-auditor/references/*.md ~/.claude/skills/security-auditor/references/
 ```
+
+> O fallback usa a versão bundled neste repo (pode estar um pouco defasada). Informe ao usuário que a versão instalada é a bundled e recomende fazer `git pull` depois.
 
 Após concluir, atualize no state:
 ```json
@@ -224,43 +240,69 @@ Quando o usuário pedir "verifique atualizações", "atualize a skill" ou simila
 ### Tasks a criar
 
 ```
-Task 1: Verificar instalação git da skill
-Task 2: git pull no diretório da skill
-Task 3: Comparar versão do security-auditor bundled com instalado
-Task 4: Atualizar security-auditor se necessário
-Task 5: Registrar last_update_check no state document
-Task 6: Reportar ao usuário o que mudou
+Task 1: Atualizar empire-vibe-coding via git pull
+Task 2: Verificar versão remota do security-auditor
+Task 3: Atualizar security-auditor se necessário
+Task 4: Registrar last_update_check no state document
+Task 5: Reportar ao usuário o que mudou
 ```
 
 ### Execução
 
-```bash
-# Task 2: atualizar skill via git
-cd ~/.claude/skills/empire-vibe-coding && git pull
+**Task 1 — Atualizar esta skill:**
 
-# Task 6: mostrar o que mudou no CHANGELOG
-git diff HEAD@{1} HEAD -- CHANGELOG.md
+```bash
+cd ~/.claude/skills/empire-vibe-coding
+git fetch origin
+# Salvar versão anterior para comparar depois
+ANTES=$(git log -1 --format="%H")
+git pull
+DEPOIS=$(git log -1 --format="%H")
 ```
 
-**Task 3-4:** após o pull, leia `bundled-skills/security-auditor/CHANGELOG.md` para obter a nova versão bundled. Se for maior que a versão instalada em `~/.claude/skills/security-auditor/`, reinstale conforme a lógica da Fase de Setup > Task 3.
+Se `ANTES == DEPOIS`, a skill já estava na versão mais recente.
 
-**Task 5:** atualize no state do projeto:
+Para mostrar o que mudou:
+```bash
+git diff $ANTES $DEPOIS -- CHANGELOG.md
+```
+
+**Task 2-3 — Verificar e atualizar security-auditor:**
+
+```bash
+# Versão instalada
+VERSAO_LOCAL=$(cat ~/.claude/skills/security-auditor/CHANGELOG.md 2>/dev/null | grep -m1 "^## v" | sed 's/## //' | cut -d' ' -f1)
+
+# Versão remota
+VERSAO_REMOTA=$(curl -s https://raw.githubusercontent.com/Empire-Business/security-auditor/main/CHANGELOG.md | grep -m1 "^## v" | sed 's/## //' | cut -d' ' -f1)
+
+echo "Instalada: $VERSAO_LOCAL | Remota: $VERSAO_REMOTA"
+```
+
+Se `VERSAO_LOCAL < VERSAO_REMOTA` (comparação de string semver), atualizar:
+```bash
+cd ~/.claude/skills/security-auditor && git pull
+```
+
+Se o diretório não for um repo git (instalação via fallback), usar o fluxo de clone descrito na Fase de Setup > Task 3.
+
+**Task 4:** atualize no state do projeto:
 ```json
 "last_update_check": "<data ISO atual>"
 ```
 
-**Task 6:** apresente ao usuário:
-- Versão anterior vs nova versão da skill
-- O que mudou (extraído do CHANGELOG.md)
-- Se o security-auditor foi atualizado ou já estava na versão mais recente
+**Task 5:** apresente ao usuário:
+- Versão anterior vs nova da skill empire-vibe-coding (com diff do CHANGELOG)
+- Versão do security-auditor antes e depois
+- Se alguma das duas estava na versão mais recente, reportar sem ruído
 
 ---
 
 ## Referências
 
-| Arquivo | Conteúdo |
-|---------|----------|
+| Arquivo / URL | Conteúdo |
+|---------------|----------|
 | `references/modelo-claude.md` | Template padrão do CLAUDE.md a instalar nos projetos |
-| `bundled-skills/security-auditor/SKILL.md` | Skill de auditoria de segurança bundled |
-| `bundled-skills/security-auditor/CHANGELOG.md` | Versão atual do security-auditor bundled |
 | `CHANGELOG.md` | Histórico de versões desta skill |
+| `bundled-skills/security-auditor/` | Versão bundled do security-auditor (fallback offline) |
+| https://github.com/Empire-Business/security-auditor | Repo oficial do security-auditor (fonte primária) |
