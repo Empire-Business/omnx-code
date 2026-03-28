@@ -374,7 +374,7 @@
       text-align: left;
     }
     .compare-table th.col-with { color: var(--gold); }
-    .compare-table th.col-without { color: var(--steel); }
+    .compare-table th.col-without { color: #8B9AAD; }
     .compare-table td {
       padding: var(--s16) var(--s24);
       font-size: .9375rem;
@@ -388,7 +388,7 @@
       font-family: var(--font-mono); font-size:.875rem;
     }
     .compare-table td.no {
-      color: rgba(255,255,255,.25);
+      color: #6B7A8D;
       font-family: var(--font-mono); font-size:.875rem;
     }
     .compare-table tr:hover td { background: rgba(255,255,255,.02); }
@@ -429,6 +429,48 @@
     }
     .footer-links a:hover { color: var(--platinum); }
     .footer-copy { font-size:.75rem; color:var(--steel); font-family: var(--font-mono); }
+
+    /* ─── Usage examples ────────────────────────────────────────── */
+    .usage-example { display: flex; flex-direction: column; gap: var(--s10); }
+    .usage-label {
+      font-family: var(--font-mono);
+      font-size: .6875rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--steel);
+      padding-left: var(--s4);
+    }
+    :root { --s10: 10px; }
+
+    /* ─── Golden rule box ────────────────────────────────────────── */
+    .golden-rule-box {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--s20);
+      background: rgba(201,162,64,.06);
+      border: 1.5px solid rgba(201,162,64,.25);
+      border-radius: var(--radius-lg);
+      padding: var(--s28) var(--s28);
+    }
+    .golden-rule-icon {
+      flex-shrink: 0;
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      background: rgba(201,162,64,.1);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 2px;
+    }
+    .golden-rule-title {
+      font-family: var(--font-mono);
+      font-size: .6875rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: var(--s8);
+    }
+    .golden-rule-text {
+      font-size: .9375rem; color: var(--platinum); line-height: 1.7;
+    }
+    @media (max-width: 640px) {
+      .golden-rule-box { flex-direction: column; }
+    }
 
     /* ─── SVG Icons helper ───────────────────────────────────────── */
     svg { display:block; }
@@ -578,6 +620,60 @@
             <svg class="install-note-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z" stroke="#28C840" stroke-width="1.5"/><path d="M8 7v4M8 5.5v.5" stroke="#28C840" stroke-width="1.5" stroke-linecap="round"/></svg>
             <p><strong>O Claude clona o repo, instala a skill em ~/.claude/skills/ e já ativa.</strong> Depois é só digitar /empire-vibe-coding em qualquer projeto.</p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regra de ouro -->
+    <div style="margin-top:var(--s48); border-top:1px solid rgba(255,255,255,.06); padding-top:var(--s48);">
+      <div style="text-align:center; max-width:640px; margin:0 auto var(--s40);">
+        <span class="eyebrow">Como usar no dia a dia</span>
+        <h2 style="color:var(--white); margin-top:var(--s12);">Chame sempre que quiser algo novo no app.</h2>
+        <p style="color:var(--platinum); margin-top:var(--s16); font-size:1.0625rem;">
+          A skill lê o seu <code style="font-family:var(--font-mono); font-size:.9em; color:var(--gold)">CLAUDE.md</code> antes de agir. Isso garante que o Claude segue <em>suas</em> regras, stack e arquitetura — e não inventa nada por conta própria.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:var(--s16); margin-bottom:var(--s40);">
+
+        <div class="usage-example">
+          <div class="usage-label">Quero uma nova feature</div>
+          <div class="chat-bubble">
+            /empire-vibe-coding<br/>
+            <span style="color:var(--platinum);">Crie uma página de perfil do usuário com foto e bio</span>
+          </div>
+        </div>
+
+        <div class="usage-example">
+          <div class="usage-label">Quero refatorar algo</div>
+          <div class="chat-bubble">
+            /empire-vibe-coding<br/>
+            <span style="color:var(--platinum);">Refatore o módulo de autenticação para usar Zustand</span>
+          </div>
+        </div>
+
+        <div class="usage-example">
+          <div class="usage-label">Quero remover algo</div>
+          <div class="chat-bubble">
+            /empire-vibe-coding<br/>
+            <span style="color:var(--platinum);">Remova o módulo de chat — não vamos mais usar</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="golden-rule-box">
+        <div class="golden-rule-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 7.27l-3.5 3.41.83 4.82L10 13.27l-4.33 2.23.83-4.82L3 7.27l4.91-.71L10 2Z" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <p class="golden-rule-title">Regra de ouro</p>
+          <p class="golden-rule-text">
+            Sempre comece qualquer pedido importante com <code style="font-family:var(--font-mono); font-size:.9em; color:var(--gold)">/empire-vibe-coding</code>. Sem a skill, o Claude age livremente — pode criar arquivos fora da estrutura, ignorar a stack definida e acumular código sem documentar. Com a skill ativada, ele lê o CLAUDE.md primeiro e só age dentro do que você definiu.
+          </p>
+          <p class="golden-rule-text" style="margin-top:var(--s8); color:var(--steel); font-style:italic;">
+            Always start any important request with /empire-vibe-coding. Without it, Claude acts freely — it may create files outside your structure, ignore the defined stack, and pile up undocumented code.
+          </p>
         </div>
       </div>
     </div>
