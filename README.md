@@ -45,8 +45,11 @@ cd ~/.claude/skills/omnx-code && git pull
 
 ## Versão
 
-`v1.3` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.4` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 
-Grátis para sempre. MIT License.
+Grátis para sempre. MIT License — [ver LICENSE](./LICENSE).
+
+> **Aviso:** esta skill gera sugestões via IA. O autor não se responsabiliza por falhas de
+> segurança em apps construídos ou auditados com ela. Leia o [LICENSE](./LICENSE) completo.
