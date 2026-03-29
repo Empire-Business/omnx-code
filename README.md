@@ -13,11 +13,17 @@
 
 ## Instalação
 
+### Claude Code
 ```bash
 git clone https://github.com/Empire-Business/omnx-code ~/.claude/skills/omnx-code
 ```
 
-Pronto. A skill fica disponível automaticamente no Claude Code.
+### OpenAI Codex
+```bash
+git clone https://github.com/Empire-Business/omnx-code ~/.codex/skills/omnx-code
+```
+
+Pronto. A skill aparece automaticamente na lista de skills do Claude Code e do Codex.
 
 ## Como usar
 
