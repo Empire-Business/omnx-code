@@ -4,6 +4,19 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.5 — 2026-04-01
+
+### Adicionado
+- **Branches dedicadas obrigatórias no trabalho normal**: toda nova feature, fix, documentação, refactor ou tarefa técnica deve rodar em branch separada; a skill não deve implementar trabalho novo em `main` ou `master`
+- **Higiene Git pré-implementação**: antes de começar, a skill agora verifica `git status`, branch atual e remote para detectar alterações locais ambíguas e evitar mistura de contexto
+- **Modo GitHub `local first`**: a skill pode preparar branch e commits localmente, mas não deve fazer `push`, abrir PR ou escrever no remoto sem pedido explícito do usuário
+- **Padrão obrigatório de commits**: commits agora usam `Conventional Commits` no assunto e corpo rico com `Contexto`, `Mudanças` e `Impacto/Testes`
+- **Lista de operações perigosas proibidas por padrão**: `push --force`, `reset --hard`, descarte de arquivos e merge direto em branch compartilhada passam a ser explicitamente bloqueados
+
+### Modificado
+- `omnx_version` no state document: `1.4` → `1.5`
+- README atualizado para refletir o novo workflow com branch dedicada e commits documentados
+
 ## v1.4 — 2026-03-28
 
 ### Adicionado
