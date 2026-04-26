@@ -995,6 +995,43 @@ Próximos passos obrigatórios antes de usar o projeto:
 
 ---
 
+## Colaboração com outras skills OMNX
+
+Esta skill faz parte do ecossistema OMNX. Quando o trabalho exigir domínios além de código e infraestrutura, verifique quais outras skills OMNX estão disponíveis e delegue para a mais adequada.
+
+### Descoberta de skills disponíveis
+
+Ao iniciar qualquer tarefa que pareça cruzar domínios, execute:
+
+```bash
+ls ~/.claude/skills/ | grep "^omnx-"
+```
+
+Para cada skill encontrada (exceto a própria `omnx-code`), leia sua descrição no frontmatter:
+
+```bash
+head -15 ~/.claude/skills/<nome-da-skill>/SKILL.md
+```
+
+Monte mentalmente um índice: `nome-da-skill → domínio coberto`. Use esse índice para decidir quando delegar.
+
+### Regras de colaboração
+
+- Invoque a skill especializada **antes** de tentar executar o trabalho no domínio dela
+- Passe o contexto relevante do projeto (stack, objetivo, CLAUDE.md se existir) ao invocar
+- Ao retornar da skill especializada, continue o fluxo normal da omnx-code (tasks, commits, etc.)
+- Se o pedido do usuário claramente pertence a outra skill desde o início, delegue imediatamente
+- Se nenhuma skill OMNX instalada cobre o domínio necessário, informe o usuário e resolva com o melhor julgamento disponível
+
+### Como invocar
+
+Use o tool `Skill` com o nome exato encontrado no `ls`:
+```
+Skill("<nome-da-skill>", args="<contexto do projeto>")
+```
+
+---
+
 ## Referências
 
 | Arquivo / URL | Conteúdo |
