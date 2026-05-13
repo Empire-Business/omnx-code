@@ -522,6 +522,24 @@ O `AGENTS.md` na raiz do projeto é a ponte entre as regras OMNX e ferramentas e
 - Se o usuário editar o AGENTS.md manualmente, preserve o conteúdo e faça merge aditivo (nunca sobrescreva)
 - Para verificar sync manualmente: o usuário pode pedir "verificar sync do AGENTS.md" ou "sincronizar AGENTS.md" em qualquer conversa com a skill ativa
 
+**15. Segurança de supply chain npm — regras obrigatórias**
+
+Ataques de supply chain via npm são uma das principais ameaças em 2026 (Mini Shai-Hulud, SANDWORM_MODE, Axios compromise). Ao instalar ou atualizar dependências em qualquer projeto:
+
+- **Nunca instale pacotes publicados há menos de 7 dias** sem confirmação explícita do usuário. Antes de qualquer `npm install <pacote>`, verifique a data de publicação:
+  ```bash
+  npm view <pacote> time.modified
+  ```
+- **Nunca instale pacotes typosquats.** Antes de instalar, confirme que o nome está correto comparando com a documentação oficial. Exemplos de typosquats conhecidos: `claud-code`, `rimarf`, `suport-color`, `yarsg`, `opencraw`.
+- **Após qualquer `npm install`, verifique se hooks de lifecycle suspeitos foram adicionados:**
+  ```bash
+  cat node_modules/<pacote>/package.json | grep -A5 '"scripts"'
+  ```
+- **Nunca use `npm install` sem `--ignore-scripts`** em pacotes de origem duvidosa ou recém-publicados.
+- **`renovate.json` obrigatório em todo projeto novo.** Ao criar ou fazer setup de qualquer projeto, gere o arquivo com `minimumReleaseAge: "7 days"` e `stabilityDays: 7`.
+- **Verificar `~/.claude/settings.json` após qualquer npm install** em pacotes relacionados a ferramentas de IA (ex: pacotes que mencionam Claude, Cursor, Copilot). O ataque Mini Shai-Hulud (SAP, abr/2026) usou o hook `SessionStart` do Claude Code como vetor de persistência.
+- **Nunca commite `~/.npmrc` com tokens** no repositório. Se o arquivo contiver tokens, interrompa e avise o usuário imediatamente.
+
 **13. Proteção absoluta do acesso Lovable — regra inviolável**
 
 O Lovable acessa o projeto via GitHub (deploy key ou OAuth). Qualquer ação que quebre essa ligação torna o projeto inabrível na plataforma. As regras abaixo são **absolutas** — não há exceção, nem com pedido explícito do usuário:
