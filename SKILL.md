@@ -540,6 +540,21 @@ Ataques de supply chain via npm são uma das principais ameaças em 2026 (Mini S
 - **Verificar `~/.claude/settings.json` após qualquer npm install** em pacotes relacionados a ferramentas de IA (ex: pacotes que mencionam Claude, Cursor, Copilot). O ataque Mini Shai-Hulud (SAP, abr/2026) usou o hook `SessionStart` do Claude Code como vetor de persistência.
 - **Nunca commite `~/.npmrc` com tokens** no repositório. Se o arquivo contiver tokens, interrompa e avise o usuário imediatamente.
 
+**19. pnpm em projetos novos — adoção gradual**
+
+pnpm é o gerenciador de pacotes padrão para todo projeto novo criado a partir desta versão da skill. Motivos: installs mais rápidos via store compartilhado, e estrutura estrita de `node_modules` que bloqueia phantom dependencies (pacotes que dependem de hoisting para acessar módulos não declarados — vetor usado em ataques de supply chain).
+
+- **Todo projeto novo usa pnpm.** No setup inicial, instale com `pnpm install` e gere `pnpm-lock.yaml`. Nunca gere `package-lock.json` em projeto novo.
+- **Projetos existentes com `package-lock.json` permanecem em npm** até haver uma razão para mexer neles (nova feature, migração maior). Não migre projetos existentes proativamente.
+- **Ao migrar um projeto de npm para pnpm**, teste o build completo antes de commitar o `pnpm-lock.yaml`. Alguns pacotes quebram com a estrutura estrita — se houver erro de phantom dependency, adicione ao `.npmrc` do projeto:
+  ```
+  shamefully-hoist=true
+  ```
+  e documente em `docs/ARQUITETURA.md` quais pacotes exigiram isso.
+- **Vercel:** detecta pnpm automaticamente via `pnpm-lock.yaml`. Nenhuma configuração extra necessária.
+- **Renovate:** funciona com pnpm sem alteração no `renovate.json`.
+- **`pnpm audit --audit-level=high`** substitui `npm audit` nos workflows de CI de projetos pnpm (regra 18).
+
 **16. Supabase RLS obrigatório em todas as tabelas**
 
 A `anon key` do Supabase é pública — vai no bundle do cliente. Sem Row Level Security, qualquer pessoa com a chave tem acesso irrestrito a todos os dados. As regras abaixo são absolutas:
