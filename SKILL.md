@@ -540,6 +540,40 @@ Ataques de supply chain via npm são uma das principais ameaças em 2026 (Mini S
 - **Verificar `~/.claude/settings.json` após qualquer npm install** em pacotes relacionados a ferramentas de IA (ex: pacotes que mencionam Claude, Cursor, Copilot). O ataque Mini Shai-Hulud (SAP, abr/2026) usou o hook `SessionStart` do Claude Code como vetor de persistência.
 - **Nunca commite `~/.npmrc` com tokens** no repositório. Se o arquivo contiver tokens, interrompa e avise o usuário imediatamente.
 
+**16. Supabase RLS obrigatório em todas as tabelas**
+
+A `anon key` do Supabase é pública — vai no bundle do cliente. Sem Row Level Security, qualquer pessoa com a chave tem acesso irrestrito a todos os dados. As regras abaixo são absolutas:
+
+- **Nunca crie uma tabela sem habilitar RLS imediatamente:**
+  ```sql
+  ALTER TABLE <tabela> ENABLE ROW LEVEL SECURITY;
+  ```
+- **Nunca faça `supabase.from('<tabela>')` no cliente sem confirmar que existe política RLS** cobrindo a operação (SELECT, INSERT, UPDATE, DELETE).
+- **Service role key é segredo absoluto** — nunca referenciada no código cliente, nunca em variável `VITE_`. Só usada em Edge Functions ou server-side.
+- **Ao criar qualquer tabela nova**, verifique e documente a política RLS em `docs/ARQUITETURA.md` antes de fazer commit.
+- Se encontrar tabela sem RLS em projeto existente, interrompa o trabalho e alerte o usuário antes de continuar.
+
+**17. Segredos não podem vazar para o bundle do cliente**
+
+No Vite, qualquer variável com prefixo `VITE_` é embutida no JavaScript final e fica visível no browser (via DevTools ou `strings` no bundle). As regras:
+
+- **`VITE_` somente para valores públicos:** Supabase anon key, IDs de analytics, URLs públicas.
+- **Nunca use `VITE_` para:** service role key, webhooks secretos, API keys privadas, tokens de terceiros com permissão de escrita.
+- **Segredos só em variáveis sem prefixo `VITE_`**, acessadas exclusivamente via Edge Functions (`supabase/functions/`) ou rotas server-side.
+- Ao revisar ou criar qualquer `.env` ou `.env.example`, audite todos os valores com `VITE_` e confirme que são realmente públicos.
+- Se encontrar um segredo com prefixo `VITE_`, interrompa, alerte o usuário e oriente a rotacionar a credencial imediatamente.
+
+**18. `npm audit` obrigatório em todo CI/CD**
+
+- **Todo workflow de GitHub Actions deve incluir `npm audit` antes do build:**
+  ```yaml
+  - name: Audit dependencies
+    run: npm audit --audit-level=high
+  ```
+- Se `npm audit` retornar vulnerabilidades de nível `high` ou `critical`, o pipeline deve falhar e bloquear o deploy.
+- Ao criar ou modificar qualquer arquivo em `.github/workflows/`, verifique se o step de audit está presente. Se não estiver, adicione-o.
+- Vulnerabilidades de nível `moderate` ou inferior podem ser aceitas com justificativa documentada em `docs/ARQUITETURA.md`.
+
 **13. Proteção absoluta do acesso Lovable — regra inviolável**
 
 O Lovable acessa o projeto via GitHub (deploy key ou OAuth). Qualquer ação que quebre essa ligação torna o projeto inabrível na plataforma. As regras abaixo são **absolutas** — não há exceção, nem com pedido explícito do usuário:
