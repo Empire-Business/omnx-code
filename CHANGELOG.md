@@ -4,6 +4,24 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## Não lançado (edição local, ainda sem tag/versão)
+
+### Arquitetura de usuários e multi-tenant obrigatória
+
+Ajuste pedido pelo usuário: todo sistema criado pela skill deve ter arquitetura de usuários bem definida e ser multi-tenant por padrão, com gate fail-closed bloqueando commit/deploy sem documentação de acesso.
+
+### Adicionado
+- **Regra 21 (`SKILL.md`)**: todo projeto novo nasce multi-tenant (tenants + membership + papéis antes de qualquer tabela de negócio, `tenant_id` em toda tabela de negócio, RLS sempre filtrando por tenant). Exceção só com confirmação explícita do usuário, documentada em `docs/ARQUITETURA.md`.
+- **Gate 1.6b (fail-closed, `SKILL.md`)**: nenhum código de autenticação/autorização é commitado, e nenhum deploy acontece, sem `docs/NIVEIS-DE-ACESSO.md` existir com a matriz completa papel × recurso × ação (sem células em branco). Espelha o gate de segurança (1.6) — os dois são independentes e ambos precisam passar.
+- **`docs/NIVEIS-DE-ACESSO.md`** vira documento obrigatório do índice de documentos, com seção própria no template `modelo-claude.md` explicando o que ele precisa conter.
+- **Templates sincronizados**: `references/modelo-claude.md` (seção "Arquitetura de Usuários & Multi-Tenant", seção "Níveis de Acesso", trilha obrigatória FASE 0/2/3, checklist de entrega) e `references/modelo-agents.md` (regra dedicada + lista de recusa) ganham as mesmas regras.
+- **Gate 1.6c — UML obrigatório antes de codar (fail-closed, `SKILL.md`)**: nenhum código de domínio é escrito em projeto novo sem `docs/UML.md` (diagrama de classes/entidades + sequência dos fluxos críticos, em Mermaid) existir e ser aprovado pelo usuário. Em projeto existente sem UML, nenhum commit novo acontece antes de gerar o diagrama por engenharia reversa do código real e validar com o usuário. Atualização do UML entra no mesmo commit que qualquer mudança de entidade/fluxo — nunca depois. Reflete em `docs/UML.md` no índice de documentos, checklist de entrega e `references/modelo-agents.md`.
+
+### Nota
+Esta entrada ainda não foi commitada nem tagueada no repositório `Empire-Business/omnx-code` — é uma edição local. O mecanismo de self-update desta skill usa tag/SHA pinado (`v1.10.0`), então essas mudanças só se propagam para outras máquinas/projetos depois de commitadas e publicadas com uma nova tag verificada.
+
+---
+
 ## v1.10 — 2026-07-10
 
 ### Gate real e update verificado (red-team da integração com a security-auditor)

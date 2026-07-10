@@ -25,6 +25,21 @@
 - **Gate de deploy (fail-closed):** antes de qualquer deploy em produção, merge em `main` ou `git push` que dispare a Vercel, execute a skill `/security-auditor` e só prossiga se `security-report/verdict.json` existir com `"gate": "PASS"`. P0/P1 em aberto (ou `❔ não verificado`/`⚠️ ação manual` em P0/P1) BLOQUEIAM — recuse o push/merge até correção + re-teste. Sem `verdict.json` da sessão atual, não publique.
 - A correção automática da auditor é opt-in: nunca aplique auto-fix sem confirmação explícita do usuário.
 
+## Regra de UML obrigatório (inegociável)
+
+- Nenhum código de domínio (models, entidades, schema) é escrito em projeto novo antes de `docs/UML.md` existir e ser aprovado (diagrama de classes/entidades em Mermaid + sequência dos fluxos críticos)
+- Em projeto existente sem `docs/UML.md`: nenhum commit novo acontece antes de gerar o UML por engenharia reversa do código/schema real e validar com o usuário
+- `docs/UML.md` é atualizado no mesmo commit que qualquer mudança de entidade, relacionamento ou fluxo crítico — nunca depois
+
+## Regra de arquitetura de usuários e multi-tenant (inegociável)
+
+- Todo sistema é multi-tenant por padrão: tabela de tenants + membership + papéis (roles) entram na primeira migration, antes de qualquer tabela de negócio
+- Toda tabela de negócio nova carrega `tenant_id` (FK not-null) desde o dia 1
+- Toda política RLS de tabela com `tenant_id` filtra por tenant, não só por `auth.uid()` — evita vazamento entre contas quando o mesmo usuário pertence a mais de um tenant
+- Exceção só é válida se o usuário confirmar explicitamente projeto single-tenant, documentado em `docs/ARQUITETURA.md`
+- **Gate obrigatório (fail-closed):** nenhum código de autenticação/autorização é commitado, e nenhum deploy acontece, sem `docs/NIVEIS-DE-ACESSO.md` existir com a matriz completa papel × recurso × ação (sem células em branco). Um papel/permissão no código sem entrada no documento é bug, não pendência
+- `docs/NIVEIS-DE-ACESSO.md` é atualizado no mesmo commit que cria/altera um papel ou permissão — nunca depois
+
 ## Regra de banco de dados (inegociável)
 
 - TODA alteração no banco Supabase é feita via migration versionada em `supabase/migrations/`
@@ -68,7 +83,7 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**), **recuse, explique o motivo e sugira a alternativa segura**.
 
 ---
 

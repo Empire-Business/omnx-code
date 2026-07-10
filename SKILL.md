@@ -413,8 +413,8 @@ Quando `setup_complete: true` e o usuário pede qualquer coisa (codar, refatorar
 **1. Sempre criar tasks primeiro**
 Antes de qualquer ação, crie tasks com `TaskCreate` descrevendo cada etapa. Nunca execute sem tasks visíveis.
 
-**1.5. Sugerir, não forçar — EXCETO segurança**
-Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceção inegociável:** o gate de segurança antes de deploy (regra 1.6) é **fail-closed** — ali você NÃO "informa e deixa decidir"; você **recusa** a publicação até o gate passar.
+**1.5. Sugerir, não forçar — EXCETO segurança, níveis de acesso e UML**
+Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceção inegociável:** o gate de segurança antes de deploy (regra 1.6), o gate de documentação de níveis de acesso (regra 1.6b) e o gate de UML (regra 1.6c) são **fail-closed** — ali você NÃO "informa e deixa decidir"; você **recusa** o commit/publicação até o gate passar.
 
 **1.6. Gate de segurança antes de deploy (fail-closed, obrigatório)**
 Antes de qualquer ação que publique em produção — `git push` para `main`/`master` ou branch ligada à Vercel, `git merge` em `main`, abrir PR de release, `supabase functions deploy`, `vercel --prod` — você DEVE:
@@ -423,6 +423,35 @@ Antes de qualquer ação que publique em produção — `git push` para `main`/`
 3. Se `gate != "PASS"`, ou o arquivo não existir/estiver velho (não é desta sessão), ou houver P0/P1 em aberto (inclui `❔ não verificado` e `⚠️ ação manual` em P0/P1): **RECUSE** a publicação. Mostre os achados, exija correção + re-execução da auditor (re-teste) e só então prossiga. Não "informe e deixe o usuário decidir".
 4. Registre no `.empire/state.json`: `last_audit_gate` (`PASS`/`FAIL`), `last_audit_at` (timestamp do `verdict.json`), `last_audit_commit` (`target_commit`).
 > O checklist no `CLAUDE.md`/`AGENTS.md` não substitui este passo: o item só pode ser marcado com o caminho do `verdict.json` da sessão e `gate: PASS`. Sem artefato, o checkbox é inválido (anti-teatro).
+
+**1.6b. Gate de documentação de níveis de acesso (fail-closed, obrigatório)**
+Nenhum sistema criado por esta skill pode ter código de autenticação/autorização **commitado**, nem ir para produção, sem que `docs/NIVEIS-DE-ACESSO.md` exista e esteja completo. Isso vale mesmo em projeto de um único tenant — se existe qualquer distinção de permissão entre usuários (ex: admin vs usuário comum), a documentação é obrigatória.
+
+Antes de qualquer `git commit` que crie ou altere: tabelas de papéis/membership, políticas RLS, middleware/guards de auth, rotas ou componentes protegidos por permissão — e antes de qualquer ação do gate 1.6 — você DEVE:
+1. Verificar que `docs/NIVEIS-DE-ACESSO.md` existe.
+2. Conferir que ele cobre **todos** os papéis atualmente definidos no schema/código (todo `role`/`enum` de permissão precisa ter uma linha na matriz do documento) e que a matriz permissão × recurso × ação está preenchida (não pode haver célula em branco ou "TBD").
+3. Se o arquivo não existir, estiver incompleto, ou houver um papel/permissão no código sem entrada correspondente no documento: **RECUSE** o commit. Crie ou atualize o documento primeiro (junto com o usuário, se as regras de negócio não estiverem claras), e só então prossiga. Não "informe e deixe o usuário decidir".
+4. Sempre que um papel novo for criado ou a matriz de permissões mudar, atualize `docs/NIVEIS-DE-ACESSO.md` no **mesmo commit** que muda o código — nunca depois.
+> Este gate é independente do 1.6: um deploy pode ter `security-report` com `gate: PASS` e ainda assim estar bloqueado por falta de documentação de acesso, e vice-versa. Os dois precisam passar.
+
+**1.6c. Gate de UML antes de codar (fail-closed, obrigatório)**
+Código nasce de um modelo, não o contrário. Escrever classes, tabelas e fluxos direto no código sem modelar antes é como construir uma casa sem planta — funciona até o dia em que duas partes do sistema foram pensadas de formas incompatíveis e alguém só descobre isso depois de já ter código dos dois lados. O UML força essa conversa **antes** de custar caro.
+
+**Projeto novo:** nenhuma linha de código de domínio (models, entidades, schema de banco, fluxos entre serviços) é escrita antes de existir um UML mínimo e aprovado pelo usuário, cobrindo:
+1. **Diagrama de classes/entidades** — as entidades principais do domínio, seus atributos essenciais e os relacionamentos entre elas (inclui a arquitetura de usuários/multi-tenant da regra 21: tenant, membership, papéis)
+2. **Diagrama(s) de sequência** — para os 2-3 fluxos mais críticos do sistema (ex: cadastro/login, a ação principal que o produto existe para fazer, checkout/pagamento se houver)
+3. Opcional, mas recomendado quando o domínio tem estados relevantes (pedido, assinatura, workflow de aprovação): **diagrama de estados**
+
+O UML vive em `docs/UML.md`, em **Mermaid** (`classDiagram`, `sequenceDiagram`, `stateDiagram-v2`) — é texto versionável, renderiza direto no GitHub e em qualquer visualizador Markdown moderno, e a IA consegue gerar e atualizar sem depender de ferramenta externa. Ele é criado na FASE 0, junto com `ARQUITETURA.md` — na prática, os dois se alimentam: o UML modela o que o `ARQUITETURA.md` descreve em prosa.
+
+**Projeto existente sem UML:** se a IA for pedida para trabalhar em um projeto que já tem código mas não tem `docs/UML.md`, o UML **precisa ser criado antes de qualquer novo commit** (não importa se a mudança pedida é pequena — a falta de UML é dívida técnica que bloqueia, igual dívida de segurança). Nesse caso:
+1. Gere o UML **a partir do código e schema existentes** (engenharia reversa) — leia as entidades reais (tabelas, models, tipos) e os fluxos reais (rotas, funções principais) para montar o diagrama, não invente.
+2. Apresente ao usuário para validação — código legado às vezes tem entidades que já não fazem sentido; é a hora de o usuário confirmar ou corrigir o modelo.
+3. Só depois do UML existir e refletir o sistema real, prossiga com a mudança pedida.
+
+**Manutenção:** toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` é atualizado no **mesmo commit** que muda o código — nunca depois. Se a IA encontrar uma mudança de schema/domínio sendo commitada sem o UML correspondente atualizado: **RECUSE** o commit, atualize o diagrama primeiro, e só então prossiga.
+
+> Este gate é independente dos gates 1.6 e 1.6b: um projeto pode ter segurança e níveis de acesso em dia e ainda estar bloqueado por UML ausente/desatualizado, e vice-versa. Os três precisam passar.
 
 **2. Ler CLAUDE.md antes de começar**
 O `CLAUDE.md` é o ponto de entrada de todo projeto. Leia-o antes de qualquer decisão técnica. Não assuma nada que não esteja documentado lá.
@@ -608,9 +637,29 @@ A `anon key` do Supabase é pública — vai no bundle do cliente. Sem Row Level
   ALTER TABLE <tabela> ENABLE ROW LEVEL SECURITY;
   ```
 - **Nunca faça `supabase.from('<tabela>')` no cliente sem confirmar que existe política RLS** cobrindo a operação (SELECT, INSERT, UPDATE, DELETE).
+- **Em tabelas com `tenant_id` (ver regra 21), a política RLS precisa filtrar por tenant, não só por `auth.uid()`.** Uma política que só verifica "o dado pertence a este usuário" sem checar o tenant permite vazamento entre contas/empresas diferentes quando o mesmo usuário pertence a mais de um tenant.
 - **Service role key é segredo absoluto** — nunca referenciada no código cliente, nunca em variável `VITE_`. Só usada em Edge Functions ou server-side.
 - **Ao criar qualquer tabela nova**, verifique e documente a política RLS em `docs/ARQUITETURA.md` antes de fazer commit.
 - Se encontrar tabela sem RLS em projeto existente, interrompa o trabalho e alerte o usuário antes de continuar.
+
+**21. Arquitetura de usuários e multi-tenant obrigatória em todo projeto novo (regra absoluta)**
+
+Todo sistema criado por esta skill é, por padrão, **multi-tenant** — mesmo que o usuário peça "algo simples" ou não mencione multi-tenant explicitamente. A razão: quase todo projeto que começa "single-tenant" (um cliente só) precisa depois suportar múltiplas empresas/times/contas, e migrar um schema single-tenant para multi-tenant depois de haver dados em produção é caro, arriscado e cheio de RLS quebrada. É muito mais barato nascer multi-tenant e, se o produto realmente só tiver um tenant para sempre, isso é apenas "multi-tenant com um tenant só" — não custa nada extra em runtime.
+
+**Exceção:** o usuário pode pedir explicitamente para não usar esse modelo (ex: ferramenta interna de uso único, protótipo descartável). Nesse caso, documente a decisão e o porquê em `docs/ARQUITETURA.md` antes de codar, e confirme com o usuário que ele entende o custo de migrar depois.
+
+Antes de escrever qualquer schema ou código de autenticação, a IA DEVE definir e documentar em `docs/ARQUITETURA.md` (seção obrigatória "Arquitetura de Usuários & Multi-Tenant"):
+
+- **Modelo de tenant:** a entidade que isola os dados (`tenants`, `organizations`, `accounts`, etc. — nome adaptado ao domínio do produto)
+- **Modelo de membership:** tabela de junção entre `auth.users` e o tenant (ex: `tenant_members`), permitindo um usuário pertencer a múltiplos tenants
+- **Modelo de papéis (roles):** papéis bem definidos por tenant (ex: `owner`, `admin`, `member`), com a matriz de permissões de cada papel documentada — nunca "todo usuário autenticado pode tudo"
+- **Isolamento de dados:** toda tabela de negócio (não-catálogo, não-config global) carrega uma coluna `tenant_id` (FK not-null para a tabela de tenants) desde a primeira migration
+- **RLS por tenant:** toda política RLS de tabela com `tenant_id` filtra por `tenant_id = <tenant do usuário autenticado>` (via função `current_tenant_id()`/claim no JWT ou subquery em `tenant_members`) **e** por papel quando a operação exigir (ex: só `owner`/`admin` pode `DELETE`)
+- **Troca de tenant:** se o produto permite um usuário pertencer a mais de um tenant, defina como o tenant ativo é selecionado/trocado na sessão (claim, cookie, parâmetro de rota) — nunca infira o tenant a partir de dado enviado pelo cliente sem validar contra o `tenant_members`
+
+Ao criar a primeira migration do projeto, a tabela de tenants, a de membership e os papéis vêm **antes** de qualquer tabela de negócio — as demais tabelas já nascem com `tenant_id` e RLS correta, nunca são "corrigidas depois". Se a IA encontrar em um projeto existente uma tabela de negócio sem `tenant_id` (e o projeto for multi-tenant), interrompa e alerte o usuário antes de continuar — é uma falha de isolamento de dados, não um detalhe.
+
+Essa arquitetura de usuários só é válida se estiver documentada de forma que qualquer pessoa (ou IA) consiga responder "quem pode fazer o quê" sem ler código. Por isso, junto com o schema, a IA cria `docs/NIVEIS-DE-ACESSO.md` com a matriz completa de papéis × permissões (ver regra 1.6b) — **nenhum código de auth/permissão é commitado sem esse documento existir e estar completo.**
 
 **20. Toda alteração de banco via migration — SQL direto é proibido (regra absoluta)**
 
