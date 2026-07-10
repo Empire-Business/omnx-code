@@ -22,6 +22,8 @@
 - Sempre ative Row Level Security (RLS) em todas as tabelas do Supabase
 - Sempre use tokens temporários e escopados — nunca chaves de admin para operações de usuário
 - Ao detectar qualquer violação dessas regras no código existente, reporte imediatamente antes de continuar
+- **Gate de deploy (fail-closed):** antes de qualquer deploy em produção, merge em `main` ou `git push` que dispare a Vercel, execute a skill `/security-auditor` e só prossiga se `security-report/verdict.json` existir com `"gate": "PASS"`. P0/P1 em aberto (ou `❔ não verificado`/`⚠️ ação manual` em P0/P1) BLOQUEIAM — recuse o push/merge até correção + re-teste. Sem `verdict.json` da sessão atual, não publique.
+- A correção automática da auditor é opt-in: nunca aplique auto-fix sem confirmação explícita do usuário.
 
 ## Regra de banco de dados (inegociável)
 
@@ -66,10 +68,10 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**), **recuse, explique o motivo e sugira a alternativa segura**.
 
 ---
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.8
+> Versão do template: omnx-code v1.10

@@ -1,6 +1,6 @@
 # OMNX Code
 
-**Skill gratuita para Claude Code.** Instala método, segurança e documentação automática em qualquer app React + TypeScript + Supabase + Vercel — em um comando.
+**Skill gratuita para Claude Code.** Instala método, segurança e documentação viva em qualquer app React + TypeScript + Supabase + Vercel — em um pedido (cada mudança de risco pede confirmação).
 
 ---
 
@@ -45,9 +45,10 @@ Atualização verificada (nunca `git pull` cego):
 
 ```bash
 cd ~/.claude/skills/omnx-code
-git fetch origin && git log --oneline HEAD..origin/main   # ver o que mudou ANTES de aplicar
-# aplicar por tag/commit verificado (confirme antes de alterar a skill):
-git checkout <TAG_OU_SHA> && git verify-tag <TAG> 2>/dev/null || echo "tag sem assinatura — valide pelo diff"
+git fetch origin --tags && git log --oneline HEAD..origin/main   # ver o que mudou ANTES de aplicar
+# verificar ANTES de trocar o código (confirme antes de alterar a skill):
+git verify-tag <TAG> && git checkout <TAG>
+# sem tag assinada: pare e peça um SHA explícito ao usuário (git checkout <SHA_AUDITADO>) — nunca 'main'
 ```
 
 ## Skills relacionadas
@@ -56,7 +57,7 @@ git checkout <TAG_OU_SHA> && git verify-tag <TAG> 2>/dev/null || echo "tag sem a
 
 ## Versão
 
-`v1.9` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.10` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 

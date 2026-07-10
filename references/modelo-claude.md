@@ -8,14 +8,17 @@
 
 ## 🔐 Segurança — Skill Obrigatória
 
-**A IA DEVE executar a skill `/security-auditor` nos seguintes momentos, sem exceção:**
+**A IA DEVE executar a skill `/security-auditor` nos seguintes momentos, sem exceção, e só liberar com `security-report/verdict.json` em `"gate": "PASS"`:**
 
-| Momento                              | Obrigatório? |
-|--------------------------------------|--------------|
-| Início do projeto (antes de codar)   | ✅ Sim        |
-| Antes de qualquer deploy em produção | ✅ Sim        |
-| Após adicionar qualquer integração   | ✅ Sim        |
-| Quando solicitado pelo usuário       | ✅ Sim        |
+| Momento                                          | Obrigatório? |
+|--------------------------------------------------|--------------|
+| Início do projeto (antes de codar)               | ✅ Sim        |
+| Antes de qualquer deploy em produção             | ✅ Sim        |
+| Antes de merge em `main` ou PR de release        | ✅ Sim        |
+| Após adicionar qualquer integração               | ✅ Sim        |
+| Após rotacionar/trocar secrets ou env vars       | ✅ Sim        |
+| Após migrations/RLS ou troca de projeto Supabase | ✅ Sim        |
+| Quando solicitado pelo usuário                   | ✅ Sim        |
 
 > Toda diretriz, checklist e política de segurança deste projeto vive dentro da skill `/security-auditor`. A IA não deve tentar replicar ou substituir essas instruções aqui.
 
@@ -314,7 +317,7 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Segurança**
 - [ ] Skill `/security-auditor` foi executada nesta entrega?
-- [ ] **Nenhum achado P0 (crítico) ou P1 (alto) ficou em aberto?** P0/P1 bloqueiam o deploy até correção + re-teste da vulnerabilidade. A auditoria é report-only; auto-fix é opt-in e só roda com confirmação explícita do usuário.
+- [ ] **`security-report/verdict.json` desta sessão existe com `"gate": "PASS"`?** Sem o artefato, ou com `gate != PASS`, o deploy está BLOQUEADO — P0/P1 em aberto (inclui `❔ não verificado`/`⚠️ ação manual`) derrubam o gate. Marcar este item sem o `verdict.json` é inválido (anti-teatro). A auditoria é report-only; auto-fix é opt-in.
 - [ ] Headers de segurança estão configurados no `vercel.json`?
 - [ ] Rate limiting está ativo nas rotas novas?
 

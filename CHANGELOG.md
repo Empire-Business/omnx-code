@@ -4,6 +4,32 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.10 — 2026-07-10
+
+### Gate real e update verificado (red-team da integração com a security-auditor)
+
+Esta versão nasce do red-team da **costura** com a `/security-auditor`: o "gate" era checkbox e o "update assinado" não tinha no que pinnar. Pódio em `security-auditor/references/hall-of-fame.md` (Rodada 2).
+
+### Adicionado
+- **Gate de deploy fail-closed (regra 1.6 no Modo de Trabalho Normal)**: antes de `git push`/`git merge` em `main`, PR de release, `supabase functions deploy` ou `vercel --prod`, a skill lê `security-report/verdict.json` e **recusa** a publicação se `gate != PASS` (ou sem artefato da sessão). Inverte o "sugerir, não forçar" para segurança. Registra `last_audit_gate/at/commit` no state.
+- **Passo 0 anti-downgrade no setup**: varre `~/.claude`, `~/.codex`, `~/.agents` (e symlinks quebrados), detecta cópias `< v1.10` ou em `main` e **trava** até o usuário decidir (remover ou linkar para a canônica). Fecha a sombra `~/.agents` com RCE cego.
+- **Frontmatter estruturado**: `version`, `min_security_auditor: "1.10"`, `contract_version: 1`.
+- **Roteamento de triggers** declarado na descrição: em pedido puro de auditoria, delega à `/security-auditor`; em "atualiza a skill", a omnx-code é dona e atualiza as duas.
+
+### Modificado
+- **Update verificado de verdade** (Task 3 e Auto-atualização): `git verify-tag <TAG> && git checkout <TAG>` (verificar antes); removido `|| echo`; `git fetch --tags`; `curl -fsSL --max-time --proto '=https' --tlsv1.2` (falha fechado em erro de rede); comparação semver com `sort -V` (não lexicográfica); sem `git pull --ff-only` automático; sem tag, pede SHA explícito (nunca `main`). State ganha `security_auditor_ref`.
+- **Self-update por último + reload**: a omnx-code atualiza a `security-auditor` primeiro e a si mesma **por último**; após self-update, para e instrui reinvocação (reload) em vez de continuar com regra velha.
+- **`AGENTS.md` espelha o gate** (bypass de agentes externos fechado): regra de gate fail-closed + "deploy sem auditoria" na lista de recusa; rodapé `v1.8 → v1.10`.
+- **`references/modelo-claude.md` e `modelo-claude.md`**: checklist de Segurança agora exige o `verdict.json` da sessão com `gate: PASS` (anti checkbox-theater); tabela de momentos ampliada (merge em `main`, rotação de secrets/env, migrations/RLS, troca de Supabase).
+- **Copy honesta**: "sempre atualizado" → "atualização verificada sob demanda"; "em um comando" → "em um pedido (confirmações por risco)" (`README.md`, `landing/index.html`).
+- Versão da skill no frontmatter e CHANGELOG: `1.9 → 1.10`.
+
+### Segurança
+- Gate agora tem atuador dentro do que a skill controla (recusa push/merge); o atuador no GitHub/Vercel (status check/branch protection) fica como guia por projeto.
+- Update sem tag assinada não degrada mais para `main`: falha fechado pedindo SHA ao usuário.
+
+---
+
 ## v1.9 — 2026-07-10
 
 ### Modificado
