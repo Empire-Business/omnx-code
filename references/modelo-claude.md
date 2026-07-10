@@ -314,6 +314,7 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Segurança**
 - [ ] Skill `/security-auditor` foi executada nesta entrega?
+- [ ] **Nenhum achado P0 (crítico) ou P1 (alto) ficou em aberto?** P0/P1 bloqueiam o deploy até correção + re-teste da vulnerabilidade. A auditoria é report-only; auto-fix é opt-in e só roda com confirmação explícita do usuário.
 - [ ] Headers de segurança estão configurados no `vercel.json`?
 - [ ] Rate limiting está ativo nas rotas novas?
 

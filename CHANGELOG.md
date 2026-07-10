@@ -4,6 +4,21 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.9 — 2026-07-10
+
+### Modificado
+- **Acoplamento com a `/security-auditor` endurecido**: mínimo requerido `v1.5` → `v1.9`; a auditoria agora é tratada como **gate de deploy** (achados P0/P1 bloqueiam até correção + re-teste) e **report-only por padrão** — auto-fix é opt-in e nunca roda sem confirmação explícita do usuário
+- **Atualização segura (inegociável)**: eliminado `git pull` cego e qualquer `rm -rf && git clone` no setup e na auto-atualização — tanto da `omnx-code` quanto da `security-auditor`. Novo fluxo: `git fetch` → inspecionar o diff real do `SKILL.md` → aplicar **por tag ou commit verificado** (`git verify-tag` quando houver assinatura) → pedir confirmação antes de alterar a skill. Em conflito, `git stash && git pull --ff-only` (nunca apagar)
+- **Task 3 (Setup)** e **Auto-atualização** reescritas para o fluxo verificado; comparação por `curl` do `CHANGELOG.md` remoto mantida apenas como heurística (não é prova de versão)
+- `references/modelo-claude.md` e `modelo-claude.md`: checklist de Segurança agora exige que nenhum P0/P1 fique em aberto antes do deploy
+- `README.md` e `landing/index.html`: copy atualizada de "correção automática" para "correção assistida" e de "git pull" para "atualização verificada"
+- Versão da skill no frontmatter do `SKILL.md`: `1.8` → `1.9`; `omnx_version` no state document: `1.8` → `1.9`
+
+### Segurança
+- Fecha o vetor de RCE em massa de `git pull` cego na branch `main`: conteúdo puxado passa a ser tratado como não confiável e aplicado só por referência imutável (tag/SHA), alinhado ao Guardrails v2 da `security-auditor` v1.9
+
+---
+
 ## v1.8 — 2026-07-10
 
 ### Adicionado

@@ -7,7 +7,7 @@
 ## O que faz
 
 - Cria e mantém o `CLAUDE.md` do seu projeto (guia vivo de arquitetura e decisões)
-- Instala e atualiza automaticamente a skill `/security-auditor` (auditoria RLS, auth, env vars)
+- Instala e mantém a skill `/security-auditor` atualizada de forma verificada (auditoria RLS, auth, env vars); a correção é assistida e só roda com confirmação explícita
 - Executa todo trabalho com tasks visíveis — você sempre sabe o que está sendo feito
 - Funciona em projetos novos e existentes (merge inteligente no CLAUDE.md)
 
@@ -41,17 +41,22 @@ React · TypeScript · Supabase · Vercel
 
 ## Atualizar
 
+Atualização verificada (nunca `git pull` cego):
+
 ```bash
-cd ~/.claude/skills/omnx-code && git pull
+cd ~/.claude/skills/omnx-code
+git fetch origin && git log --oneline HEAD..origin/main   # ver o que mudou ANTES de aplicar
+# aplicar por tag/commit verificado (confirme antes de alterar a skill):
+git checkout <TAG_OU_SHA> && git verify-tag <TAG> 2>/dev/null || echo "tag sem assinatura — valide pelo diff"
 ```
 
 ## Skills relacionadas
 
-- [security-auditor](https://github.com/Empire-Business/security-auditor) — auditoria e correção automática de segurança (instalada automaticamente pelo omnx-code)
+- [security-auditor](https://github.com/Empire-Business/security-auditor) — auditoria de segurança com correção assistida (instalada e mantida pelo omnx-code; gate de deploy em P0/P1)
 
 ## Versão
 
-`v1.8` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.9` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 
