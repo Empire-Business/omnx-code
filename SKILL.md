@@ -178,16 +178,32 @@ A skill `/security-auditor` tem seu próprio repositório público:
 
 **Passo 0 — Detectar instalações irmãs e divergência (anti-downgrade):**
 
-Antes de instalar/atualizar, varra os locais conhecidos e avise sobre cópias antigas ou quebradas (nunca remova automaticamente):
+Antes de instalar/atualizar, varra os locais conhecidos **das duas skills** e avise sobre cópias antigas, quebradas ou apontando para o lugar errado (nunca remova automaticamente):
 
 ```bash
-for d in ~/.claude/skills/security-auditor ~/.codex/skills/security-auditor ~/.agents/skills/security-auditor; do
-  if [ -L "$d" ]; then echo "SYMLINK $d -> $(readlink "$d") $( [ -e "$d" ] || echo '(QUEBRADO)' )"; fi
-  if [ -d "$d" ]; then echo "DIR  $d : $(cat "$d/CHANGELOG.md" 2>/dev/null | grep -m1 '^## v' || echo 'sem CHANGELOG')"; fi
+for skill in omnx-code security-auditor; do
+  for rt in claude codex agents; do
+    d="$HOME/.$rt/skills/$skill"
+    [ -L "$d" ] && echo "SYMLINK $d -> $(readlink "$d") $( [ -e "$d" ] || echo '(QUEBRADO)' )"
+    [ -d "$d" ] && [ ! -L "$d" ] && echo "DIR  $d : $(cat "$d/CHANGELOG.md" 2>/dev/null | grep -m1 '^## v' || echo 'sem CHANGELOG')"
+  done
 done
 ```
 
-Se alguma instalação for `< v1.10` (mínimo), estiver em `main`, ou for symlink quebrado, **avise o usuário e trave o setup** até ele decidir (remover a cópia antiga, ou transformá-la em symlink da canônica em `~/.claude/skills/security-auditor`). A v1.10 endurecida é contornada se qualquer runtime ler uma cópia antiga — a skill ativa precisa saber das irmãs.
+A **canônica** é sempre `$HOME/.claude/skills/<skill>` (cópia real, repo git). Os atalhos em `~/.codex/skills` e `~/.agents/skills` são **opcionais** e, quando existem, devem ser **symlinks para a canônica** — nunca clones separados, nunca caminhos fixos de uma máquina.
+
+Como decidir o que fazer com cada entrada encontrada:
+- **DIR real em `~/.claude/skills/<skill>`** → é a canônica. Se `< v1.10` ou em `main`, trave e peça ao usuário para atualizar pelo fluxo verificado.
+- **Symlink que resolve para `$HOME/.claude/skills/<skill>`** → OK, nada a fazer.
+- **Symlink QUEBRADO** (alvo não existe) ou **apontando para caminho estrangeiro** (qualquer coisa que não seja `$HOME/.claude/skills/<skill>` — ex.: `~/Desenvolvimento/...`, `/Users/<outra-pessoa>/...`) → **corrigir** recriando o atalho para a canônica (com confirmação do usuário):
+  ```bash
+  # Sempre com $HOME (resolve na máquina de quem roda) — NUNCA caminho fixo (/Users/alguem/...)
+  rm "$HOME/.<rt>/skills/<skill>"   # remove só o atalho errado (o alvo fica intacto)
+  ln -s "$HOME/.claude/skills/<skill>" "$HOME/.<rt>/skills/<skill>"
+  ```
+- **DIR real em `~/.codex` ou `~/.agents` (clone separado)** → sombra perigosa (pode estar velha/vulnerável). Avisar e travar até o usuário decidir: remover a cópia e (opcional) transformar em symlink da canônica. Nunca apague automaticamente.
+
+A v1.10 endurecida é contornada se qualquer runtime ler uma cópia antiga — por isso a skill ativa precisa conhecer as irmãs. Como a skill roda em computadores diferentes, **toda referência a caminho usa `$HOME`** (nunca `/Users/<nome>/...`), para que o mesmo fluxo funcione em qualquer máquina.
 
 **Passo 1 — Verificar se está instalada e a versão local (real, em disco):**
 
