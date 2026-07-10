@@ -210,8 +210,8 @@ Use só para decidir SE vale atualizar. Em falha de rede (HTTP != 200/timeout), 
 
 | Situação | Ação |
 |----------|------|
-| Não instalada | Validar a tag/SHA ANTES de clonar: `git clone https://github.com/Empire-Business/security-auditor ~/.claude/skills/security-auditor && cd ~/.claude/skills/security-auditor && git fetch --tags`. Se houver tag assinada >= mínimo: `git verify-tag <TAG> && git checkout <TAG>`. Se NÃO houver tag assinada: **PARE** e peça ao usuário um SHA explícito (`git checkout <SHA_AUDITADO>`); nunca derive "a mais recente", nunca fique em `main`. Só marque `security_auditor_installed=true` depois do checkout bem-sucedido |
-| Versão instalada < remota | `cd ~/.claude/skills/security-auditor && git fetch origin --tags && git log --oneline HEAD..origin/main` (diff ANTES) → mostrar o diff real do `SKILL.md` → pedir "sim" → **verificar antes**: `git verify-tag <TAG> && git checkout <TAG>` (ou, sem tag, `git checkout <SHA_AUDITADO>` fornecido pelo usuário) |
+| Não instalada | Validar ANTES de clonar: `git clone https://github.com/Empire-Business/security-auditor ~/.claude/skills/security-auditor && cd ~/.claude/skills/security-auditor && git fetch --tags`. Aplicar o bloco PINNED: `PINNED_TAG=v1.10.0; PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && echo "tag anotada validada por SHA" && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; se um dia houver GPG, o verify-tag passa primeiro). NUNCA derive "a mais recente", nunca fique em `main`. Só marque `security_auditor_installed=true` depois do checkout bem-sucedido |
+| Versão instalada < remota | `cd ~/.claude/skills/security-auditor && git fetch origin --tags && git log --oneline HEAD..origin/main` (diff ANTES) → mostrar o diff real do `SKILL.md` → pedir "sim" → aplicar o bloco PINNED: `PINNED_TAG=v1.10.0; PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; nunca `main`) |
 | Versão instalada < v1.10 (mínimo) e não há tag/SHA >= v1.10 | Bloquear o setup e avisar: versão antiga/incompatível; NÃO usar `git pull main` para "forçar". Pedir ao usuário uma tag/SHA >= v1.10 |
 | Versão instalada >= remota e >= v1.10 | Nada a fazer — reportar versão encontrada |
 
@@ -740,9 +740,12 @@ ANTES=$(git rev-parse HEAD)
 git fetch origin --tags
 git log --oneline HEAD..origin/main            # diff ANTES
 git --no-pager diff HEAD..origin/main -- SKILL.md
-# pedir "sim", depois verificar ANTES de trocar:
-#   com tag assinada: git verify-tag <TAG> && git checkout <TAG>
-#   sem tag: PARE e peça SHA explícito ao usuário → git checkout <SHA_AUDITADO>
+# pedir "sim", depois aplicar o bloco PINNED (tag anotada validada por SHA, nunca 'main', nunca 'tag mais alta'):
+PINNED_TAG=v1.10.0
+PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb
+if git verify-tag "$PINNED_TAG" 2>/dev/null; then git checkout "$PINNED_TAG";
+elif [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ]; then echo "tag anotada validada por SHA pinado" && git checkout "$PINNED_TAG";
+else echo "FALHA: tag nao aponta para o SHA pinado; abortando" && exit 1; fi
 ```
 
 Se o diretório não for um repo git (instalação corrompida), NÃO use `rm -rf && git clone`. Avise o usuário e reinstale de forma controlada pelo fluxo da Fase de Setup > Task 3 (clone + checkout de tag/SHA), preservando customizações. Em conflito ou falha: **não** avance refs (nem `--ff-only`), mostre `git status --short` e deixe o usuário resolver.
@@ -775,8 +778,11 @@ git --no-pager diff HEAD..origin/main -- SKILL.md
 
 Mostre o diff ao usuário e peça confirmação. Aplique **verificando antes**, por referência imutável (nunca `git pull` em `main`):
 ```bash
-# com tag assinada: git verify-tag <TAG> && git checkout <TAG>
-# sem tag: PARE e peça SHA explícito ao usuário → git checkout <SHA_AUDITADO>
+PINNED_TAG=v1.10.0
+PINNED_SHA=20289c2d3c7de95d76fdd9539e3d9f9f2b8ba1ce
+if git verify-tag "$PINNED_TAG" 2>/dev/null; then git checkout "$PINNED_TAG";
+elif [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ]; then echo "tag anotada validada por SHA pinado" && git checkout "$PINNED_TAG";
+else echo "FALHA: tag nao aponta para o SHA pinado; abortando" && exit 1; fi
 DEPOIS=$(git rev-parse HEAD)
 ```
 

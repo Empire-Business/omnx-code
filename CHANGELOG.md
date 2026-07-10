@@ -18,6 +18,7 @@ Esta versão nasce do red-team da **costura** com a `/security-auditor`: o "gate
 
 ### Modificado
 - **Update verificado de verdade** (Task 3 e Auto-atualização): `git verify-tag <TAG> && git checkout <TAG>` (verificar antes); removido `|| echo`; `git fetch --tags`; `curl -fsSL --max-time --proto '=https' --tlsv1.2` (falha fechado em erro de rede); comparação semver com `sort -V` (não lexicográfica); sem `git pull --ff-only` automático; sem tag, pede SHA explícito (nunca `main`). State ganha `security_auditor_ref`.
+- **Release carimbado (`v1.10.0`)**: o setup (Passo 0), a Task 1-2 e o self-update (Task 4) agora pinnam `v1.10.0` + SHA da auditor (`41fd0d6…`) e da própria omnx (`20289c2…`), validando a tag anotada pelo SHA imutável (nunca "tag mais alta", nunca `main`).
 - **Self-update por último + reload**: a omnx-code atualiza a `security-auditor` primeiro e a si mesma **por último**; após self-update, para e instrui reinvocação (reload) em vez de continuar com regra velha.
 - **`AGENTS.md` espelha o gate** (bypass de agentes externos fechado): regra de gate fail-closed + "deploy sem auditoria" na lista de recusa; rodapé `v1.8 → v1.10`.
 - **`references/modelo-claude.md` e `modelo-claude.md`**: checklist de Segurança agora exige o `verdict.json` da sessão com `gate: PASS` (anti checkbox-theater); tabela de momentos ampliada (merge em `main`, rotação de secrets/env, migrations/RLS, troca de Supabase).
