@@ -23,7 +23,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.7** |
+| Versão da skill | **1.8** |
 | Security-auditor mínimo requerido | **v1.5** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -78,7 +78,7 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
 
 ```json
 {
-  "omnx_version": "1.7",
+  "omnx_version": "1.8",
   "setup_complete": false,
   "claude_md_installed": false,
   "claude_md_merged_at": null,
@@ -567,6 +567,46 @@ A `anon key` do Supabase é pública — vai no bundle do cliente. Sem Row Level
 - **Service role key é segredo absoluto** — nunca referenciada no código cliente, nunca em variável `VITE_`. Só usada em Edge Functions ou server-side.
 - **Ao criar qualquer tabela nova**, verifique e documente a política RLS em `docs/ARQUITETURA.md` antes de fazer commit.
 - Se encontrar tabela sem RLS em projeto existente, interrompa o trabalho e alerte o usuário antes de continuar.
+
+**20. Toda alteração de banco via migration — SQL direto é proibido (regra absoluta)**
+
+Nenhuma mudança no banco Supabase pode ser feita por SQL direto. **100% das alterações de banco precisam estar registradas em arquivos de migration versionados em `supabase/migrations/`.** É isso que garante rastreabilidade, reprodutibilidade entre ambientes (local, staging, produção) e a possibilidade de reconstruir o schema do zero com um único comando.
+
+É PROIBIDO usar qualquer um destes caminhos para alterar o banco:
+- SQL Editor do painel Supabase (Dashboard → SQL Editor → Run)
+- `supabase db execute --sql "..."` ou `supabase db query` para mutação
+- `psql -c "..."`, `psql -f` solto, ou qualquer cliente conectando direto para rodar DDL/DML
+- RPCs que executam SQL arbitrário (ex: `db.sql(...)`, `exec_sql`, funções do tipo "run this query")
+- DDL/DML inline vindo do código da aplicação (criar/alterar tabela em runtime)
+
+Isso cobre TUDO: criar/alterar/dropar tabelas e colunas, índices, enums, constraints, extensões, functions, triggers, views, policies de RLS, grants e seeds que mudam estrutura. **Se muda o banco, vira migration.**
+
+Fluxo obrigatório para qualquer mudança:
+```bash
+# 1. Criar o arquivo de migration (nome descritivo)
+supabase migration new <descricao_da_mudanca>
+
+# 2. Editar o arquivo gerado em supabase/migrations/<timestamp>_<descricao>.sql
+#    com o SQL da alteração (idempotente quando possível)
+
+# 3. Aplicar
+supabase db push            # no projeto remoto vinculado
+# ou, em desenvolvimento local:
+supabase db reset           # reaplica tudo do zero no banco local
+
+# 4. Regenerar os tipos TypeScript do projeto
+supabase gen types typescript --project-id <ref> > src/integrations/supabase/types.ts
+# (use --local em vez de --project-id quando estiver rodando contra o banco local)
+```
+
+Regras inegociáveis:
+- Nunca edite uma migration já aplicada em qualquer ambiente. Para corrigir, crie uma **nova** migration.
+- A migration e o código que depende dela entram no **mesmo commit**. Nunca commite código que usa uma coluna/tabela sem a migration correspondente.
+- `supabase/migrations/` nunca entra no `.gitignore` — é a fonte de verdade do schema.
+- Antes de entregar, rode `supabase migration list` e confirme que não há drift entre local e remoto.
+- A única exceção permitida para SQL direto é leitura (`SELECT`) para inspeção/debug — nunca para mutar, e nunca como mecanismo de entrega.
+
+Se encontrar em um projeto existente qualquer objeto criado por SQL direto (sem migration correspondente), interrompa, registre o objeto, e oriente o usuário a capturá-lo em uma migration antes de continuar.
 
 **17. Segredos não podem vazar para o bundle do cliente**
 

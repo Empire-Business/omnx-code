@@ -4,6 +4,25 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.8 — 2026-07-10
+
+### Adicionado
+- **Regra absoluta de migrations (Regra 20 no Modo de Trabalho Normal):** toda alteração de banco Supabase DEVE passar por migration versionada em `supabase/migrations/`. SQL direto é proibido para qualquer mutação — SQL Editor do painel, `supabase db execute`, `psql`, RPCs de SQL arbitrário e DDL/DML inline no código. Cobre tabelas, colunas, índices, enums, constraints, extensões, functions, triggers, views, policies de RLS, grants e seeds estruturais
+- **Fluxo obrigatório documentado:** `supabase migration new` → editar arquivo → `supabase db push` (ou `db reset` local) → `supabase gen types typescript`
+- **Regras inegociáveis:** nunca editar migration já aplicada (criar nova); migration e código dependente entram no mesmo commit; `supabase/migrations/` nunca no `.gitignore`; verificar drift com `supabase migration list`; única exceção é leitura (`SELECT`) para inspeção
+- **Seção "Regra de Migrations — SQL Direto Proibido (INEGOCIÁVEL)"** adicionada ao template `references/modelo-claude.md` (instalado como `CLAUDE.md` nos projetos)
+- **Seção "Regra de banco de dados (inegociável)"** adicionada ao template `references/modelo-agents.md` (lido por Lovable, Cursor, Windsurf, Codex)
+- Itens de migrations adicionados ao checklist de entrega (Banco de Dados) do template do CLAUDE.md
+- Frase de recusa do `AGENTS.md` atualizada para incluir "executar SQL direto no banco em vez de migration"
+
+### Modificado
+- `omnx_version` no state document: `1.7` → `1.8`
+- Versão da skill no frontmatter do `SKILL.md`: `1.7` → `1.8`
+- Versão do template no rodapé do `references/modelo-agents.md`: `v1.7` → `v1.8`
+- FASE 2 (Banco de Dados) do template do CLAUDE.md reforça que toda alteração é via migration
+
+---
+
 ## v1.4 — 2026-03-28
 
 ### Adicionado
@@ -31,7 +50,7 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 ## v1.2 — 2026-03-28
 
 ### Modificado
-- **Renomeado de `empire-vibe-coding` para `omnx-code`**: repo GitHub, nome da skill, comando `/omnx-code`, diretório de instalação `~/.claude/skills/omnx-code`
+- **Renomeado de `omnx-vibe-coding` para `omnx-code`**: repo GitHub, nome da skill, comando `/omnx-code`, diretório de instalação `~/.claude/skills/omnx-code`
 - **Nova identidade visual na landing page**: fundo preto, verde neon (#00FF88), wordmark OMNX em texto — sem dependência de logo PNG externo
 - **Removidas referências ao Empire Business design system**: landing page agora usa design system próprio OMNX
 

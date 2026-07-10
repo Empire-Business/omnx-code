@@ -51,7 +51,7 @@ cd ~/.claude/skills/omnx-code && git pull
 
 ## Versão
 
-`v1.4` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.8` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 

@@ -23,6 +23,16 @@
 - Sempre use tokens temporários e escopados — nunca chaves de admin para operações de usuário
 - Ao detectar qualquer violação dessas regras no código existente, reporte imediatamente antes de continuar
 
+## Regra de banco de dados (inegociável)
+
+- TODA alteração no banco Supabase é feita via migration versionada em `supabase/migrations/`
+- É PROIBIDO executar SQL direto para mudar o banco: nada de SQL Editor do Supabase, `supabase db execute`, `psql`, ou RPC que rode SQL arbitrário
+- Nunca edite uma migration já aplicada — crie uma nova para corrigir
+- A migration e o código que depende dela entram no mesmo commit
+- `supabase/migrations/` nunca vai no `.gitignore` — é a fonte de verdade do schema
+- Leitura (`SELECT`) para inspeção é permitida; qualquer mutação só via migration
+- Após aplicar migrations, regenere os tipos: `supabase gen types typescript`
+
 ## Regras de Git (inegociáveis)
 
 - `.env`, `.env.*`, `*.pem`, `*.key` e arquivos com chaves sempre no `.gitignore`
@@ -56,10 +66,10 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration), **recuse, explique o motivo e sugira a alternativa segura**.
 
 ---
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.7
+> Versão do template: omnx-code v1.8
