@@ -18,6 +18,21 @@ Ajuste pedido pelo usuário: todo sistema criado pela skill deve ter arquitetura
 - **Gate 1.6c — UML obrigatório antes de codar (fail-closed, `SKILL.md`)**: nenhum código de domínio é escrito em projeto novo sem `docs/UML.md` (diagrama de classes/entidades + sequência dos fluxos críticos, em Mermaid) existir e ser aprovado pelo usuário. Em projeto existente sem UML, nenhum commit novo acontece antes de gerar o diagrama por engenharia reversa do código real e validar com o usuário. Atualização do UML entra no mesmo commit que qualquer mudança de entidade/fluxo — nunca depois. Reflete em `docs/UML.md` no índice de documentos, checklist de entrega e `references/modelo-agents.md`.
 - **Passo 1.5 — gate de versão da própria omnx-code (fail-closed, roda em TODA ativação da skill)**: antes de qualquer task de setup ou trabalho normal, a skill compara sua versão local (CHANGELOG/`git describe` em disco, sem rede) com a versão remota mais recente (`CHANGELOG.md` do GitHub, com cache de 24h em `.empire/state.json` via `last_version_gate_check`/`last_version_gate_checked_at`). Se local < remota, **bloqueia** qualquer trabalho e dispara a Auto-atualização automaticamente (sem esperar o usuário pedir), parando e pedindo reload após o self-update. Falha de rede sem cache válido exige confirmação explícita do usuário antes de prosseguir (nunca decide sozinho). Fecha a lacuna em que um projeto ficava rodando indefinidamente com uma `omnx-code` desatualizada até alguém lembrar de pedir "atualiza a skill".
 
+### Gate 1.6b relaxado para commit simples
+
+Ajuste pedido pelo usuário: verificação de segurança/documentação de acesso estava travando commits simples em branch de feature, não só PR/publicação.
+
+### Modificado
+- **Gate 1.6b (`SKILL.md`)**: deixa de ser fail-closed em todo commit que toca papéis/RLS/auth. Agora só recusa (fail-closed) antes de push/merge para `main`/`master`, PR de release ou deploy — em commit simples de trabalho incremental, apenas avisa e sugere atualizar `docs/NIVEIS-DE-ACESSO.md`, sem bloquear. O gate 1.6 (security-auditor) e o 1.6c (UML) continuam fail-closed como antes — não foram alterados.
+- **Regra 1.5 (`SKILL.md`)**: texto atualizado para refletir que 1.6b só é inegociável antes de publicar; 1.6 e 1.6c continuam inegociáveis em todo commit relevante.
+
+### Sugestão de banco de teste/staging para mudanças críticas
+
+Ajuste pedido pelo usuário: a skill deve sugerir (não forçar) testar em banco de teste/staging antes de aplicar migrations arriscadas em produção.
+
+### Adicionado
+- **Regra 20b (`SKILL.md`)**: antes de `supabase db push` de migrations que fazem `DROP`/`ALTER` destrutivo, mudança de tipo de coluna, backfill de dados, mudança de RLS em tabela com tráfego, ou qualquer migration sem `DOWN` claro, a skill sugere rodar primeiro num projeto Supabase de staging ou banco local antes de ir para produção. É sugestão (regra 1.5), não gate fail-closed — o usuário decide.
+
 ### Nota
 Esta entrada ainda não foi commitada nem tagueada no repositório `Empire-Business/omnx-code` — é uma edição local. O mecanismo de self-update desta skill usa tag/SHA pinado (`v1.10.0`), então essas mudanças só se propagam para outras máquinas/projetos depois de commitadas e publicadas com uma nova tag verificada.
 

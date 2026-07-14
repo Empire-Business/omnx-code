@@ -448,8 +448,8 @@ Quando `setup_complete: true` e o usuário pede qualquer coisa (codar, refatorar
 **1. Sempre criar tasks primeiro**
 Antes de qualquer ação, crie tasks com `TaskCreate` descrevendo cada etapa. Nunca execute sem tasks visíveis.
 
-**1.5. Sugerir, não forçar — EXCETO segurança, níveis de acesso e UML**
-Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceção inegociável:** o gate de segurança antes de deploy (regra 1.6), o gate de documentação de níveis de acesso (regra 1.6b) e o gate de UML (regra 1.6c) são **fail-closed** — ali você NÃO "informa e deixa decidir"; você **recusa** o commit/publicação até o gate passar.
+**1.5. Sugerir, não forçar — EXCETO segurança e UML sempre; níveis de acesso antes de PR/main**
+Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceção inegociável:** o gate de segurança antes de deploy (regra 1.6) e o gate de UML (regra 1.6c) são **fail-closed** em todo commit relevante — ali você NÃO "informa e deixa decidir"; você **recusa** o commit/publicação até o gate passar. O gate de documentação de níveis de acesso (regra 1.6b) é fail-closed só antes de publicar (push/merge para `main`/`master`, PR de release, deploy); em commit simples de trabalho incremental em branch de feature, ele só avisa e sugere — não bloqueia.
 
 **1.6. Gate de segurança antes de deploy (fail-closed, obrigatório)**
 Antes de qualquer ação que publique em produção — `git push` para `main`/`master` ou branch ligada à Vercel, `git merge` em `main`, abrir PR de release, `supabase functions deploy`, `vercel --prod` — você DEVE:
@@ -459,15 +459,16 @@ Antes de qualquer ação que publique em produção — `git push` para `main`/`
 4. Registre no `.empire/state.json`: `last_audit_gate` (`PASS`/`FAIL`), `last_audit_at` (timestamp do `verdict.json`), `last_audit_commit` (`target_commit`).
 > O checklist no `CLAUDE.md`/`AGENTS.md` não substitui este passo: o item só pode ser marcado com o caminho do `verdict.json` da sessão e `gate: PASS`. Sem artefato, o checkbox é inválido (anti-teatro).
 
-**1.6b. Gate de documentação de níveis de acesso (fail-closed, obrigatório)**
-Nenhum sistema criado por esta skill pode ter código de autenticação/autorização **commitado**, nem ir para produção, sem que `docs/NIVEIS-DE-ACESSO.md` exista e esteja completo. Isso vale mesmo em projeto de um único tenant — se existe qualquer distinção de permissão entre usuários (ex: admin vs usuário comum), a documentação é obrigatória.
+**1.6b. Gate de documentação de níveis de acesso (fail-closed antes de PR/main; sugestão em commit simples)**
+Nenhum sistema criado por esta skill pode ir para produção sem que `docs/NIVEIS-DE-ACESSO.md` exista e esteja completo. Isso vale mesmo em projeto de um único tenant — se existe qualquer distinção de permissão entre usuários (ex: admin vs usuário comum), a documentação é obrigatória antes do deploy.
 
-Antes de qualquer `git commit` que crie ou altere: tabelas de papéis/membership, políticas RLS, middleware/guards de auth, rotas ou componentes protegidos por permissão — e antes de qualquer ação do gate 1.6 — você DEVE:
-1. Verificar que `docs/NIVEIS-DE-ACESSO.md` existe.
-2. Conferir que ele cobre **todos** os papéis atualmente definidos no schema/código (todo `role`/`enum` de permissão precisa ter uma linha na matriz do documento) e que a matriz permissão × recurso × ação está preenchida (não pode haver célula em branco ou "TBD").
-3. Se o arquivo não existir, estiver incompleto, ou houver um papel/permissão no código sem entrada correspondente no documento: **RECUSE** o commit. Crie ou atualize o documento primeiro (junto com o usuário, se as regras de negócio não estiverem claras), e só então prossiga. Não "informe e deixe o usuário decidir".
-4. Sempre que um papel novo for criado ou a matriz de permissões mudar, atualize `docs/NIVEIS-DE-ACESSO.md` no **mesmo commit** que muda o código — nunca depois.
-> Este gate é independente do 1.6: um deploy pode ter `security-report` com `gate: PASS` e ainda assim estar bloqueado por falta de documentação de acesso, e vice-versa. Os dois precisam passar.
+- **Commit simples** (trabalho incremental, ainda em branch de feature, não é push/merge para `main`/`master` nem abertura de PR de release): se o commit cria ou altera tabelas de papéis/membership, políticas RLS, middleware/guards de auth, rotas ou componentes protegidos por permissão, **avise** que `docs/NIVEIS-DE-ACESSO.md` precisa ser atualizado antes do deploy e **sugira** atualizar já. Não bloqueie o commit por causa disso — informe e prossiga.
+- **Antes de qualquer ação do gate 1.6** (push/merge para `main`/`master`, PR de release, deploy) você DEVE, de forma fail-closed:
+  1. Verificar que `docs/NIVEIS-DE-ACESSO.md` existe.
+  2. Conferir que ele cobre **todos** os papéis atualmente definidos no schema/código (todo `role`/`enum` de permissão precisa ter uma linha na matriz do documento) e que a matriz permissão × recurso × ação está preenchida (não pode haver célula em branco ou "TBD").
+  3. Se o arquivo não existir, estiver incompleto, ou houver um papel/permissão no código sem entrada correspondente no documento: **RECUSE** a publicação. Crie ou atualize o documento primeiro (junto com o usuário, se as regras de negócio não estiverem claras), e só então prossiga. Não "informe e deixe o usuário decidir".
+  4. Sempre que um papel novo for criado ou a matriz de permissões mudar, atualize `docs/NIVEIS-DE-ACESSO.md` o mais tardar até este ponto — nunca deixe passar para produção sem isso.
+> Este gate é independente do 1.6: um deploy pode ter `security-report` com `gate: PASS` e ainda assim estar bloqueado por falta de documentação de acesso, e vice-versa. Os dois precisam passar antes de PR/main — nenhum dos dois trava commit simples em branch de feature.
 
 **1.6c. Gate de UML antes de codar (fail-closed, obrigatório)**
 Código nasce de um modelo, não o contrário. Escrever classes, tabelas e fluxos direto no código sem modelar antes é como construir uma casa sem planta — funciona até o dia em que duas partes do sistema foram pensadas de formas incompatíveis e alguém só descobre isso depois de já ter código dos dois lados. O UML força essa conversa **antes** de custar caro.
@@ -735,6 +736,19 @@ Regras inegociáveis:
 - A única exceção permitida para SQL direto é leitura (`SELECT`) para inspeção/debug — nunca para mutar, e nunca como mecanismo de entrega.
 
 Se encontrar em um projeto existente qualquer objeto criado por SQL direto (sem migration correspondente), interrompa, registre o objeto, e oriente o usuário a capturá-lo em uma migration antes de continuar.
+
+**20b. Sugerir banco de teste/staging antes de mudanças críticas no banco**
+
+Migration é rastreável, mas não é reversível de graça: um `DROP COLUMN`, uma mudança de tipo, um `ALTER` que reescreve uma tabela grande, ou uma migration que envolve backfill/perda potencial de dados pode dar errado de um jeito que só aparece rodando contra dados reais — e nesse ponto já é tarde para desfazer sem restore. Testar direto em produção transforma qualquer erro de schema em incidente.
+
+Antes de aplicar (`supabase db push`) uma migration que se encaixe em qualquer um destes casos, **sugira** ao usuário (não bloqueie, ele decide) rodar primeiro num banco de teste/staging — seja um projeto Supabase de staging separado, seja `supabase db reset` local com uma cópia dos dados:
+- `DROP`/`ALTER` de coluna ou tabela que já tem dados em produção (perda de dado é irreversível sem backup)
+- Mudança de tipo de coluna (`ALTER COLUMN ... TYPE`) que pode falhar silenciosamente ou truncar valores
+- Qualquer migration com passo de backfill/transformação de dados existentes, não só DDL
+- Mudança em política RLS de tabela com tráfego em produção (risco de vazar ou bloquear acesso indevidamente)
+- Qualquer migration que o próprio SQL marque como não-reversível (sem `DOWN` claro/equivalente)
+
+Como sugerir: explique o risco específico da mudança, proponha o caminho (projeto de staging vinculado via `supabase link --project-ref <staging-ref>`, ou banco local) e pergunte se o usuário quer testar lá antes do `db push` no projeto de produção. Se o usuário preferir ir direto, prossiga — isso segue a regra 1.5 (sugerir, não forçar), não é um gate fail-closed.
 
 **17. Segredos não podem vazar para o bundle do cliente**
 
