@@ -29,7 +29,7 @@
 
 - Nenhum código de domínio (models, entidades, schema) é escrito em projeto novo antes de `docs/UML.md` existir e ser aprovado (diagrama de classes/entidades em Mermaid + sequência dos fluxos críticos)
 - Em projeto existente sem `docs/UML.md`: nenhum commit novo acontece antes de gerar o UML por engenharia reversa do código/schema real e validar com o usuário
-- `docs/UML.md` é atualizado no mesmo commit que qualquer mudança de entidade, relacionamento ou fluxo crítico — nunca depois
+- `docs/UML.md` e `docs/UML.html` são atualizados no mesmo commit que qualquer mudança de entidade, relacionamento ou fluxo crítico — nunca depois
 
 ## Regra de arquitetura de usuários e multi-tenant (inegociável)
 
@@ -70,6 +70,8 @@
 
 - Antes de codar qualquer feature: verifique se existem `PRD.md`, `ROADMAP.md` e `ARQUITETURA.md`
 - Se não existirem → crie esses documentos primeiro. Não comece a codar sem eles
+- Antes de criar mockups/protótipos: exija `PRD.md`, `ARQUITETURA.md`, `UML.md` e design system (`docs/DESIGN.md` ou `docs/design-system/`) completos
+- Mockups vão em `docs/mockups/`, um arquivo HTML por tela, navegáveis via `docs/mockups/index.html`
 - Toda documentação técnica vai para `docs/[NOME].md`
 - O `CLAUDE.md` é um índice enxuto — nunca coloque documentação longa diretamente nele
 - Ao remover uma feature: delete o código, o doc em `docs/` e a entrada no índice do `CLAUDE.md`

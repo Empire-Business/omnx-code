@@ -6,6 +6,21 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ## Não lançado (edição local, ainda sem tag/versão)
 
+### Fluxo de Mockups navegáveis e fidelidade ao PRD/design system
+
+Ajuste pedido pelo usuário: a skill agora cria mockups/protótipos navegáveis de forma rigorosa, 100% fiéis ao PRD e ao design system, com um arquivo HTML por tela.
+
+### Adicionado
+- **Seção "Fluxo de Mockups" no `SKILL.md`**: workflow completo para criar mockups em `docs/mockups/`, acionado por pedidos de mockup, protótipo, wireframe ou "telas do app".
+- **Gate fail-closed para mockups**: nenhum mockup é gerado sem `docs/PRD.md`, `docs/ARQUITETURA.md`, `docs/UML.md` + `docs/UML.html` e design system completo (`docs/DESIGN.md` ou `docs/design-system/`). Se faltar algo, a skill cria a documentação primeiro com o usuário.
+- **Um arquivo HTML por tela**: cada tela vira `docs/mockups/tel-XXX-nome.html`; há um `docs/mockups/index.html` como hub de navegação e `docs/mockups/README.md` com rastreabilidade PRD ↔ telas.
+- **Design system mínimo exigido**: lista explícita de cores, tipografia, espaçamento, componentes base e layout que o design system deve cobrir antes de iniciar mockups.
+- **Validação obrigatória**: task dedicada para verificar cobertura dos requisitos P0/P1 do PRD e fidelidade visual ao design system, registrada em `docs/mockups/VALIDACAO.md`.
+- **Mockups autocontidos**: HTML/CSS puro, sem frameworks externos, abrem direto no navegador (`file://`), com links entre telas funcionando e botões sem destino exibindo `alert` descritivo.
+- **Rigor de nomenclatura e CSS**: cada tela deve usar o nome `tel-XXX-nome-da-tela.html` e ter CSS inline no próprio arquivo; `styles.css` compartilhado e nomes genéricos são proibidos explicitamente.
+- **Atualização dos templates**: `references/modelo-claude.md` (trilha FASE 0, índice de documentos, seção "Etapa 3b — Mockups navegáveis") e `references/modelo-agents.md` (fluxo de desenvolvimento) refletem o novo fluxo e o design system.
+- **Triggers na descrição da skill**: `SKILL.md` frontmatter agora menciona mockups, protótipos, wireframes e "telas do app" como contextos de ativação.
+
 ### Arquitetura de usuários e multi-tenant obrigatória
 
 Ajuste pedido pelo usuário: todo sistema criado pela skill deve ter arquitetura de usuários bem definida e ser multi-tenant por padrão, com gate fail-closed bloqueando commit/deploy sem documentação de acesso.
@@ -16,6 +31,7 @@ Ajuste pedido pelo usuário: todo sistema criado pela skill deve ter arquitetura
 - **`docs/NIVEIS-DE-ACESSO.md`** vira documento obrigatório do índice de documentos, com seção própria no template `modelo-claude.md` explicando o que ele precisa conter.
 - **Templates sincronizados**: `references/modelo-claude.md` (seção "Arquitetura de Usuários & Multi-Tenant", seção "Níveis de Acesso", trilha obrigatória FASE 0/2/3, checklist de entrega) e `references/modelo-agents.md` (regra dedicada + lista de recusa) ganham as mesmas regras.
 - **Gate 1.6c — UML obrigatório antes de codar (fail-closed, `SKILL.md`)**: nenhum código de domínio é escrito em projeto novo sem `docs/UML.md` (diagrama de classes/entidades + sequência dos fluxos críticos, em Mermaid) existir e ser aprovado pelo usuário. Em projeto existente sem UML, nenhum commit novo acontece antes de gerar o diagrama por engenharia reversa do código real e validar com o usuário. Atualização do UML entra no mesmo commit que qualquer mudança de entidade/fluxo — nunca depois. Reflete em `docs/UML.md` no índice de documentos, checklist de entrega e `references/modelo-agents.md`.
+- **UML visual obrigatório (`docs/UML.html`, `SKILL.md` + `references/modelo-uml.html`)**: sempre que `docs/UML.md` for criado ou atualizado, a IA também gera `docs/UML.html` — uma página HTML autocontida que renderiza todos os diagramas visualmente com abas navegáveis, tema dark e interatividade (Mermaid.js via CDN). O template base está em `references/modelo-uml.html`. Ambos os arquivos entram no mesmo commit. Checklist de entrega e índice do `modelo-claude.md` atualizados para incluir `UML.html`. Reflete em `modelo-agents.md` (menção a ambos os arquivos).
 - **Passo 1.5 — gate de versão da própria omnx-code (fail-closed, roda em TODA ativação da skill)**: antes de qualquer task de setup ou trabalho normal, a skill compara sua versão local (CHANGELOG/`git describe` em disco, sem rede) com a versão remota mais recente (`CHANGELOG.md` do GitHub, com cache de 24h em `.empire/state.json` via `last_version_gate_check`/`last_version_gate_checked_at`). Se local < remota, **bloqueia** qualquer trabalho e dispara a Auto-atualização automaticamente (sem esperar o usuário pedir), parando e pedindo reload após o self-update. Falha de rede sem cache válido exige confirmação explícita do usuário antes de prosseguir (nunca decide sozinho). Fecha a lacuna em que um projeto ficava rodando indefinidamente com uma `omnx-code` desatualizada até alguém lembrar de pedir "atualiza a skill".
 
 ### Gate 1.6b relaxado para commit simples

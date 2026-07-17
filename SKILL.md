@@ -8,11 +8,21 @@ description: |
   Instala e mantém o CLAUDE.md do projeto seguindo o padrão OMNX, garante
   que a skill /security-auditor está instalada e atualizada globalmente, e executa
   qualquer trabalho de desenvolvimento guiado pelo CLAUDE.md — com tasks 100% do tempo.
+  Também cria mockups navegáveis 100% fiéis ao PRD e ao design system, em arquivos
+  separados por tela, dentro de docs/mockups/.
 
   Use SEMPRE que o usuário pedir para começar um projeto novo, codar qualquer feature,
-  estruturar documentação, auditar segurança, ou sempre que mencionar "omnx",
-  "omnx-code", "omnx code", ou pedir para "ativar o framework".
+  estruturar documentação, auditar segurança, criar mockups, prototipar telas,
+  wireframes, ou sempre que mencionar "omnx", "omnx-code", "omnx code",
+  "mockup", "protótipo", "telas do app" ou pedir para "ativar o framework".
   Em projetos novos, esta skill é o primeiro passo obrigatório antes de qualquer código.
+  Em pedidos de mockup, esta skill exige PRD, ARQUITETURA, UML e design system
+  aprovados antes de gerar qualquer tela.
+  Quando o pedido envolver multi-tenancy, sub-contas, agência, tenant,
+  workspace isolation, BYOK, isolamento de credenciais, roteamento de webhooks
+  por tenant, ou offboarding LGPD de tenant, esta skill é a porta de entrada e
+  DEVE ativar a skill especializada `omnx-multi-tenancy` para definir o playbook
+  e as fases de trabalho.
   Roteamento de triggers: em pedido PURO de auditoria de segurança, esta skill DELEGA à `/security-auditor` (não se candidata ao mesmo trigger); em "atualiza a skill" / "verifique atualizações", esta skill é a DONA e atualiza as duas (omnx-code + security-auditor).
 ---
 
@@ -480,12 +490,14 @@ Código nasce de um modelo, não o contrário. Escrever classes, tabelas e fluxo
 
 O UML vive em `docs/UML.md`, em **Mermaid** (`classDiagram`, `sequenceDiagram`, `stateDiagram-v2`) — é texto versionável, renderiza direto no GitHub e em qualquer visualizador Markdown moderno, e a IA consegue gerar e atualizar sem depender de ferramenta externa. Ele é criado na FASE 0, junto com `ARQUITETURA.md` — na prática, os dois se alimentam: o UML modela o que o `ARQUITETURA.md` descreve em prosa.
 
+**Versão visual interativa (`docs/UML.html`):** sempre que `docs/UML.md` for criado ou atualizado, a IA também DEVE gerar um `docs/UML.html` correspondente — uma página HTML autocontida que renderiza todos os diagramas Mermaid visualmente com abas navegáveis, tema dark, e interatividade. O HTML usa o template `references/modelo-uml.html` como base, substituindo os placeholders (nome do projeto, versão, descrições e diagramas) pelo conteúdo real do projeto. O resultado final é um arquivo que abre em qualquer navegador, sem servidor, e exibe todos os diagramas em abas navegáveis. Ambos os arquivos (`UML.md` + `UML.html`) entram no **mesmo commit**.
+
 **Projeto existente sem UML:** se a IA for pedida para trabalhar em um projeto que já tem código mas não tem `docs/UML.md`, o UML **precisa ser criado antes de qualquer novo commit** (não importa se a mudança pedida é pequena — a falta de UML é dívida técnica que bloqueia, igual dívida de segurança). Nesse caso:
 1. Gere o UML **a partir do código e schema existentes** (engenharia reversa) — leia as entidades reais (tabelas, models, tipos) e os fluxos reais (rotas, funções principais) para montar o diagrama, não invente.
 2. Apresente ao usuário para validação — código legado às vezes tem entidades que já não fazem sentido; é a hora de o usuário confirmar ou corrigir o modelo.
 3. Só depois do UML existir e refletir o sistema real, prossiga com a mudança pedida.
 
-**Manutenção:** toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` é atualizado no **mesmo commit** que muda o código — nunca depois. Se a IA encontrar uma mudança de schema/domínio sendo commitada sem o UML correspondente atualizado: **RECUSE** o commit, atualize o diagrama primeiro, e só então prossiga.
+**Manutenção:** toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` e `docs/UML.html` são atualizados no **mesmo commit** que muda o código — nunca depois. Se a IA encontrar uma mudança de schema/domínio sendo commitada sem os arquivos UML correspondentes atualizados: **RECUSE** o commit, atualize os diagramas primeiro, e só então prossiga.
 
 > Este gate é independente dos gates 1.6 e 1.6b: um projeto pode ter segurança e níveis de acesso em dia e ainda estar bloqueado por UML ausente/desatualizado, e vice-versa. Os três precisam passar.
 
@@ -809,6 +821,339 @@ Para tarefas que envolvem múltiplos domínios em paralelo (ex: migração de ba
 - O contexto do `CLAUDE.md` do projeto
 - Sua tarefa específica
 - Instrução para usar `TaskCreate` e não agir fora do escopo dado
+
+---
+
+## Fluxo de Mockups (prototipagem fiel ao PRD)
+
+> Mockups não são "rascunhos bonitos". São representações visuais rigorosas do produto descrito no PRD, construídas **antes** de gastar tempo escrevendo código de produção. Um mockup pela metade é pior que nenhum mockup: ele esconde gaps de UX que só aparecem depois, quando custam caro para corrigir.
+
+### Quando ativar este fluxo
+
+Este fluxo é acionado quando o usuário pedir qualquer coisa relacionada a:
+- mockup, mockups, protótipo, protótipos, wireframe, wireframes
+- "telas do app", "telas do sistema", "fluxo de telas"
+- "quero ver como fica" antes de codar
+- "gerar as telas" a partir do PRD
+
+A skill deve se candidatar ativamente a esses triggers e **recusar** criar mockups sem os pré-requisitos documentados.
+
+### Princípios inegociáveis
+
+1. **Sem documentação, sem mockup.** Se `docs/PRD.md`, `docs/ARQUITETURA.md`, `docs/UML.md` ou o design system não existirem, a skill primeiro cria/atualiza esses documentos com o usuário. Mockup só começa depois da aprovação.
+2. **100% fiel ao PRD.** Toda funcionalidade P0/P1 do PRD deve aparecer em alguma tela. Toda tela deve estar rastreável a uma seção do PRD.
+3. **100% fiel ao design system.** Cores, tipografia, espaçamento, componentes e estados vêm do design system. Nenhuma cor ou fonte arbitrária.
+4. **Uma tela por arquivo.** Cada tela vira um arquivo HTML separado em `docs/mockups/`.
+5. **Navegável.** Há um `index.html` central que lista todas as telas e cada tela possui links para as próximas telas do fluxo.
+6. **Autocontido.** Os mockups abrem direto no navegador (`file://`) sem precisar de servidor, build ou dependências externas.
+
+---
+
+### Pré-requisitos (gate fail-closed)
+
+Antes de gerar qualquer mockup, verifique a existência dos arquivos abaixo. A ausência de qualquer um deles **bloqueia** o fluxo de mockup até que seja criado/aprovado.
+
+| Arquivo | Por que é obrigatório | O que fazer se faltar |
+|---------|----------------------|----------------------|
+| `docs/PRD.md` | Fonte da verdade do produto | Criar seguindo a seção "Etapa 1 — PRD.md" desta skill. Só prosseguir com aprovação do usuário. |
+| `docs/ARQUITETURA.md` | Define estrutura técnica e decisões que impactam telas | Criar seguindo a seção "Etapa 3 — ARQUITETURA.md". |
+| `docs/UML.md` + `docs/UML.html` | Modela entidades e fluxos críticos antes de desenhar telas | Criar conforme regra 1.6c. |
+| Design system (`docs/DESIGN.md` ou `docs/design-system/DESIGN.md` ou `docs/design-system/tokens.json`) | Garante fidelidade visual e consistência | Criar com o usuário, exigindo definição de cores, tipografia, espaçamento, componentes base e estados. |
+
+**Design system mínimo exigido:**
+
+Se o design system estiver incompleto, recuse criar mockups e peça ao usuário para completar. O mínimo é:
+
+```markdown
+# Design System
+
+## Cores
+- Primária: `#...`
+- Secundária: `#...`
+- Background: `#...`
+- Surface: `#...`
+- Texto primário: `#...`
+- Texto secundário: `#...`
+- Estados: sucesso, erro, aviso, info
+
+## Tipografia
+- Fonte de títulos: ...
+- Fonte de corpo: ...
+- Escala: H1, H2, H3, body, small, label (com tamanhos e pesos)
+
+## Espaçamento
+- Base: ...px
+- Escalas: xs, sm, md, lg, xl, 2xl
+
+## Componentes base
+- Botão primário/secundário/terciário: padding, border-radius, estados (hover, disabled)
+- Input, select, textarea: padding, border, focus, erro
+- Card: padding, sombra, borda, radius
+- Navegação: header, sidebar, tabs
+
+## Layout
+- Container máximo: ...px
+- Grid: ...colunas, gutters
+- Breakpoints: mobile, tablet, desktop
+```
+
+> **Anti-teatro:** não basta o arquivo existir. A skill deve LER o design system e confirmar que ele cobre os itens acima. Se houver seção marcada "TBD" ou vazia, o gate falha.
+
+---
+
+### Task 0 — Criar tasks do fluxo de mockup
+
+Antes de qualquer coisa, liste as tasks:
+
+```
+Task 1: Verificar pré-requisitos (PRD, ARQUITETURA, UML, design system)
+Task 2: Criar/atualizar documentação faltante (se houver)
+Task 3: Inventariar telas a partir do PRD e UML
+Task 4: Criar estrutura docs/mockups/ e README.md de rastreabilidade
+Task 5: Gerar HTML de cada tela (um arquivo por tela)
+Task 6: Criar docs/mockups/index.html como hub de navegação
+Task 7: Validar cobertura do PRD e fidelidade ao design system
+Task 8: Commitar alterações
+```
+
+---
+
+### Task 1 — Verificar pré-requisitos
+
+Leia os arquivos e registre o status:
+
+```bash
+for f in docs/PRD.md docs/ARQUITETURA.md docs/UML.md docs/DESIGN.md docs/design-system/DESIGN.md docs/design-system/tokens.json; do
+  echo "=== $f ==="
+  [ -f "$f" ] && echo "EXISTS" || echo "MISSING"
+done
+```
+
+Apresente ao usuário:
+
+```
+📋 Pré-requisitos para mockup:
+✅ docs/PRD.md
+✅ docs/ARQUITETURA.md
+✅ docs/UML.md
+✅ docs/UML.html
+❌ Design system (docs/DESIGN.md ou docs/design-system/*)
+```
+
+Se tudo estiver OK, vá para Task 3. Se algo faltar, vá para Task 2.
+
+---
+
+### Task 2 — Criar documentação faltante
+
+Siga os fluxos normais desta skill para cada documento ausente:
+
+- `docs/PRD.md` → seção "Etapa 1 — PRD.md" do CLAUDE.md
+- `docs/ARQUITETURA.md` → seção "Etapa 3 — ARQUITETURA.md"
+- `docs/UML.md` + `docs/UML.html` → regra 1.6c
+- Design system → crie no formato DESIGN.md mínimo descrito acima, validando cada seção com o usuário
+
+**Nunca gere mockups nesta task.** Só crie a documentação. Após cada documento, peça aprovação explícita do usuário antes de prosseguir.
+
+---
+
+### Task 3 — Inventariar telas
+
+Com PRD, ARQUITETURA, UML e design system em mãos, crie o inventário de telas em `docs/mockups/README.md` (sobrescreva se já existir, mantendo histórico em `docs/MUDANCAS.md`).
+
+Cada entrada deve ter:
+
+```markdown
+### TEL-001 — Login
+- **Nome:** Tela de login
+- **PRD refs:** RF-03 (Autenticação), RF-04 (Recuperação de senha)
+- **Fluxo:** Entrada no app → Login → Dashboard
+- **URL do mockup:** `tel-001-login.html`
+- **Conteúdo obrigatório:** logo, email, senha, botão "Entrar", link "Esqueci senha", link "Criar conta"
+- **Estados:** vazio, erro de credenciais, carregando
+
+### TEL-002 — Dashboard
+- **Nome:** Dashboard principal
+- **PRD refs:** RF-05 (Home), RF-06 (Métricas)
+- **Fluxo:** Login → Dashboard → Detalhe
+- **URL do mockup:** `tel-002-dashboard.html`
+- **Conteúdo obrigatório:** header com menu, cards de métricas, lista de atividades recentes
+- **Estados:** vazio (primeiro acesso), com dados
+```
+
+Regras para o inventário:
+- IDs sequenciais no formato `TEL-XXX`
+- Cada funcionalidade P0/P1 do PRD deve aparecer em pelo menos uma tela
+- Cada tela deve estar ligada a um ou mais requisitos do PRD
+- Liste todos os estados relevantes (vazio, erro, sucesso, carregando, sem permissão)
+
+Apresente o inventário ao usuário para validação. Só prossiga com aprovação.
+
+---
+
+### Task 4 — Criar estrutura docs/mockups/
+
+```bash
+mkdir -p docs/mockups
+```
+
+Crie/resete `docs/mockups/README.md` com:
+- Propósito da pasta
+- Índice de telas com link para cada arquivo
+- Rastreabilidade PRD ↔ telas
+- Instruções de como abrir (`open docs/mockups/index.html`)
+
+Crie `docs/mockups/.gitignore` se necessário (normalmente não é necessário ignorar nada aqui — mockups são documentação versionável).
+
+---
+
+### Task 5 — Gerar HTML de cada tela
+
+Para cada tela do inventário, crie um arquivo `docs/mockups/tel-XXX-nome.html`.
+
+**Estrutura obrigatória de cada arquivo:**
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TEL-001 — Login | Nome do Projeto</title>
+  <style>
+    /* Tokens do design system */
+    :root {
+      --color-primary: #...;
+      --color-bg: #...;
+      --font-title: ...;
+      --font-body: ...;
+      --space-md: ...;
+      /* ... */
+    }
+    /* Estilos da tela */
+  </style>
+</head>
+<body>
+  <header class="mockup-header">
+    <span class="screen-id">TEL-001</span>
+    <h1>Login</h1>
+    <nav>
+      <a href="index.html">← Índice</a>
+      <a href="tel-002-dashboard.html">Próxima →</a>
+    </nav>
+  </header>
+
+  <main class="mockup-stage">
+    <!-- conteúdo real da tela -->
+  </main>
+
+  <footer class="mockup-meta">
+    <p>PRD refs: RF-03, RF-04</p>
+    <p>Estados: vazio, erro, carregando</p>
+  </footer>
+</body>
+</html>
+```
+
+**Regras de implementação:**
+
+1. **Use apenas CSS puro.** Sem frameworks externos, sem builds, sem npm. O mockup deve abrir em qualquer navegador.
+2. **CSS inline em cada arquivo.** Cada tela deve ser 100% autocontida: todas as regras de estilo dentro de uma tag `<style>` no próprio HTML. **Não crie `styles.css` compartilhado**, `theme.css`, nem qualquer outro arquivo de CSS externo. Se você copiar uma única tela para outra pasta, ela deve continuar renderizando perfeitamente.
+3. **Nome de arquivo obrigatório:** `tel-XXX-nome-da-tela.html`, onde `XXX` é o ID da tela no inventário (ex: `tel-001-login.html`, `tel-002-dashboard.html`). Não use nomes genéricos como `login.html` ou `page1.html`.
+4. **Tokens via CSS variables.** Todas as cores, fontes e espaçamentos vêm do design system. Se o design system definir `tokens.json`, converta as variáveis para `:root` no próprio arquivo.
+5. **Represente estados.** Para cada tela, crie visualmente os estados listados no inventário. Se um estado for importante, considere criar uma seção extra na mesma tela mostrando "Estado: erro", "Estado: vazio" etc.
+6. **Dados realistas.** Use conteúdo de exemplo que pareça com o domínio real (nomes, valores, datas). Não use "lorem ipsum" genérico.
+7. **Interatividade mínima.** Links entre telas funcionam. Botões sem destino mostram um `alert` explicando o que aconteceria (ex: "Alert: enviaria formulário de login"). Não precisa de JavaScript complexo.
+8. **Responsivo básico.** Pelo menos mobile (375px) e desktop (1440px) devem ser legíveis.
+9. **Sem funcionalidade real.** O mockup é visual. Não conecta a APIs, não salva dados, não implementa auth real.
+
+---
+
+### Task 6 — Criar index.html (hub de navegação)
+
+O `docs/mockups/index.html` deve:
+- Listar todas as telas com ID, nome, link e fluxo
+- Ter um resumo de cobertura do PRD ("RF-03 → TEL-001, TEL-003")
+- Incluir instruções de como abrir os mockups
+- Usar os mesmos tokens visuais do design system
+
+---
+
+### Task 7 — Validar cobertura e fidelidade
+
+Esta é a task mais importante. Não pule.
+
+**Validação de cobertura do PRD:**
+
+Para cada requisito funcional P0/P1 do PRD, responda: "em qual tela isso aparece?". Se houver requisito sem tela, volte ao inventário e crie a tela correspondente.
+
+**Validação de fidelidade ao design system:**
+
+Faça uma revisão manual dos arquivos HTML:
+- Todas as cores usadas estão no design system?
+- Todas as fontes e tamanhos estão no design system?
+- Todos os espaçamentos seguem a escala?
+- Os componentes (botões, inputs, cards) respeitam as definições?
+
+**Validação de completude e conformidade das telas:**
+
+- Cada tela tem header com ID e navegação?
+- Cada tela tem todos os elementos listados no inventário?
+- Cada tela representa os estados listados?
+- Cada tela tem links funcionando para as próximas telas do fluxo?
+- Cada arquivo de tela segue o padrão `tel-XXX-nome-da-tela.html`?
+- Cada arquivo de tela tem CSS inline (`<style>` no `<head>`) e **nenhum** `<link rel="stylesheet">` externo?
+- Não há arquivos CSS compartilhados (`styles.css`, `theme.css`, etc.) na pasta `docs/mockups/`?
+
+**Registro da validação:**
+
+Crie um arquivo `docs/mockups/VALIDACAO.md` (ou seção no README) documentando:
+- Requisitos P0/P1 cobertos por cada tela
+- Requisitos não cobertos (se houver) e justificativa
+- Checklist de fidelidade ao design system
+
+Se a validação encontrar gaps, corrija antes de commitar.
+
+---
+
+### Task 8 — Commitar
+
+Siga o padrão de commits desta skill. Commit único ou commits separados por etapa:
+
+```text
+docs: adiciona mockups navegáveis do app
+
+Contexto: protótipo visual fiel ao PRD antes do desenvolvimento
+Mudanças: cria docs/mockups/ com 7 telas, index.html, README.md e VALIDACAO.md
+Impacto/Testes: mockups abertos manualmente no Chrome/Safari; todos os links entre telas funcionam
+```
+
+Atualize `docs/MUDANCAS.md` e o índice do `CLAUDE.md`.
+
+---
+
+### Integração com o CLAUDE.md e AGENTS.md
+
+Sempre que este fluxo for executado, atualize:
+
+- `CLAUDE.md` → adicione `docs/mockups/` na tabela de índice de documentos (se ainda não estiver)
+- `AGENTS.md` → se outro agente (Lovable, Cursor) for trabalhar no projeto, ele deve saber que os mockups existem e são a referência visual do PRD
+
+---
+
+### Anti-padrões proibidos neste fluxo
+
+| Proibido | Por que | O que fazer em vez disso |
+|----------|---------|--------------------------|
+| Criar mockup sem PRD aprovado | O mockup não reflete o produto real | Criar o PRD primeiro |
+| Criar mockup sem design system | Design inconsistente, genérico | Exigir design system completo |
+| Colocar várias telas em um único arquivo | Difícil navegar e revisar | Um arquivo por tela |
+| Usar nomes genéricos como `login.html` | Perde rastreabilidade com o inventário | Usar `tel-XXX-nome-da-tela.html` |
+| Criar `styles.css` compartilhado | Quebra a regra de autocontido; copiar uma tela perde o estilo | Colocar CSS inline em cada arquivo HTML |
+| Usar cores/fontes fora do design system | Quebra fidelidade | Mapear tudo para tokens |
+| Deixar estados importantes de fora | O usuário não vê casos de erro/vazio | Representar todos os estados do inventário |
+| Mockup estático sem links | Não simula fluxo real | Sempre linkar próximas telas |
+| Ignorar requisitos P0/P1 "porque é só mockup" | Mockup pela metade | Cobrir todos os requisitos P0/P1 |
 
 ---
 
@@ -1277,6 +1622,29 @@ Próximos passos obrigatórios antes de usar o projeto:
 
 Esta skill faz parte do ecossistema OMNX. Quando o trabalho exigir domínios além de código e infraestrutura, verifique quais outras skills OMNX estão disponíveis e delegue para a mais adequada.
 
+### Multi-tenancy (`omnx-multi-tenancy`)
+
+Sempre que o usuário pedir para tornar o sistema multi-tenant, adicionar
+sub-contas, criar um modelo de agência, isolar tenants, implementar BYOK
+(bring-your-own-key), isolar credenciais por workspace, rotear webhooks por
+tenant, ou fazer offboarding LGPD de tenant, **ative a `omnx-multi-tenancy`
+antes de criar qualquer task de código**.
+
+Ela é a especialista que traduz o pedido em fases de trabalho, define as
+migrations, aponta os testes de isolamento e garante que nada seja feito fora
+de ordem. A `omnx-code` continua sendo a dona da execução (tasks, commits,
+documentação, regras do CLAUDE.md).
+
+Como invocar:
+
+```
+Skill("omnx-multi-tenancy", args="<contexto do projeto e do pedido do usuário>")
+```
+
+Contexto mínimo a passar: stack, se o projeto é novo ou legado, número de
+workspaces/tenants atuais, integrações que precisam de isolamento (GHL, Meta,
+Notion, OpenRouter), e se há Single-Tenant Lock ativado.
+
 ### Descoberta de skills disponíveis
 
 Ao iniciar qualquer tarefa que pareça cruzar domínios, execute:
@@ -1314,8 +1682,9 @@ Skill("<nome-da-skill>", args="<contexto do projeto>")
 
 | Arquivo / URL | Conteúdo |
 |---------------|----------|
-| `references/modelo-claude.md` | Template padrão do CLAUDE.md a instalar nos projetos |
-| `references/modelo-agents.md` | Template padrão do AGENTS.md (Lovable, Cursor, Windsurf, Codex) |
-| `CHANGELOG.md` | Histórico de versões desta skill |
+| `references/modelo-claude.md` | Template padrao do CLAUDE.md a instalar nos projetos |
+| `references/modelo-agents.md` | Template padrao do AGENTS.md (Lovable, Cursor, Windsurf, Codex) |
+| `references/modelo-uml.html` | Template HTML visual para UML (abas navegaveis, tema dark, Mermaid.js) |
+| `CHANGELOG.md` | Historico de versoes desta skill |
 | https://github.com/Empire-Business/security-auditor | Repo oficial do security-auditor |
 | https://agents.md | Padrão aberto AGENTS.md — referência da especificação |
