@@ -72,9 +72,17 @@
 - Se não existirem → crie esses documentos primeiro. Não comece a codar sem eles
 - Antes de criar mockups/protótipos: exija `PRD.md`, `ARQUITETURA.md`, `UML.md` e design system (`docs/DESIGN.md` ou `docs/design-system/`) completos
 - Mockups vão em `docs/mockups/`, um arquivo HTML por tela, navegáveis via `docs/mockups/index.html`
+- Handoffs vão em `docs/handoffs/` (`latest.md`, `HISTORY.md`, `README.md`) — atualize ao final de toda sessão significativa e leia na retomada
 - Toda documentação técnica vai para `docs/[NOME].md`
 - O `CLAUDE.md` é um índice enxuto — nunca coloque documentação longa diretamente nele
 - Ao remover uma feature: delete o código, o doc em `docs/` e a entrada no índice do `CLAUDE.md`
+
+## Handoffs entre sessões
+
+- `docs/handoffs/latest.md` guarda o estado atual do projeto e deve ser lido primeiro quando o usuário pedir para continuar, retomar ou limpar contexto
+- `docs/handoffs/HISTORY.md` guarda o histórico cronológico — acrescente, nunca apague
+- Atualize o handoff ao final de toda sessão que produzir mudanças significativas
+- O handoff é um resumo, não substitui `PRD.md`, `ARQUITETURA.md`, `UML.md` ou outros docs
 
 ## Comunicação
 
@@ -91,4 +99,4 @@ Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tor
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.10
+> Versão do template: omnx-code v1.11

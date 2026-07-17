@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.10"
+version: "1.11"
 min_security_auditor: "1.10"
 contract_version: 1
 description: |
@@ -10,11 +10,18 @@ description: |
   qualquer trabalho de desenvolvimento guiado pelo CLAUDE.md — com tasks 100% do tempo.
   Também cria mockups navegáveis 100% fiéis ao PRD e ao design system, em arquivos
   separados por tela, dentro de docs/mockups/.
+  Sempre que possível, opera de forma enxuta para economizar tokens: resume contexto,
+  evita releituras desnecessárias e mantém docs de handoff em docs/handoffs/ para que
+  o usuário possa dar CLEAR no contexto e retomar depois.
 
   Use SEMPRE que o usuário pedir para começar um projeto novo, codar qualquer feature,
   estruturar documentação, auditar segurança, criar mockups, prototipar telas,
   wireframes, ou sempre que mencionar "omnx", "omnx-code", "omnx code",
   "mockup", "protótipo", "telas do app" ou pedir para "ativar o framework".
+  Também use quando o usuário pedir para "continuar", "retomar", "handoff",
+  "limpar contexto", "nova sessão", "resumir o que estava fazendo" ou qualquer variação
+  que indique retomada de trabalho — a skill deve ler docs/handoffs/latest.md e
+  retomar a partir dele.
   Em projetos novos, esta skill é o primeiro passo obrigatório antes de qualquer código.
   Em pedidos de mockup, esta skill exige PRD, ARQUITETURA, UML e design system
   aprovados antes de gerar qualquer tela.
@@ -37,7 +44,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.10** |
+| Versão da skill | **1.11** |
 | Security-auditor mínimo requerido | **v1.10** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -105,6 +112,46 @@ curl -fsSL --max-time 15 --proto '=https' --tlsv1.2 https://raw.githubuserconten
 
 ---
 
+## Passo 1.6 — Detecção de Handoff (retomada de sessão)
+
+Este passo roda **toda vez** que a skill é ativada, antes de decidir entre Setup ou Modo de Trabalho Normal. Ele detecta se o usuário está retomando uma sessão anterior ou se existe um handoff prévio no projeto.
+
+**Gatilhos de retomada (qualquer um dispara leitura do handoff):**
+
+- O usuário disser: "continuar", "retomar", "handoff", "continua os handoffs", "limpar contexto", "nova sessão", "resumir o que estava fazendo", "voltar ao que estávamos fazendo", "o que estávamos fazendo?"
+- Existe `docs/handoffs/latest.md` no projeto (mesmo que o usuário não mencione handoff explicitamente)
+
+**Ação quando um gatilho é detectado:**
+
+1. Leia `docs/handoffs/latest.md` (se existir) **antes** de ler o `CLAUDE.md`.
+2. Se `docs/handoffs/latest.md` não existir, mas o usuário pediu explicitamente para continuar/retomar, avise: "Não encontrei um handoff anterior em docs/handoffs/latest.md. Vou tratar este como início de uma nova sessão." e prossiga para o Passo 1 / Setup / Modo de Trabalho Normal.
+3. Se o handoff existir, resuma para o usuário em no máximo 5 bullets:
+   - O que estava sendo feito
+   - Qual a fase/etapa atual
+   - O que falta fazer
+   - Decisões pendentes
+   - Próximo passo recomendado
+4. Continue o trabalho a partir do estado descrito no handoff, sem pedir ao usuário para repetir o contexto.
+
+**Quando criar/atualizar o handoff:**
+
+- Ao final de toda sessão que produziu mudanças significativas (código, documentação, decisões arquiteturais, mudança de fase)
+- Quando o usuário pedir explicitamente: "handoff", "cria handoff", "atualiza handoff", "limpa contexto", "vou sair", "termina por hoje"
+- Antes de operações de longa duração que podem ser interrompidas
+- Sempre que uma nova fase do projeto for concluída (FASE 0 → FASE 1, etc.)
+
+**Arquivos de handoff:**
+
+| Arquivo | Propósito |
+|---------|-----------|
+| `docs/handoffs/latest.md` | Estado atual do projeto — é o único arquivo lido na retomada. Deve ser curto e denso. |
+| `docs/handoffs/HISTORY.md` | Histórico cronológico de todas as sessões. Acrescente, nunca sobrescreva. |
+| `docs/handoffs/README.md` | Explica como usar os handoffs e como retomar. |
+
+> **Economia de tokens:** o `latest.md` deve ter no máximo 200 linhas. Se o projeto for muito grande, foque no estado atual, decisões pendentes e próximos passos. Detalhes históricos vão para `HISTORY.md`, não para `latest.md`.
+
+---
+
 ## Fase de Setup
 
 ### Tasks obrigatórias (criar todas antes de começar)
@@ -123,7 +170,7 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
 
 ```json
 {
-  "omnx_version": "1.10",
+  "omnx_version": "1.11",
   "setup_complete": false,
   "claude_md_installed": false,
   "claude_md_merged_at": null,
@@ -135,7 +182,9 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
   "github_repo_private": null,
   "last_update_check": null,
   "last_version_gate_check": null,
-  "last_version_gate_checked_at": null
+  "last_version_gate_checked_at": null,
+  "handoffs_enabled": true,
+  "last_handoff_at": null
 }
 ```
 
@@ -442,9 +491,11 @@ Apresente ao usuário um resumo do que foi feito:
 - /security-auditor: [instalado v1.10 / já estava atualizado v1.X] — gate: P0/P1 em aberto bloqueiam deploy; auto-fix só com confirmação explícita
 - GitHub: [criado <owner>/<repo> (privado) / remote já existia / gh não disponível]
 - State document: .empire/state.json criado
+- Handoffs: docs/handoffs/ preparada para salvar estado entre sessões
 
 Agora você pode usar esta skill a qualquer momento para codar,
 documentar ou auditar segurança. O CLAUDE.md é o seu índice — tudo parte dele.
+Para pausar e retomar depois, peça "handoff" ou "atualiza o handoff".
 ```
 
 ---
@@ -815,6 +866,22 @@ O Lovable acessa o projeto via GitHub (deploy key ou OAuth). Qualquer ação que
 
 - O arquivo `.lovable/` ou `lovable.config.*` na raiz do projeto deve ser tratado como **somente leitura** por esta skill. Nunca edite, mova ou delete sem instrução explícita do usuário seguida de confirmação dupla.
 
+**22. Economia de tokens — trabalho enxuto sem perder precisão**
+
+Tokens são o recurso mais escasso em sessões longas. A skill deve operar de forma enxuta em todos os momentos, sem sacrificar segurança, rastreabilidade ou qualidade. Isso não significa "fazer menos" — significa evitar desperdício de contexto.
+
+Princípios:
+
+1. **Não releia o que já está no handoff.** Se `docs/handoffs/latest.md` cobre o estado atual do projeto, use-o como fonte de verdade em vez de reler dezenas de arquivos. Releia apenas o que mudou desde o handoff.
+2. **Resuma antes de expandir.** Ao apresentar resultados ao usuário, use bullets, tabelas e frases curtas. Evite reproduzir trechos longos de código ou documentação inteiros na conversa — aponte para o arquivo e cite a linha relevante.
+3. **Tasks enxutas.** Crie tasks com títulos claros e descrições de uma linha. Evite descrições enormes que repetem o que já está no CLAUDE.md ou no handoff.
+4. **Use arquivos em vez de conversa.** Decisões, critérios, listas de requisitos e detalhes técnicos devem viver em `docs/`, não no contexto da conversa. A skill deve escrever no arquivo e referenciar, não recitar.
+5. **Evite releituras repetidas.** Se você já leu `docs/PRD.md` nesta sessão, não precisa reler a menos que o usuário tenha alterado algo. Mantenha uma noção mental do que já foi carregado.
+6. **Handoff como cache de contexto.** Quando o handoff estiver atualizado, a skill pode confiar nele para retomar o trabalho sem reconstruir todo o contexto do zero.
+7. **Não gere saída redundante.** Se o usuário pediu "ajuste o botão", não explique a stack inteira do projeto. Explique o que foi alterado, por quê e onde.
+
+**Regra prática:** se uma informação já existe em um arquivo versionado do projeto (`CLAUDE.md`, `docs/handoffs/latest.md`, `docs/PRD.md`, etc.), prefira citar o arquivo a reproduzi-la na resposta.
+
 ### Quando usar agentes em time
 
 Para tarefas que envolvem múltiplos domínios em paralelo (ex: migração de banco + atualização de UI + testes), use subagentes com o tool `Agent`. Cada agente recebe:
@@ -1154,6 +1221,223 @@ Sempre que este fluxo for executado, atualize:
 | Deixar estados importantes de fora | O usuário não vê casos de erro/vazio | Representar todos os estados do inventário |
 | Mockup estático sem links | Não simula fluxo real | Sempre linkar próximas telas |
 | Ignorar requisitos P0/P1 "porque é só mockup" | Mockup pela metade | Cobrir todos os requisitos P0/P1 |
+
+---
+
+## Fluxo de Handoffs (continuidade entre sessões)
+
+> O objetivo do handoff é simples: permitir que o usuário dê CLEAR no contexto, feche a sessão e retome depois sem perder o estado do trabalho. O handoff é um documento vivo, não um relatório de status. Ele deve conter **apenas o que a próxima sessão precisa saber** para continuar de onde parou.
+
+### Quando ativar este fluxo
+
+Este fluxo é acionado:
+
+1. **Automaticamente**, ao final de qualquer sessão que produziu mudanças significativas (código, documentação, decisões, mudança de fase).
+2. **Explicitamente**, quando o usuário disser: "handoff", "cria handoff", "atualiza handoff", "limpa contexto", "vou sair", "termina por hoje", "resumir para a próxima sessão", "salvar estado".
+3. **Antes de interrupções**, como operações longas ou quando o usuário indica que vai pausar.
+
+### Princípios inegociáveis
+
+1. **Handoff nunca substitui documentação.** O handoff resume o estado atual; o `CLAUDE.md`, `PRD.md`, `ARQUITETURA.md` e outros docs continuam sendo a fonte de verdade. Não duplique documentação longa no handoff.
+2. **latest.md é curto e denso.** Máximo 200 linhas. Se o estado não couber nisso, você está colocando coisa demais no handoff — mova detalhes para `HISTORY.md` ou para o doc apropriado em `docs/`.
+3. **Atualize sempre que a sessão mudar algo importante.** Handoff desatualizado é pior que nenhum handoff, porque induz a próxima sessão a tomar decisões com base em informação velha.
+4. **Leia o handoff na retomada.** Quando a skill detectar que o usuário está continuando uma sessão anterior, `docs/handoffs/latest.md` é o primeiro arquivo a ser lido — antes mesmo de buscar detalhes em outros docs.
+
+### Estrutura da pasta `docs/handoffs/`
+
+| Arquivo | Propósito | Quando atualizar |
+|---------|-----------|------------------|
+| `docs/handoffs/latest.md` | Estado atual do projeto. É o único arquivo lido na retomada. | Ao final de toda sessão significativa ou quando solicitado. |
+| `docs/handoffs/HISTORY.md` | Histórico cronológico de sessões. | Acrescente uma entrada ao final de cada sessão que produzir handoff. Nunca apague. |
+| `docs/handoffs/README.md` | Explica o que são os handoffs e como retomar. | Criar na primeira vez; atualizar se o processo mudar. |
+
+---
+
+### Task 0 — Criar tasks do fluxo de handoff
+
+Antes de qualquer coisa, liste as tasks:
+
+```
+Task 1: Verificar se docs/handoffs/ existe e criar estrutura se necessário
+Task 2: Coletar estado atual do projeto (o que foi feito nesta sessão, o que falta, decisões pendentes)
+Task 3: Atualizar docs/handoffs/latest.md com o estado atual
+Task 4: Acrescentar entrada em docs/handoffs/HISTORY.md
+Task 5: Criar/atualizar docs/handoffs/README.md se necessário
+Task 6: Commitar alterações (se houver outras mudanças pendentes)
+```
+
+---
+
+### Task 1 — Criar estrutura
+
+```bash
+mkdir -p docs/handoffs
+```
+
+Se for o primeiro handoff do projeto, crie os três arquivos. Se já existirem, apenas atualize `latest.md` e acrescente em `HISTORY.md`.
+
+---
+
+### Task 2 — Coletar estado atual
+
+Pergunte-se (e registre) antes de escrever:
+
+1. **O que foi feito nesta sessão?** (máximo 5 bullets)
+2. **Qual é a fase/etapa atual do projeto?** (FASE 0, FASE 1, etc.)
+3. **O que falta fazer?** (próximos passos concretos)
+4. **Há decisões pendentes?** (escolhas que só o usuário pode tomar)
+5. **Há bloqueios?** (gates de segurança, UML, níveis de acesso, dependências externas)
+6. **Qual o próximo passo recomendado?** (a primeira ação da próxima sessão)
+
+> **Dica de economia de tokens:** use as informações que você já tem do trabalho desta sessão. Não releia arquivos inteiros só para fazer o handoff — mas verifique rapidamente se algo importante mudou.
+
+---
+
+### Task 3 — Atualizar `docs/handoffs/latest.md`
+
+Sempre sobrescreva este arquivo com o estado atual. Use este template:
+
+```markdown
+# Handoff Atual — <Nome do Projeto>
+
+**Sessão:** <data e hora BRT>
+**Responsável:** IA OMNX Code
+**Fase atual:** <FASE X — descrição>
+
+## O que foi feito nesta sessão
+
+- [bullet 1]
+- [bullet 2]
+- [bullet 3]
+
+## Estado atual
+
+- [descrição da situação: branch, último commit, docs aprovados, etc.]
+
+## O que falta fazer
+
+1. [próximo passo concreto]
+2. [próximo passo concreto]
+3. [próximo passo concreto]
+
+## Decisões pendentes
+
+- [decisão 1 — quem precisa decidir e o que está em jogo]
+- [decisão 2]
+
+## Bloqueios / gates
+
+- [ ] Gate de segurança: <status>
+- [ ] Gate UML: <status>
+- [ ] Gate Níveis de Acesso: <status>
+
+## Próximo passo recomendado
+
+[Uma frase clara: "Implementar a tela de login seguindo o mockup TEL-001"]
+
+## Referências rápidas
+
+- PRD: `docs/PRD.md`
+- Arquitetura: `docs/ARQUITETURA.md`
+- UML: `docs/UML.md` + `docs/UML.html`
+- Design system: `docs/DESIGN.md`
+- Mockups: `docs/mockups/`
+- Roadmap: `docs/ROADMAP.md`
+```
+
+**Regras do `latest.md`:**
+
+- Máximo 200 linhas.
+- Use bullets e tabelas, não parágrafos longos.
+- Não copie código inteiro. Aponte para o arquivo e cite a função/componente.
+- Se uma seção não tiver nada (ex: sem bloqueios), escreva "Nenhum" em vez de omitir.
+- Atualize o campo "Sessão" com a data/hora BRT do fim da sessão.
+
+---
+
+### Task 4 — Atualizar `docs/handoffs/HISTORY.md`
+
+Acrescente uma nova entrada ao final, nunca sobrescreva. Cada entrada deve ter:
+
+```markdown
+## <data e hora BRT>
+
+### Feito
+- [bullet 1]
+- [bullet 2]
+
+### Decisões
+- [decisão tomada]
+
+### Próximo passo deixado
+- [o que a próxima sessão deveria fazer]
+```
+
+> **Economia de tokens:** o `HISTORY.md` pode crescer indefinidamente. A skill não precisa lê-lo na retomada — ele é apenas auditoria. Se ficar muito grande (>1000 linhas), sugira ao usuário arquivar entradas antigas em `docs/handoffs/history/YYYY-MM.md`.
+
+---
+
+### Task 5 — Criar/atualizar `docs/handoffs/README.md`
+
+Na primeira vez, crie:
+
+```markdown
+# Handoffs do Projeto
+
+Esta pasta guarda o estado vivo do trabalho para que sessões possam ser retomadas sem perder contexto.
+
+## Arquivos
+
+| Arquivo | Quando ler | Quando atualizar |
+|---------|------------|------------------|
+| `latest.md` | Ao retomar uma sessão | Ao final de toda sessão significativa |
+| `HISTORY.md` | Quando precisar de histórico | Ao final de cada sessão |
+
+## Como retomar
+
+1. Abra `docs/handoffs/latest.md`
+2. Leia o estado atual e o próximo passo recomendado
+3. Continue a partir dele
+
+> Gerenciado automaticamente pela skill `omnx-code`.
+```
+
+---
+
+### Task 6 — Commitar
+
+Se o handoff for a única mudança, commit separado:
+
+```text
+docs: atualiza handoff do projeto
+
+Contexto: sessão finalizada, estado salvo para retomada
+Mudanças: atualiza docs/handoffs/latest.md e HISTORY.md
+Impacto/Testes: nenhum — documentação apenas
+```
+
+Se houver outras mudanças pendentes, o handoff pode entrar no mesmo commit da entrega principal (desde que a mensagem de commit mencione a documentação).
+
+---
+
+### Integração com o `CLAUDE.md`
+
+Sempre que este fluxo for executado pela primeira vez em um projeto, atualize:
+
+- `CLAUDE.md` → adicione `docs/handoffs/` na tabela de índice de documentos
+- `AGENTS.md` → adicione uma linha sobre handoffs para que outros agentes saibam que existe um estado de retomada
+
+---
+
+### Anti-padrões proibidos neste fluxo
+
+| Proibido | Por que | O que fazer em vez disso |
+|----------|---------|--------------------------|
+| Usar handoff como substituto do PRD/ARQUITETURA | O handoff é resumo, não fonte de verdade | Manter docs principais atualizados e citá-los |
+| Deixar `latest.md` desatualizado | Induz a próxima sessão a erro | Atualizar ao final de toda sessão significativa |
+| Colocar código inteiro no handoff | desperdiça tokens e dificulta leitura | Apontar para arquivo e citar função/componente |
+| Criar handoff gigante (>200 linhas) | Perde o objetivo de resumo | Mover detalhes para HISTORY.md ou docs/ |
+| Ignorar o handoff na retomada | Reinicia o contexto do zero | Ler `latest.md` primeiro |
 
 ---
 

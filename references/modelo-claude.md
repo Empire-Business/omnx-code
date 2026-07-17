@@ -354,6 +354,8 @@ A IA deve ler todos os arquivos abaixo antes de executar qualquer tarefa:
 | `docs/NIVEIS-DE-ACESSO.md`   | Matriz de papéis × permissões — **bloqueia commit e deploy se ausente/incompleta** | — |
 | `docs/DESIGN.md`             | Design system (cores, tipografia, componentes, espaçamento) — **gate para mockups** | — |
 | `docs/mockups/`              | Mockups navegáveis (um arquivo HTML por tela), gerados a partir do PRD e design system | — |
+| `docs/handoffs/latest.md`    | Estado atual do projeto para retomada entre sessões      | —             |
+| `docs/handoffs/HISTORY.md`   | Histórico cronológico das sessões anteriores             | —             |
 | `docs/ROADMAP.md`            | Tarefas pendentes, em andamento e concluídas             | —             |
 | `docs/MUDANCAS.md`           | Changelog de todas as alterações relevantes              | —             |
 | `docs/integracoes/vercel.md` | Configuração de deploy, domínio e segurança no Vercel    | —             |
@@ -410,6 +412,18 @@ Site atualizado no ar ✅
 
 - Branch `main` → Deploy em **produção** (site real)
 - Outras branches → Deploy em **preview** (URL temporária para testes)
+
+---
+
+## 🔄 Handoffs entre Sessões
+
+Para economizar tokens e permitir que o usuário dê CLEAR no contexto, o projeto mantém handoffs em `docs/handoffs/`:
+
+- `docs/handoffs/latest.md` — estado atual do projeto; lido na retomada de qualquer sessão
+- `docs/handoffs/HISTORY.md` — histórico cronológico das sessões
+- `docs/handoffs/README.md` — como usar os handoffs
+
+A IA deve atualizar `latest.md` ao final de toda sessão significativa e lê-lo primeiro quando o usuário pedir para continuar, retomar ou limpar contexto.
 
 ---
 

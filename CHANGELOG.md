@@ -4,7 +4,22 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
-## Não lançado (edição local, ainda sem tag/versão)
+## v1.11 — 2026-07-16
+
+### Handoffs entre sessões e economia de tokens
+
+Ajuste pedido pelo usuário: a skill agora cria e mantém docs de handoff em pasta dedicada (`docs/handoffs/`) para que o usuário possa dar CLEAR no contexto e retomar o trabalho em uma nova sessão. Também passa a operar de forma mais enxuta para economizar tokens.
+
+### Adicionado
+- **Passo 1.6 no `SKILL.md` — Detecção de Handoff**: roda em toda ativação da skill, detectando pedidos de continuidade ("continuar", "retomar", "handoff", "limpar contexto", "nova sessão", etc.) e lendo `docs/handoffs/latest.md` antes de reconstruir o contexto do zero.
+- **Seção "Fluxo de Handoffs" no `SKILL.md`**: workflow completo para criar/atualizar `docs/handoffs/latest.md`, `docs/handoffs/HISTORY.md` e `docs/handoffs/README.md`, com templates, regras de tamanho (máximo 200 linhas para `latest.md`) e anti-padrões.
+- **Regra 22 no Modo de Trabalho Normal — Economia de tokens**: diretrizes para evitar releituras desnecessárias, resumir outputs, usar tasks enxutas e confiar no handoff como cache de contexto.
+- **Campos no state document**: `handoffs_enabled: true` e `last_handoff_at` para rastrear quando o handoff foi atualizado pela última vez.
+- **Mensagem de setup final atualizada**: informa ao usuário sobre `docs/handoffs/` e como pedir handoff.
+- **Atualização dos templates**: `references/modelo-claude.md` (seção "Handoffs entre Sessões" + índice de documentos) e `references/modelo-agents.md` (seções "Handoffs entre sessões" e atualização do fluxo de desenvolvimento).
+- **Triggers na descrição da skill**: `SKILL.md` frontmatter agora menciona "continuar", "retomar", "handoff", "limpar contexto", "nova sessão" e economia de tokens como contextos de ativação.
+
+---
 
 ### Fluxo de Mockups navegáveis e fidelidade ao PRD/design system
 

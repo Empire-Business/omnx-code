@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML Visual — NOME_DO_PROJETO</title>
+<!--
+  TEMPLATE: modelo-uml.html — OMNX Code v1.10+
+  ---------------------------------------------------------------------------
+  Este arquivo é um template. A IA deve:
+  1. Substituir NOME_DO_PROJETO pelo nome real do produto
+  2. Preencher cada <div class="mermaid"> com os diagramas correspondentes
+     do docs/UML.md do projeto (classDiagram, sequenceDiagram, stateDiagram)
+  3. Ajustar os títulos das abas e painéis conforme os diagramas do projeto
+  4. Remover placeholders/divs de diagramas que o projeto não tiver
+  5. Ajustar a versão no header e footer (ex: "v1.0", "v2.0")
+
+  Regra: SEMPRE que docs/UML.md for criado ou atualizado, o UML.html
+  correspondente também deve ser gerado/atualizado no MESMO commit.
+  ---------------------------------------------------------------------------
+-->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0b;
+    --surface: #121214;
+    --border: #1e1e22;
+    --text: #e4e4e7;
+    --text-secondary: #9898a0;
+    --accent: #22c55e;
+    --accent-glow: rgba(34, 197, 94, 0.15);
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  .version-badge {
+    font-size: 11px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-weight: 500;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 24px 0;
+    background: var(--bg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface); }
+  .tab.active {
+    color: var(--accent);
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .content {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    min-height: calc(100vh - 120px);
+  }
+
+  .panel {
+    display: none;
+    padding: 24px;
+  }
+
+  .panel.active { display: block; }
+
+  .panel h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .panel .subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .mermaid-wrapper {
+    background: #0d0d0f;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .mermaid-wrapper .mermaid {
+    display: flex;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .tabs { padding: 12px 12px 0; }
+    .panel { padding: 16px; }
+    .mermaid-wrapper { padding: 12px; }
+    .tab { font-size: 11px; padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">NOME_DO_PROJETO</span>
+  <span class="version-badge">UML VERSAO_DO_UML</span>
+  <span style="flex:1"></span>
+  <span style="color:var(--text-secondary);font-size:13px">Diagramas do Sistema</span>
+</header>
+
+<!--
+  ABAS: Adicione/remova abas conforme os diagramas do projeto.
+  Cada botao .tab deve ter data-panel="<id>" que corresponde ao id do painel abaixo.
+  O primeiro botao sempre tem class="tab active".
+-->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-panel="class">Classes</button>
+  <button class="tab" data-panel="sequence-1">Sequência: Fluxo Principal</button>
+  <button class="tab" data-panel="sequence-2">Sequência: Fluxo Secundário</button>
+  <button class="tab" data-panel="state-1">Estados: Ciclo de Vida</button>
+  <button class="tab" data-panel="context">Contexto (C4)</button>
+</div>
+
+<div class="content">
+
+  <!-- ============================================================ -->
+  <!-- PAINEL 1: Diagrama de Classes                               -->
+  <!-- ============================================================ -->
+  <div class="panel active" id="panel-class">
+    <h2>Diagrama de Classes</h2>
+    <p class="subtitle">DESCRICAO_DO_DIAGRAMA_DE_CLASSES</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+        <!-- COLE AQUI O classDiagram COMPLETO DO docs/UML.md -->
+classDiagram
+    class Exemplo {
+        +UUID id
+        +String nome
+        +DateTime createdAt
+    }
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PAINEL 2: Sequencia — Fluxo Principal                       -->
+  <!-- ============================================================ -->
+  <div class="panel" id="panel-sequence-1">
+    <h2>Sequência: Fluxo Principal</h2>
+    <p class="subtitle">DESCRICAO_DO_FLUXO_PRINCIPAL</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+        <!-- COLE AQUI O sequenceDiagram DO FLUXO PRINCIPAL do docs/UML.md -->
+sequenceDiagram
+    participant A as Ator 1
+    participant B as Sistema
+    A->>B: Acao
+    B-->>A: Resposta
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PAINEL 3: Sequencia — Fluxo Secundario                      -->
+  <!-- ============================================================ -->
+  <div class="panel" id="panel-sequence-2">
+    <h2>Sequência: Fluxo Secundário</h2>
+    <p class="subtitle">DESCRICAO_DO_FLUXO_SECUNDARIO</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+        <!-- COLE AQUI O sequenceDiagram DO FLUXO SECUNDARIO do docs/UML.md -->
+sequenceDiagram
+    participant A as Ator
+    participant B as Servico
+    A->>B: Request
+    B-->>A: Response
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PAINEL 4: Estados — Ciclo de Vida                           -->
+  <!-- ============================================================ -->
+  <div class="panel" id="panel-state-1">
+    <h2>Estados: Ciclo de Vida</h2>
+    <p class="subtitle">DESCRICAO_DO_DIAGRAMA_DE_ESTADOS</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+        <!-- COLE AQUI O stateDiagram DO docs/UML.md -->
+stateDiagram-v2
+    [*] --> Inicial
+    Inicial --> Processando
+    Processando --> Finalizado
+    Finalizado --> [*]
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PAINEL 5: Contexto C4 — Nivel 1                             -->
+  <!-- ============================================================ -->
+  <div class="panel" id="panel-context">
+    <h2>Diagrama de Contexto (C4 — Nível 1)</h2>
+    <p class="subtitle">Visão arquitetônica de alto nível: plataforma, serviços externos e usuários.</p>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+        <!-- COLE AQUI O DIAGRAMA C4 (graph TB) DO docs/UML.md -->
+graph TB
+    subgraph "NOME_DO_SISTEMA"
+        UI[Frontend]
+        API[API / Backend]
+        DB[(Banco de Dados)]
+    end
+    subgraph "Servicos Externos"
+        S1[Servico A]
+        S2[Servico B]
+    end
+    subgraph "Usuarios"
+        U1[Usuario 1]
+        U2[Usuario 2]
+    end
+    U1 --> UI
+    U2 --> UI
+    UI --> API
+    API --> DB
+    API --> S1
+    API --> S2
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  NOME_DO_PROJETO — UML Visual VERSAO_DO_UML &middot; Renderizado com Mermaid.js &middot; DATA_DE_GERACAO
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1a1a1e',
+      primaryTextColor: '#e4e4e7',
+      primaryBorderColor: '#2e2e32',
+      lineColor: '#3a3a40',
+      secondaryColor: '#0f0f11',
+      tertiaryColor: '#121214',
+      noteBkgColor: '#1a2a1a',
+      noteTextColor: '#e4e4e7',
+      fontSize: '13px',
+      fontFamily: 'Inter, -apple-system, sans-serif'
+    },
+    sequence: {
+      actorFontSize: '13px',
+      noteFontSize: '11px',
+      messageFontSize: '12px',
+      boxMargin: 8
+    }
+  });
+
+  window.addEventListener('load', () => {
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.panel;
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const panel = document.getElementById('panel-' + target);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
