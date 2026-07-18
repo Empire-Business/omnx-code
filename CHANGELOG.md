@@ -4,6 +4,17 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.13 — 2026-07-17
+
+### Regra 23 — Documentação obrigatória para integrações de API/webhook
+
+Adicionado a pedido do usuário: toda integração de API externa ou webhook (recebido ou disparado pelo app) agora exige três coisas antes de ser considerada pronta.
+
+### Adicionado
+- **Regra 23 (`SKILL.md`) — "Toda integração de API/webhook precisa ser documentada e configurável na UI"**: (1) documentação ampla em `docs/` (o que a integração faz, autenticação, rate limits, comportamento em falha), indexada no CLAUDE.md como as demais docs (regra 7); (2) parte didática na UI de configuração — instruções, tooltips e exemplo de formato quando a integração exigir credencial/URL/parâmetro do usuário, para não depender de suporte ou leitura de código; (3) contrato de dados claro no lado que recebe — método HTTP, schema/exemplo real de payload, campos obrigatórios/opcionais, autenticação esperada, códigos de resposta, e um exemplo de request funcional (`curl` ou equivalente) para qualquer sistema externo integrar sem precisar perguntar. Documentação atualiza no mesmo commit que qualquer mudança de contrato, mesmo princípio já aplicado a migrations (regra 20).
+
+---
+
 ## v1.12.1 — 2026-07-17
 
 ### Correção do pin de auto-atualização da própria skill
