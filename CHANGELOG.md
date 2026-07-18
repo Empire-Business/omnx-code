@@ -4,6 +4,14 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.12.1 — 2026-07-17
+
+### Correção do pin de auto-atualização da própria skill
+
+O pin `PINNED_TAG`/`PINNED_SHA` usado pela Task 4 do fluxo de auto-atualização (que verifica a própria omnx-code) ainda apontava para `v1.10.0` — desatualizado desde o release v1.11. Corrigido para apontar para `v1.12.0` (SHA `16fc4be975f0b570757f7ed56aee9aafd7ac678f`), a última tag estável antes deste patch.
+
+---
+
 ## v1.12 — 2026-07-17
 
 ### Orientação sobre branches soltas sem PR na higiene Git

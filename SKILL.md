@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.12"
+version: "1.12.1"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -44,7 +44,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.12** |
+| Versão da skill | **1.12.1** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -1528,8 +1528,8 @@ git --no-pager diff HEAD..origin/main -- SKILL.md
 
 Mostre o diff ao usuário e peça confirmação. Aplique **verificando antes**, por referência imutável (nunca `git pull` em `main`):
 ```bash
-PINNED_TAG=v1.10.0
-PINNED_SHA=20289c2d3c7de95d76fdd9539e3d9f9f2b8ba1ce
+PINNED_TAG=v1.12.0
+PINNED_SHA=16fc4be975f0b570757f7ed56aee9aafd7ac678f
 if git verify-tag "$PINNED_TAG" 2>/dev/null; then git checkout "$PINNED_TAG";
 elif [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ]; then echo "tag anotada validada por SHA pinado" && git checkout "$PINNED_TAG";
 else echo "FALHA: tag nao aponta para o SHA pinado; abortando" && exit 1; fi
