@@ -4,6 +4,18 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.12 — 2026-07-17
+
+### Orientação sobre branches soltas sem PR na higiene Git
+
+Ajuste pedido pelo usuário: a Regra 3 (higiene Git, "Modo de Trabalho Normal") ganhou orientação para lidar com branches que ficam soltas sem PR, sem virar automação nova.
+
+### Adicionado
+- **Regra 3 (`SKILL.md`) — "Branches soltas sem PR"**: ao rodar a checagem normal de `git status`/`git branch` desta regra, a skill agora avisa se a branch atual (ou outras branches locais) parece velha, divergente de `main`/`master` por muitos commits, ou sem PR aberto associado, e orienta como resolver: rebasear/atualizar com `main` com frequência em vez de deixar divergir, abrir PR cedo (mesmo em draft) para sinalizar trabalho em progresso, e perguntar ao usuário antes de deletar branch claramente abandonada (nunca deletar sozinha).
+- **Sugestão de checagem periódica via `/schedule`**: a skill deixa explícito que ela mesma não faz varredura automática/periódica de branches; se o usuário quiser esse tipo de checagem rodando com regularidade, é sugerido usar a skill `/schedule` para configurar um agente agendado — sem instalar nenhuma automação sozinha.
+
+---
+
 ## v1.11 — 2026-07-16
 
 ### Handoffs entre sessões e economia de tokens

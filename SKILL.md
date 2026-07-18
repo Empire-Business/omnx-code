@@ -1,7 +1,7 @@
 ---
 name: omnx-code
-version: "1.11"
-min_security_auditor: "1.10"
+version: "1.12"
+min_security_auditor: "1.11"
 contract_version: 1
 description: |
   Framework "vibe coding" completo para apps React + TypeScript + Supabase + Vercel.
@@ -44,8 +44,8 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.11** |
-| Security-auditor mínimo requerido | **v1.10** |
+| Versão da skill | **1.12** |
+| Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
 | State document | `.empire/state.json` (na raiz do projeto do usuário) |
@@ -287,7 +287,7 @@ done
 A **canônica** é sempre `$HOME/.claude/skills/<skill>` (cópia real, repo git). Os atalhos em `~/.codex/skills` e `~/.agents/skills` são **opcionais** e, quando existem, devem ser **symlinks para a canônica** — nunca clones separados, nunca caminhos fixos de uma máquina.
 
 Como decidir o que fazer com cada entrada encontrada:
-- **DIR real em `~/.claude/skills/<skill>`** → é a canônica. Se `< v1.10` ou em `main`, trave e peça ao usuário para atualizar pelo fluxo verificado.
+- **DIR real em `~/.claude/skills/<skill>`** → é a canônica. Se `< v1.11` ou em `main`, trave e peça ao usuário para atualizar pelo fluxo verificado.
 - **Symlink que resolve para `$HOME/.claude/skills/<skill>`** → OK, nada a fazer.
 - **Symlink QUEBRADO** (alvo não existe) ou **apontando para caminho estrangeiro** (qualquer coisa que não seja `$HOME/.claude/skills/<skill>` — ex.: `~/Desenvolvimento/...`, `/Users/<outra-pessoa>/...`) → **corrigir** recriando o atalho para a canônica (com confirmação do usuário):
   ```bash
@@ -297,7 +297,7 @@ Como decidir o que fazer com cada entrada encontrada:
   ```
 - **DIR real em `~/.codex` ou `~/.agents` (clone separado)** → sombra perigosa (pode estar velha/vulnerável). Avisar e travar até o usuário decidir: remover a cópia e (opcional) transformar em symlink da canônica. Nunca apague automaticamente.
 
-A v1.10 endurecida é contornada se qualquer runtime ler uma cópia antiga — por isso a skill ativa precisa conhecer as irmãs. Como a skill roda em computadores diferentes, **toda referência a caminho usa `$HOME`** (nunca `/Users/<nome>/...`), para que o mesmo fluxo funcione em qualquer máquina.
+A v1.11 endurecida é contornada se qualquer runtime ler uma cópia antiga — por isso a skill ativa precisa conhecer as irmãs. Como a skill roda em computadores diferentes, **toda referência a caminho usa `$HOME`** (nunca `/Users/<nome>/...`), para que o mesmo fluxo funcione em qualquer máquina.
 
 **Passo 1 — Verificar se está instalada e a versão local (real, em disco):**
 
@@ -320,12 +320,14 @@ Use só para decidir SE vale atualizar. Em falha de rede (HTTP != 200/timeout), 
 
 | Situação | Ação |
 |----------|------|
-| Não instalada | Validar ANTES de clonar: `git clone https://github.com/Empire-Business/security-auditor ~/.claude/skills/security-auditor && cd ~/.claude/skills/security-auditor && git fetch --tags`. Aplicar o bloco PINNED: `PINNED_TAG=v1.10.0; PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && echo "tag anotada validada por SHA" && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; se um dia houver GPG, o verify-tag passa primeiro). NUNCA derive "a mais recente", nunca fique em `main`. Só marque `security_auditor_installed=true` depois do checkout bem-sucedido |
-| Versão instalada < remota | `cd ~/.claude/skills/security-auditor && git fetch origin --tags && git log --oneline HEAD..origin/main` (diff ANTES) → mostrar o diff real do `SKILL.md` → pedir "sim" → aplicar o bloco PINNED: `PINNED_TAG=v1.10.0; PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; nunca `main`) |
-| Versão instalada < v1.10 (mínimo) e não há tag/SHA >= v1.10 | Bloquear o setup e avisar: versão antiga/incompatível; NÃO usar `git pull main` para "forçar". Pedir ao usuário uma tag/SHA >= v1.10 |
-| Versão instalada >= remota e >= v1.10 | Nada a fazer — reportar versão encontrada |
+| Não instalada | Validar ANTES de clonar: `git clone https://github.com/Empire-Business/security-auditor ~/.claude/skills/security-auditor && cd ~/.claude/skills/security-auditor && git fetch --tags`. Aplicar o bloco PINNED: `PINNED_TAG=v1.11.0; PINNED_SHA=ab81f3455a7feeb0e813acc74059a44b7968c1da; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && echo "tag anotada validada por SHA" && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; se um dia houver GPG, o verify-tag passa primeiro). NUNCA derive "a mais recente", nunca fique em `main`. Só marque `security_auditor_installed=true` depois do checkout bem-sucedido |
+| Versão instalada < remota | `cd ~/.claude/skills/security-auditor && git fetch origin --tags && git log --oneline HEAD..origin/main` (diff ANTES) → mostrar o diff real do `SKILL.md` → pedir "sim" → aplicar o bloco PINNED: `PINNED_TAG=v1.11.0; PINNED_SHA=ab81f3455a7feeb0e813acc74059a44b7968c1da; git verify-tag "$PINNED_TAG" 2>/dev/null && git checkout "$PINNED_TAG" || { [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ] && git checkout "$PINNED_TAG"; }` (tag anotada validada por SHA; nunca `main`) |
+| Versão instalada < v1.11 (mínimo) e não há tag/SHA >= v1.11 | Bloquear o setup e avisar: versão antiga/incompatível; NÃO usar `git pull main` para "forçar". Pedir ao usuário uma tag/SHA >= v1.11 |
+| Versão instalada >= remota e >= v1.11 | Nada a fazer — reportar versão encontrada |
 
 Comparação de versão: use `sort -V` (semver), nunca comparação lexicográfica de string (`v1.9 < v1.10` é falso em string). Em conflito ou falha, **NÃO** avance refs automaticamente (nem `--ff-only`) e **NUNCA** apague a skill — mostre `git status --short` e deixe o usuário resolver.
+
+> **Nota histórica**: os exemplos de comparação lexicográfica acima usam `v1.9`/`v1.10` só para ilustrar o problema — a versão mínima real vigente é a citada nas tabelas acima (v1.11).
 
 Após concluir, atualize no state:
 ```json
@@ -488,7 +490,7 @@ Apresente ao usuário um resumo do que foi feito:
 ✅ Setup OMNX Code concluído
 
 - CLAUDE.md: [instalado / mesclado com projeto existente]
-- /security-auditor: [instalado v1.10 / já estava atualizado v1.X] — gate: P0/P1 em aberto bloqueiam deploy; auto-fix só com confirmação explícita
+- /security-auditor: [instalado v1.11 / já estava atualizado v1.X] — gate: P0/P1 em aberto bloqueiam deploy; auto-fix só com confirmação explícita
 - GitHub: [criado <owner>/<repo> (privado) / remote já existia / gh não disponível]
 - State document: .empire/state.json criado
 - Handoffs: docs/handoffs/ preparada para salvar estado entre sessões
@@ -568,6 +570,11 @@ Use essa checagem para decidir o fluxo:
 - Se houver mudanças locais não relacionadas ou ambíguas, pare e peça direção ao usuário. Não misture trabalho novo com alteração antiga.
 - Se estiver em `main` ou `master`, sugira ao usuário: "⚠️ Você está na branch '{branch_atual}'. Recomendo criar uma branch dedicada antes de prosseguir. Deseja que eu crie uma branch?" Aguarde confirmação antes de continuar.
 - Se já estiver em uma branch de tarefa compatível com o pedido atual, pode continuar nela. Se a branch atual não corresponder ao escopo, sugira criar outra branch.
+- **Branches soltas sem PR (orientação, não automação)**: ao rodar o `git status`/`git branch` desta regra, se a branch atual (ou outras branches locais) estiver há muito tempo sem commit novo, divergente de `main`/`master` por muitos commits, ou sem PR aberto associado, avise o usuário e oriente como resolver para evitar conflitos futuros:
+  - Rebasear/atualizar a branch com `main` com frequência em vez de deixar divergir por semanas
+  - Abrir o PR cedo (mesmo em draft) para sinalizar trabalho em progresso e evitar que outra branch pise no mesmo arquivo
+  - Se a branch está claramente abandonada, perguntar ao usuário se quer deletá-la (nunca deletar sozinha — ver regra 11 de operações destrutivas)
+  - **Esta skill não faz varredura periódica automática de branches** — se o usuário quiser esse tipo de checagem rodando com regularidade (ex: diariamente, sem precisar abrir uma sessão manualmente), sugira que ele use a skill `/schedule` para configurar um agente agendado que rode essa checagem.
 
 **4. Toda nova funcionalidade recomenda-se em branch separada**
 Para qualquer trabalho novo fora de setup e auto-atualização, recomenda-se usar branch dedicada. Isso inclui `feature`, `fix`, `docs`, `refactor`, testes e tarefas técnicas.
@@ -1476,7 +1483,7 @@ echo "Instalada: $VERSAO_LOCAL | Remota: $VERSAO_REMOTA"
 printf '%s\n%s\n' "$VERSAO_LOCAL" "$VERSAO_REMOTA" | sort -V | head -1
 ```
 
-Se `VERSAO_LOCAL < VERSAO_REMOTA` (semver, via `sort -V`) ou `< v1.10` (mínimo), atualizar **verificando ANTES**:
+Se `VERSAO_LOCAL < VERSAO_REMOTA` (semver, via `sort -V`) ou `< v1.11` (mínimo), atualizar **verificando ANTES**:
 ```bash
 cd ~/.claude/skills/security-auditor
 ANTES=$(git rev-parse HEAD)
@@ -1484,8 +1491,8 @@ git fetch origin --tags
 git log --oneline HEAD..origin/main            # diff ANTES
 git --no-pager diff HEAD..origin/main -- SKILL.md
 # pedir "sim", depois aplicar o bloco PINNED (tag anotada validada por SHA, nunca 'main', nunca 'tag mais alta'):
-PINNED_TAG=v1.10.0
-PINNED_SHA=41fd0d699e9b82ce7f1c9820a40f08d1a8ca49fb
+PINNED_TAG=v1.11.0
+PINNED_SHA=ab81f3455a7feeb0e813acc74059a44b7968c1da
 if git verify-tag "$PINNED_TAG" 2>/dev/null; then git checkout "$PINNED_TAG";
 elif [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ]; then echo "tag anotada validada por SHA pinado" && git checkout "$PINNED_TAG";
 else echo "FALHA: tag nao aponta para o SHA pinado; abortando" && exit 1; fi
