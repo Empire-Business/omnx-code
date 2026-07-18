@@ -4,6 +4,14 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.13.1 — 2026-07-17
+
+### Correção do pin de auto-atualização da própria skill
+
+Atualiza o pin `PINNED_TAG`/`PINNED_SHA` da Task 4 (auto-update da omnx-code) para `v1.13.0` (SHA `0cea2e46c38a97d39035be4020f3661c1421662e`), acompanhando o release anterior.
+
+---
+
 ## v1.13 — 2026-07-17
 
 ### Regra 23 — Documentação obrigatória para integrações de API/webhook
