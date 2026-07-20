@@ -4,6 +4,14 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.14 — 2026-07-19
+
+### Regra 20c — Projetos Supabase efêmeros de validação — nunca deletar sozinho
+
+Adicionado a pedido do usuário: quando for preciso validar migrations/RLS/isolamento com escrita real e não houver banco de teste, a skill pode criar um projeto Supabase efêmero via Management API, aplicar migrations e testar — mas nunca pode excluir esse projeto automaticamente. Ao terminar, deve renomear o projeto para o prefixo `DELETAR-`, reportar ao usuário o nome exato, o `project-ref` e a região para exclusão manual, registrar em documento o que foi criado e para quê, e nunca tocar em nenhum projeto Supabase que não tenha criado na mesma execução.
+
+---
+
 ## v1.13.1 — 2026-07-17
 
 ### Correção do pin de auto-atualização da própria skill

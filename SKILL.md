@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.13.1"
+version: "1.14"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -819,6 +819,17 @@ Antes de aplicar (`supabase db push`) uma migration que se encaixe em qualquer u
 - Qualquer migration que o próprio SQL marque como não-reversível (sem `DOWN` claro/equivalente)
 
 Como sugerir: explique o risco específico da mudança, proponha o caminho (projeto de staging vinculado via `supabase link --project-ref <staging-ref>`, ou banco local) e pergunte se o usuário quer testar lá antes do `db push` no projeto de produção. Se o usuário preferir ir direto, prossiga — isso segue a regra 1.5 (sugerir, não forçar), não é um gate fail-closed.
+
+**20c. Projetos Supabase efêmeros de validação — nunca deletar sozinho**
+
+Quando for necessário validar migrations, RLS ou isolamento multi-tenant com **escrita real** (não dá para confirmar só lendo o SQL) e não houver banco de teste/staging disponível, é permitido criar um projeto Supabase **efêmero** via Management API, aplicar as migrations, testar, e descartar — mas o descarte nunca é automático.
+
+Fluxo obrigatório:
+- **Nunca delete o projeto efêmero automaticamente.** O risco de errar o `project-ref` e excluir o projeto errado (inclusive um de produção) é grande demais para automatizar. A skill não tem — e não deve simular ter — certeza suficiente de qual projeto está na tela do usuário.
+- **Ao terminar o teste, renomeie o projeto efêmero** para começar com o prefixo `DELETAR-` (ex.: `DELETAR-validacao-rls`), deixando claro visualmente no painel Supabase que aquele projeto está pronto para descarte.
+- **Reporte ao usuário** o nome exato do projeto, o `project-ref` e a região, pedindo que ele mesmo confirme e exclua pelo painel do Supabase.
+- **Registre em documento** (ex: `docs/handoffs/latest.md` ou um doc de validação em `docs/`) qual projeto efêmero foi criado, quando, para qual finalidade, e o `project-ref` exato — para rastreabilidade caso o usuário esqueça de excluir depois.
+- **Nunca toque em nenhum projeto Supabase que a skill não criou nesta mesma execução.** Isso inclui listar, inspecionar com intenção de alterar, renomear ou excluir qualquer projeto pré-existente do usuário — a validação efêmera opera isolada do restante da conta.
 
 **17. Segredos não podem vazar para o bundle do cliente**
 
