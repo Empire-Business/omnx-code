@@ -96,7 +96,7 @@ Se este projeto já tem código mas ainda não tem `docs/UML.md`, **nenhum commi
 
 ### Manutenção
 
-Toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` e `docs/UML.html` sao atualizados no **mesmo commit** que muda o codigo — nunca depois. Uma mudanca de schema/dominio commitada sem os arquivos UML correspondentes e tratada como bug, nao como pendencia.
+Toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` e `docs/UML.html` sao atualizados no **mesmo commit** que muda o codigo — nunca depois. Toda migration nova (tabela, coluna, função/RPC, trigger, policy) é gatilho obrigatório de atualização do UML. Antes de concluir qualquer tarefa com migration, compare o timestamp da migration mais recente com o campo `Atualizado em` do UML: se estiver atrás, a tarefa não está concluída. Uma mudanca de schema/dominio commitada sem os arquivos UML correspondentes e tratada como bug, nao como pendencia.
 
 ---
 
@@ -114,6 +114,51 @@ Toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` 
 ### Regra de atualização
 
 Sempre que um papel novo é criado ou uma permissão muda, `docs/NIVEIS-DE-ACESSO.md` é atualizado **no mesmo commit** que muda o código — nunca depois, nunca "eu documento no final". Um papel ou permissão que existe no código/schema sem entrada correspondente no documento é tratado como bug, não como pendência.
+
+---
+
+## 🎫 Sistema de Tickets de Erro — Obrigatório (BLOQUEIA DEPLOY)
+
+**Todo sistema com interface visível ao usuário final precisa ter um sistema de tickets de erro antes de ir para produção.** Não é opcional e não é "adicionar depois se der tempo": é o mesmo tipo de gate que segurança e níveis de acesso. Não se aplica a scripts internos ou jobs sem UI.
+
+A ideia por trás disso é simples: um erro que o usuário não consegue reportar facilmente é um erro que nunca chega até quem pode corrigir. E um erro reportado sem contexto técnico (print, log, rota, navegador) vira uma investigação de "me manda mais detalhes" que atrasa a correção em dias. O objetivo é fechar essa distância: **do clique do usuário até a fila de correção, sem fricção e sem depender de descrição manual.**
+
+### O que precisa existir
+
+1. **Botão/atalho de "Reportar problema" visível em qualquer tela** — não escondido em um menu de configurações. Padrão recomendado: botão flutuante discreto (canto inferior) ou item fixo no menu principal, disponível em toda a aplicação autenticada.
+2. **Captura automática ao acionar o report** (o usuário só descreve o que estava tentando fazer, opcionalmente — nunca precisa colar log ou tirar print manualmente):
+   - Print de tela da tela atual no momento do report
+   - Logs do console / stack trace do erro (se houver um erro JS associado)
+   - Rota/URL atual e a ação que estava sendo executada
+   - Timestamp, navegador, sistema operacional, resolução de tela
+   - Id do usuário e do tenant (quando aplicável), sem expor dados sensíveis de outros usuários
+3. **Captura automática também em erro não tratado** — um error boundary do React (para erros de render) e um handler global (`window.onerror` + `unhandledrejection`, para erros fora do ciclo de render) disparam a mesma captura sem exigir que o usuário clique em nada. O usuário vê uma tela amigável de erro ("algo deu errado, já avisamos o time") e o ticket é criado em segundo plano.
+4. **Fila interna organizada por status** — os tickets caem numa área que o time de correção acompanha, com status mínimo: `novo → em análise → em correção → resolvido`. Pode ser uma tabela própria no Supabase com um painel simples (`/admin/tickets` ou equivalente, protegido por papel — ver seção de Níveis de Acesso) ou uma integração que envia o ticket para o sistema de suporte que o time já usa (ex: webhook para Linear/Slack/email). O importante é que nenhum ticket fica perdido em log que ninguém olha.
+
+### Estrutura mínima de dados (se usar tabela própria no Supabase)
+
+```sql
+-- exemplo de shape mínimo — adapte nomes ao padrão do projeto
+create table public.error_tickets (
+  id uuid primary key default gen_random_uuid(),
+  tenant_id uuid references public.tenants(id),
+  user_id uuid references auth.users(id),
+  status text not null default 'novo' check (status in ('novo','em_analise','em_correcao','resolvido')),
+  description text,           -- o que o usuário disse que estava fazendo (opcional)
+  error_message text,         -- mensagem/stack trace, se houver
+  route text,                 -- rota onde ocorreu
+  screenshot_url text,        -- print enviado ao Storage
+  browser_info jsonb,         -- navegador, SO, resolução
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz
+);
+```
+
+Como toda tabela nova, entra em migration versionada (regra de Migrations acima) e tem RLS ativo: o usuário só cria tickets (não lê tickets de outros); a leitura/atualização de status fica restrita ao papel responsável pela correção, seguindo a matriz em `docs/NIVEIS-DE-ACESSO.md`.
+
+### Regra de atualização
+
+`docs/SISTEMA-DE-TICKETS.md` documenta: como o usuário reporta, o que é capturado automaticamente, onde a fila vive (tabela + painel, ou integração externa), os status do fluxo e quem é notificado em cada mudança. Esse documento é criado **antes do primeiro deploy** e atualizado sempre que o fluxo de captura ou a fila mudar — mesmo princípio já aplicado a UML (migrations) e Níveis de Acesso: o que descreve o comportamento não pode ficar defasado em relação ao código.
 
 ---
 
@@ -352,6 +397,7 @@ A IA deve ler todos os arquivos abaixo antes de executar qualquer tarefa:
 | `docs/UML.md`                | Diagramas de classes/entidades e sequencia (Mermaid) — **bloqueia codigo novo/commit se ausente/desatualizado** | — |
 | `docs/UML.html`              | Versao visual interativa dos diagramas UML (abrir no navegador) — **gerado junto com UML.md no mesmo commit** | — |
 | `docs/NIVEIS-DE-ACESSO.md`   | Matriz de papéis × permissões — **bloqueia commit e deploy se ausente/incompleta** | — |
+| `docs/SISTEMA-DE-TICKETS.md` | Como o usuário reporta erro, o que é capturado automaticamente e a fila de correção — **bloqueia deploy se ausente/incompleto** | — |
 | `docs/DESIGN.md`             | Design system (cores, tipografia, componentes, espaçamento) — **gate para mockups** | — |
 | `docs/mockups/`              | Mockups navegáveis (um arquivo HTML por tela), gerados a partir do PRD e design system | — |
 | `docs/handoffs/latest.md`    | Estado atual do projeto para retomada entre sessões      | —             |
@@ -452,6 +498,12 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] Toda tabela de negócio nova tem coluna `tenant_id` (FK not-null), exceto se o projeto foi explicitamente definido como single-tenant e isso está documentado em `docs/ARQUITETURA.md`?
 - [ ] Toda política RLS de tabela com `tenant_id` filtra por tenant (não só por `auth.uid()`)?
 
+**Sistema de Tickets de Erro**
+- [ ] **Existe um botão/atalho de "Reportar problema" visível em qualquer tela da aplicação?** Sem isso, o deploy está BLOQUEADO (gate 1.6d).
+- [ ] **A captura automática (print de tela, log/stack trace, rota, timestamp, navegador, usuário/tenant) funciona tanto pelo botão de reportar quanto por um error boundary/handler global de erro não tratado?**
+- [ ] Os tickets caem numa fila interna organizada por status (`novo → em análise → em correção → resolvido`), seja tabela própria com painel ou integração com o sistema de suporte do time?
+- [ ] **`docs/SISTEMA-DE-TICKETS.md` existe e documenta o fluxo completo (como reportar, o que é capturado, onde a fila vive, status, quem é notificado)?** Sem esse documento, o deploy está BLOQUEADO (gate 1.6d).
+
 **Banco de Dados**
 - [ ] RLS está ativo em todas as tabelas afetadas?
 - [ ] Nenhuma `service_role_key` está no `.env` ou no código?
@@ -526,5 +578,6 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] WAF e Bot Fight Mode ativos no Cloudflare?
 - [ ] Rate Limiting configurado no Cloudflare?
 - [ ] Vercel Analytics ativo?
+- [ ] **Sistema de tickets de erro ativo em produção (botão de reportar + captura automática + fila) e `docs/SISTEMA-DE-TICKETS.md` atualizado?** ✅ OBRIGATÓRIO
 - [ ] **Skill `/security-auditor` executada antes do deploy?** ✅ OBRIGATÓRIO
 - [ ] A IA explicou ao usuário como verificar cada item no painel?

@@ -30,6 +30,7 @@
 - Nenhum código de domínio (models, entidades, schema) é escrito em projeto novo antes de `docs/UML.md` existir e ser aprovado (diagrama de classes/entidades em Mermaid + sequência dos fluxos críticos)
 - Em projeto existente sem `docs/UML.md`: nenhum commit novo acontece antes de gerar o UML por engenharia reversa do código/schema real e validar com o usuário
 - `docs/UML.md` e `docs/UML.html` são atualizados no mesmo commit que qualquer mudança de entidade, relacionamento ou fluxo crítico — nunca depois
+- Toda migration nova (tabela, coluna, função/RPC, trigger, policy) é gatilho obrigatório de atualização do UML; antes de concluir a tarefa, confira se o campo `Atualizado em` do UML cobre a migration mais recente — UML desatualizado é bug, não pendência
 
 ## Regra de arquitetura de usuários e multi-tenant (inegociável)
 
@@ -39,6 +40,14 @@
 - Exceção só é válida se o usuário confirmar explicitamente projeto single-tenant, documentado em `docs/ARQUITETURA.md`
 - **Gate obrigatório (fail-closed):** nenhum código de autenticação/autorização é commitado, e nenhum deploy acontece, sem `docs/NIVEIS-DE-ACESSO.md` existir com a matriz completa papel × recurso × ação (sem células em branco). Um papel/permissão no código sem entrada no documento é bug, não pendência
 - `docs/NIVEIS-DE-ACESSO.md` é atualizado no mesmo commit que cria/altera um papel ou permissão — nunca depois
+
+## Regra de sistema de tickets de erro (inegociável)
+
+- Todo projeto com interface visível ao usuário final precisa de um botão/atalho "Reportar problema" acessível a partir de qualquer tela — nunca escondido em menu de terceiro nível
+- Ao reportar (ou ao ocorrer um erro não tratado, via error boundary + handler global), a aplicação captura automaticamente: print de tela, log/stack trace, rota atual, timestamp, navegador/dispositivo e usuário/tenant — sem exigir que o usuário descreva o erro tecnicamente
+- Os tickets caem numa fila interna com status (`novo → em análise → em correção → resolvido`), seja tabela própria no Supabase (com RLS: usuário só cria os próprios, papel responsável lê/atualiza) ou integração com o sistema de suporte do time
+- **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
+- `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
 ## Regra de banco de dados (inegociável)
 
@@ -93,10 +102,10 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**, **fazer deploy sem sistema de tickets de erro (botão de reportar + captura automática + fila) e sem `docs/SISTEMA-DE-TICKETS.md` completo**), **recuse, explique o motivo e sugira a alternativa segura**.
 
 ---
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.11
+> Versão do template: omnx-code v1.15

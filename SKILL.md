@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.14"
+version: "1.15"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -44,7 +44,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.13.1** |
+| Versão da skill | **1.15** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -550,9 +550,24 @@ O UML vive em `docs/UML.md`, em **Mermaid** (`classDiagram`, `sequenceDiagram`, 
 2. Apresente ao usuário para validação — código legado às vezes tem entidades que já não fazem sentido; é a hora de o usuário confirmar ou corrigir o modelo.
 3. Só depois do UML existir e refletir o sistema real, prossiga com a mudança pedida.
 
-**Manutenção:** toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` e `docs/UML.html` são atualizados no **mesmo commit** que muda o código — nunca depois. Se a IA encontrar uma mudança de schema/domínio sendo commitada sem os arquivos UML correspondentes atualizados: **RECUSE** o commit, atualize os diagramas primeiro, e só então prossiga.
+**Manutenção (inegociável):** toda vez que uma entidade, relacionamento ou fluxo crítico muda, `docs/UML.md` e `docs/UML.html` são atualizados no **mesmo commit** que muda o código — nunca depois. **Toda migration nova que crie ou altere tabela, coluna, função/RPC, trigger ou policy é gatilho obrigatório de atualização do UML — sem exceção**, mesmo quando a mudança parece "só interna". Regra operacional anti-esquecimento: antes de dar por concluída qualquer tarefa que criou ou aplicou migration, compare o timestamp da migration mais recente (`ls supabase/migrations | tail -1`) com o campo `Atualizado em` do UML — se o UML estiver atrás, a tarefa NÃO está concluída; atualize o UML primeiro. UML desatualizado é bug, não pendência. Se a IA encontrar uma mudança de schema/domínio sendo commitada sem os arquivos UML correspondentes atualizados: **RECUSE** o commit, atualize os diagramas primeiro, e só então prossiga.
 
 > Este gate é independente dos gates 1.6 e 1.6b: um projeto pode ter segurança e níveis de acesso em dia e ainda estar bloqueado por UML ausente/desatualizado, e vice-versa. Os três precisam passar.
+
+**1.6d. Gate de sistema de tickets de erro antes de deploy (fail-closed, obrigatório)**
+
+Todo sistema com interface visível ao usuário final vai quebrar em algum momento — é inevitável. O que diferencia um sistema profissional de um "vibe coded" não é a ausência de erros, é o que acontece no segundo seguinte ao erro: o usuário sabe reportar em poucos cliques, e quem vai corrigir recebe o contexto técnico completo sem precisar pedir print, log ou "o que você estava fazendo?" por WhatsApp. Sem isso, todo bug em produção vira uma investigação arqueológica.
+
+**Regra:** nenhum sistema criado por esta skill com UI voltada ao usuário final pode ir para produção sem um sistema de tickets de erro funcional. Não se aplica a scripts internos, jobs de background ou ferramentas sem interface — aplica-se a qualquer projeto que tenha uma tela.
+
+- **Commit simples** (trabalho incremental, branch de feature, não é push/merge para `main`/`master` nem PR de release): se o commit introduz a primeira tela/fluxo com UI do projeto e o sistema de tickets ainda não existe, **avise** que ele precisa estar pronto antes do deploy e **sugira** implementar já. Não bloqueie o commit por isso.
+- **Antes de qualquer ação do gate 1.6** (push/merge para `main`/`master`, PR de release, deploy) você DEVE, de forma fail-closed:
+  1. Verificar que existe uma forma de reportar erro **fácil de encontrar** na UI — um botão/atalho visível a partir de qualquer tela (ex: flutuante ou no menu principal), não escondido em configurações de terceiro nível.
+  2. Verificar que existe uma **função de captura automática** acionada tanto pelo botão de reportar quanto por um error boundary/handler global (erros não tratados, promises rejeitadas), que reúne sem exigir digitação técnica do usuário: print de tela da tela no momento do erro, logs do console/stack trace, rota atual, timestamp, navegador/dispositivo, e id do usuário/tenant quando aplicável — e envia tudo automaticamente para uma área interna organizada em fila (tabela dedicada no banco com status, ou integração com o sistema de suporte que o time já usa).
+  3. Verificar que `docs/SISTEMA-DE-TICKETS.md` existe e documenta: como o usuário reporta, o que é capturado automaticamente, onde a fila vive, os status do fluxo (`novo → em análise → em correção → resolvido`) e quem é notificado.
+  4. Se qualquer um dos três itens acima faltar ou estiver incompleto: **RECUSE** a publicação. Implemente junto com o usuário (a especificação técnica completa vive no template `CLAUDE.md`, seção "Sistema de Tickets de Erro") e só então prossiga. Não "informe e deixe o usuário decidir".
+
+> Este gate é independente dos gates 1.6, 1.6b e 1.6c: um projeto pode ter segurança, níveis de acesso e UML em dia e ainda estar bloqueado por falta de sistema de tickets de erro, e vice-versa. Todos precisam passar antes de PR/main.
 
 **2. Ler CLAUDE.md antes de começar**
 O `CLAUDE.md` é o ponto de entrada de todo projeto. Leia-o antes de qualquer decisão técnica. Não assuma nada que não esteja documentado lá.

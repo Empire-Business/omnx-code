@@ -4,6 +4,19 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.15 — 2026-07-22
+
+### Gate 1.6d — Sistema de tickets de erro obrigatório antes de deploy
+
+Adicionado a pedido do usuário: nenhum sistema com interface visível ao usuário final pode ir para produção sem um sistema de tickets de erro funcional.
+
+### Adicionado
+- **Gate 1.6d (`SKILL.md`) — "Sistema de tickets de erro antes de deploy"**: fail-closed, independente dos gates 1.6/1.6b/1.6c, exige (1) botão/atalho de "Reportar problema" visível em qualquer tela, (2) função de captura automática — acionada pelo botão OU por error boundary/handler global de erro não tratado — que reúne print de tela, log/stack trace, rota, timestamp, navegador/dispositivo e usuário/tenant, e envia tudo para uma fila interna sem exigir descrição técnica manual do usuário, e (3) `docs/SISTEMA-DE-TICKETS.md` documentando o fluxo completo (como reportar, o que é capturado, onde a fila vive, status `novo → em análise → em correção → resolvido`, quem é notificado). Commit simples em branch de feature apenas avisa; push/merge para `main`/`master`/PR de release/deploy bloqueia sem os três itens.
+- **`references/modelo-claude.md`**: nova seção "🎫 Sistema de Tickets de Erro — Obrigatório (BLOQUEIA DEPLOY)" com especificação técnica completa (shape mínimo de tabela Supabase com RLS, error boundary + handler global, fila por status), entrada na tabela "Índice de Documentos", itens novos no "Checklist de Entrega" e no "Checklist de Deploy".
+- **`references/modelo-agents.md`**: nova seção "Regra de sistema de tickets de erro (inegociável)" sincronizada com o CLAUDE.md, e item novo na lista de violações que devem ser recusadas.
+
+---
+
 ## v1.14 — 2026-07-19
 
 ### Regra 20c — Projetos Supabase efêmeros de validação — nunca deletar sozinho
