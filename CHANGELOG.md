@@ -4,6 +4,51 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.17.1 — 2026-07-23
+
+### Migração de CLAUDE.md antigo para o formato índice — segura, opt-in, não-bloqueante
+
+Adicionado a pedido do usuário: a mudança da v1.17 (CLAUDE.md/AGENTS.md como índice de `docs/regras/`) não pode "quebrar" projetos já configurados por versões anteriores da skill. Esta versão deixa isso explícito e dá um caminho claro e seguro para quem quiser migrar.
+
+### Adicionado
+- **`SKILL.md`, Passo 2 ("Ler CLAUDE.md antes de começar")**: nova nota de compatibilidade — um `CLAUDE.md` de versão anterior (regras inline, sem `docs/regras/`) ou um link quebrado para `docs/regras/<nome>.md` nunca bloqueia o trabalho normal; a skill lê o que existir e ignora links mortos, sem parar para reorganizar sozinha.
+- **`SKILL.md`, Task 2, Cenário B**: dividido em **B.1** (adicionar regras que faltam — seguro, aditivo, roda direto) e **B.2** (reorganizar regras já escritas inline — delicado, só roda sob pedido explícito do usuário ou confirmação no primeiro setup, nunca automático em projeto já em uso). B.2 segue uma ordem específica para nunca deixar o projeto num estado quebrado: checagem de git limpo → mostrar o plano → criar os arquivos novos em `docs/regras/` primeiro (sem tocar no CLAUDE.md) → só depois editar o CLAUDE.md → mostrar o diff → commit dedicado só para a reorganização → lembrar o usuário que `git revert` desfaz tudo.
+- **Gatilhos novos na descrição da skill**: "reorganiza o CLAUDE.md", "migra pro novo formato", "deixa o CLAUDE.md enxuto", "atualiza pro padrão de índice", "meu CLAUDE.md está gigante" — para quem já tem projeto configurado e quer migrar sob demanda.
+- **`SKILL.md`, regra 7**: esclarecido que o gate de "extrair conteúdo grande para docs/regras/" vale para conteúdo que **a própria skill está escrevendo agora**, não para retroagir sobre conteúdo pré-existente sem pedido do usuário — evita que uma tarefa de código dispare uma reorganização não solicitada como efeito colateral.
+
+---
+
+## v1.17 — 2026-07-23
+
+### CLAUDE.md e AGENTS.md viram índices — conteúdo completo migra para docs/regras/
+
+Adicionado a pedido do usuário: `references/modelo-claude.md` estava passando de 600 linhas e crescendo a cada gate novo, o que aumenta o custo de toda sessão nova (o CLAUDE.md é lido no início de todo trabalho). A partir desta versão, o template nasce como índice — cada regra tem um resumo de 1-2 frases + link — e o conteúdo completo de cada regra vive em um arquivo próprio.
+
+### Adicionado
+- **`references/regras/*.md`** (18 arquivos novos): cada regra inegociável do projeto (segurança, banco de dados, multi-tenant, apps & loja de apps, UML, níveis de acesso, sistema de tickets, acesso ao Supabase, migrations, git, trilha obrigatória, PRD/ROADMAP/ARQUITETURA/mockups, stack, comunicação, deploy, handoffs, checklist de entrega, testes) agora tem um arquivo próprio e completo, extraído sem perda de conteúdo do `modelo-claude.md` anterior.
+- **`references/modelo-claude.md` reescrito**: de ~620 linhas para um índice enxuto com tabela "Índice de Regras" (resumo + link para `docs/regras/<nome>.md`) e a tabela "Índice de Documentos" já existente, mantida.
+- **`references/modelo-agents.md`**: cada seção ganhou um ponteiro `(detalhe: docs/regras/<nome>.md)` para a versão completa da regra, mantendo o corpo do arquivo condensado como já era.
+- **`SKILL.md`, Task 2**: Cenário A agora copia `references/regras/*.md` para `docs/regras/*.md` no projeto do usuário, junto com o `CLAUDE.md`. Cenário B (merge) foi reescrito para, além de nunca perder informação do usuário, extrair qualquer seção de regra que hoje esteja inline no `CLAUDE.md` do usuário para `docs/regras/<nome>.md`, deixando só a linha de índice.
+- **`SKILL.md`, regra 7**: passou a codificar o gate contínuo — não é só uma regra de instalação inicial. Qualquer regra nova ou seção existente que cresça além de ~15-20 linhas direto no `CLAUDE.md`/`AGENTS.md` deve ser extraída para `docs/regras/` antes da tarefa ser considerada concluída.
+
+---
+
+## v1.16 — 2026-07-23
+
+### Regra 24 — Arquitetura de Apps & Loja de Apps interna obrigatória
+
+Adicionado a pedido do usuário: todo sistema criado por esta skill nasce modular por padrão — cada funcionalidade do produto é modelada como um app listado num catálogo, e o produto expõe uma Loja de Apps interna onde o tenant ativa/desativa cada app. É o mesmo raciocínio da regra 21 (multi-tenant): decompor em apps desde o início é barato, fatiar um monólito depois é caro.
+
+### Adicionado
+- **Regra 24 (`SKILL.md`) — "Arquitetura de Apps & Loja de Apps interna"**: define catálogo de apps (tabela global com `slug`, `is_core`, dependências), instalação por tenant (`tenant_apps`), gate de acesso em runtime (frontend E backend/RLS, nunca só UI escondida) e a tela de Loja de Apps. Exceção só é válida com confirmação explícita do usuário para app único, documentada em `docs/ARQUITETURA.md`.
+- **Gate 1.6c (UML)**: diagrama de classes agora inclui obrigatoriamente `App` e `TenantApp` como entidades.
+- **Fluxo de Mockups**: inventário de telas exige obrigatoriamente uma tela de Loja de Apps (P0 mesmo sem menção explícita no PRD); Task 7 de validação confere se ela está atualizada com o catálogo; novo item na tabela de anti-padrões.
+- **`references/modelo-claude.md`**: nova seção "🧩 Arquitetura de Apps & Loja de Apps Interna (INEGOCIÁVEL)"; Etapa 1 (PRD) ganha a seção "Apps do produto"; Etapa 3 (Arquitetura) e Etapa 3b (mockups) atualizadas; nova linha no Índice de Documentos; novo bloco no Checklist de Entrega ("Arquitetura de Apps & Loja de Apps"); "Trilha Obrigatória" (FASE 0 e FASE 2) atualizada.
+- **`references/modelo-agents.md`**: nova seção "Regra de arquitetura de apps e loja de apps (inegociável)", sincronizada com o CLAUDE.md, e item novo na lista de violações que devem ser recusadas.
+- **Descrição da skill**: menciona explicitamente que todo sistema gerado nasce modular com Loja de Apps interna.
+
+---
+
 ## v1.15 — 2026-07-22
 
 ### Gate 1.6d — Sistema de tickets de erro obrigatório antes de deploy

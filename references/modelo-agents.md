@@ -6,7 +6,7 @@
 
 ---
 
-## Stack obrigatória
+## Stack obrigatória (detalhe: `docs/regras/stack.md`)
 
 - React 18 + TypeScript strict + Vite
 - Tailwind CSS + shadcn/ui
@@ -14,7 +14,7 @@
 - Vercel (deploy) + Cloudflare (DNS/WAF)
 - Nunca introduza dependências fora desta stack sem aprovação explícita do usuário
 
-## Regras de segurança (inegociáveis)
+## Regras de segurança (inegociáveis) (detalhe: `docs/regras/seguranca.md`)
 
 - NUNCA use `SUPABASE_SERVICE_ROLE_KEY` no frontend ou em qualquer código client-side
 - NUNCA exponha chaves de API, tokens ou secrets em código commitado
@@ -25,14 +25,14 @@
 - **Gate de deploy (fail-closed):** antes de qualquer deploy em produção, merge em `main` ou `git push` que dispare a Vercel, execute a skill `/security-auditor` e só prossiga se `security-report/verdict.json` existir com `"gate": "PASS"`. P0/P1 em aberto (ou `❔ não verificado`/`⚠️ ação manual` em P0/P1) BLOQUEIAM — recuse o push/merge até correção + re-teste. Sem `verdict.json` da sessão atual, não publique.
 - A correção automática da auditor é opt-in: nunca aplique auto-fix sem confirmação explícita do usuário.
 
-## Regra de UML obrigatório (inegociável)
+## Regra de UML obrigatório (inegociável) (detalhe: `docs/regras/uml.md`)
 
 - Nenhum código de domínio (models, entidades, schema) é escrito em projeto novo antes de `docs/UML.md` existir e ser aprovado (diagrama de classes/entidades em Mermaid + sequência dos fluxos críticos)
 - Em projeto existente sem `docs/UML.md`: nenhum commit novo acontece antes de gerar o UML por engenharia reversa do código/schema real e validar com o usuário
 - `docs/UML.md` e `docs/UML.html` são atualizados no mesmo commit que qualquer mudança de entidade, relacionamento ou fluxo crítico — nunca depois
 - Toda migration nova (tabela, coluna, função/RPC, trigger, policy) é gatilho obrigatório de atualização do UML; antes de concluir a tarefa, confira se o campo `Atualizado em` do UML cobre a migration mais recente — UML desatualizado é bug, não pendência
 
-## Regra de arquitetura de usuários e multi-tenant (inegociável)
+## Regra de arquitetura de usuários e multi-tenant (inegociável) (detalhe: `docs/regras/multi-tenant.md` e `docs/regras/niveis-de-acesso.md`)
 
 - Todo sistema é multi-tenant por padrão: tabela de tenants + membership + papéis (roles) entram na primeira migration, antes de qualquer tabela de negócio
 - Toda tabela de negócio nova carrega `tenant_id` (FK not-null) desde o dia 1
@@ -41,7 +41,17 @@
 - **Gate obrigatório (fail-closed):** nenhum código de autenticação/autorização é commitado, e nenhum deploy acontece, sem `docs/NIVEIS-DE-ACESSO.md` existir com a matriz completa papel × recurso × ação (sem células em branco). Um papel/permissão no código sem entrada no documento é bug, não pendência
 - `docs/NIVEIS-DE-ACESSO.md` é atualizado no mesmo commit que cria/altera um papel ou permissão — nunca depois
 
-## Regra de sistema de tickets de erro (inegociável)
+## Regra de arquitetura de apps e loja de apps (inegociável) (detalhe: `docs/regras/apps-loja-de-apps.md`)
+
+- Todo sistema nasce modular: cada funcionalidade é um app listado num catálogo global (`apps`), e o tenant ativa/desativa cada um numa Loja de Apps interna — nunca código sempre ligado sem fronteira de app
+- A tabela de catálogo de apps e a de instalação por tenant (`tenant_apps` ou equivalente) entram na primeira migration, junto com tenants/membership, antes de qualquer tabela de negócio
+- Todo requisito funcional do PRD é atribuído a um app específico — nenhuma funcionalidade fica sem app dono
+- Toda rota, componente e endpoint/RPC de um app não-core verifica se o app está ativo para o tenant atual, no frontend E no backend (RLS/policy) — nunca confie só na UI escondida
+- Desativar um app oculta e bloqueia acesso, nunca apaga dados
+- Exceção só é válida se o usuário confirmar explicitamente um app único sem loja, documentado em `docs/ARQUITETURA.md`
+- **Gate obrigatório (fail-closed):** mockups gerados por esta skill incluem obrigatoriamente uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada
+
+## Regra de sistema de tickets de erro (inegociável) (detalhe: `docs/regras/sistema-de-tickets.md`)
 
 - Todo projeto com interface visível ao usuário final precisa de um botão/atalho "Reportar problema" acessível a partir de qualquer tela — nunca escondido em menu de terceiro nível
 - Ao reportar (ou ao ocorrer um erro não tratado, via error boundary + handler global), a aplicação captura automaticamente: print de tela, log/stack trace, rota atual, timestamp, navegador/dispositivo e usuário/tenant — sem exigir que o usuário descreva o erro tecnicamente
@@ -49,7 +59,7 @@
 - **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
 - `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
-## Regra de banco de dados (inegociável)
+## Regra de banco de dados (inegociável) (detalhe: `docs/regras/migrations.md` e `docs/regras/acesso-supabase.md`)
 
 - TODA alteração no banco Supabase é feita via migration versionada em `supabase/migrations/`
 - É PROIBIDO executar SQL direto para mudar o banco: nada de SQL Editor do Supabase, `supabase db execute`, `psql`, ou RPC que rode SQL arbitrário
@@ -59,7 +69,7 @@
 - Leitura (`SELECT`) para inspeção é permitida; qualquer mutação só via migration
 - Após aplicar migrations, regenere os tipos: `supabase gen types typescript`
 
-## Regras de Git (inegociáveis)
+## Regras de Git (inegociáveis) (detalhe: `docs/regras/git.md`)
 
 - `.env`, `.env.*`, `*.pem`, `*.key` e arquivos com chaves sempre no `.gitignore`
 - Commits seguem Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
@@ -93,7 +103,7 @@
 - Atualize o handoff ao final de toda sessão que produzir mudanças significativas
 - O handoff é um resumo, não substitui `PRD.md`, `ARQUITETURA.md`, `UML.md` ou outros docs
 
-## Comunicação
+## Comunicação (detalhe: `docs/regras/comunicacao.md`)
 
 - Responda sempre em português brasileiro
 - Seja didático e paciente — assuma que o usuário pode ter conhecimento zero sobre o tema
@@ -102,10 +112,10 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**, **fazer deploy sem sistema de tickets de erro (botão de reportar + captura automática + fila) e sem `docs/SISTEMA-DE-TICKETS.md` completo**), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**, **fazer deploy sem sistema de tickets de erro (botão de reportar + captura automática + fila) e sem `docs/SISTEMA-DE-TICKETS.md` completo**, **criar funcionalidade sem app dono no catálogo ou sem checagem de `tenant_apps.enabled` no backend**), **recuse, explique o motivo e sugira a alternativa segura**.
 
 ---
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.15
+> Versão do template: omnx-code v1.17.1

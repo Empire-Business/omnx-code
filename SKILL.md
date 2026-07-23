@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.15"
+version: "1.17.1"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -10,6 +10,9 @@ description: |
   qualquer trabalho de desenvolvimento guiado pelo CLAUDE.md — com tasks 100% do tempo.
   Também cria mockups navegáveis 100% fiéis ao PRD e ao design system, em arquivos
   separados por tela, dentro de docs/mockups/.
+  Todo sistema gerado nasce modular por padrão: cada funcionalidade vira um app
+  independente listado num catálogo, com uma Loja de Apps interna onde o tenant
+  ativa/desativa cada um — nunca um monólito de funções sempre ligadas.
   Sempre que possível, opera de forma enxuta para economizar tokens: resume contexto,
   evita releituras desnecessárias e mantém docs de handoff em docs/handoffs/ para que
   o usuário possa dar CLEAR no contexto e retomar depois.
@@ -22,6 +25,12 @@ description: |
   "limpar contexto", "nova sessão", "resumir o que estava fazendo" ou qualquer variação
   que indique retomada de trabalho — a skill deve ler docs/handoffs/latest.md e
   retomar a partir dele.
+  Também use quando o usuário pedir para "reorganiza o CLAUDE.md", "migra pro novo
+  formato", "deixa o CLAUDE.md enxuto", "atualiza pro padrão de índice", "meu CLAUDE.md
+  está gigante", ou qualquer variação que indique migrar um CLAUDE.md/AGENTS.md antigo
+  (com regras escritas por extenso) para o formato índice + docs/regras/ — essa migração
+  é sempre feita com plano mostrado e confirmação explícita antes de mexer em qualquer
+  arquivo (nunca automática nem silenciosa em projeto já configurado).
   Em projetos novos, esta skill é o primeiro passo obrigatório antes de qualquer código.
   Em pedidos de mockup, esta skill exige PRD, ARQUITETURA, UML e design system
   aprovados antes de gerar qualquer tela.
@@ -44,7 +53,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.15** |
+| Versão da skill | **1.17.1** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -194,31 +203,48 @@ Se o arquivo já existe, leia e preserve todos os campos existentes — apenas a
 
 Adicione `.empire/` ao `.gitignore` do projeto **somente** se o usuário não quiser versionar o state. Por padrão, pergunte se deve versionar ou não.
 
-### Task 2 — CLAUDE.md
+### Task 2 — CLAUDE.md + `docs/regras/`
+
+O `CLAUDE.md` desta skill é, por design, um **índice**: cada regra tem um resumo curto na tabela e o conteúdo completo vive em `docs/regras/<nome>.md`. Isso existe para o `CLAUDE.md` não crescer sem limite — ver regra 7 para o porquê e o gate que mantém isso verdadeiro ao longo do projeto, não só na instalação.
 
 **Cenário A — CLAUDE.md não existe no projeto:**
 
-Copie o conteúdo de `references/modelo-claude.md` (deste repositório da skill) como `CLAUDE.md` na raiz do projeto do usuário. Informe ao usuário que o arquivo foi criado e que ele deve revisar e personalizar as seções marcadas.
+1. Copie `references/modelo-claude.md` (deste repositório da skill) como `CLAUDE.md` na raiz do projeto do usuário — ele já nasce como índice.
+2. Copie **todos** os arquivos de `references/regras/*.md` (deste repositório da skill) para `docs/regras/*.md` no projeto do usuário, preservando os nomes de arquivo.
+3. Informe ao usuário que os arquivos foram criados e que ele deve revisar e personalizar o conteúdo.
 
 **Cenário B — CLAUDE.md já existe:**
 
-Este é o cenário mais delicado. O objetivo é enriquecer sem destruir. Siga esta lógica:
+Este é o cenário mais delicado, e o risco real é diferente para cada tipo de mudança: **adicionar** regras que faltam é seguro por natureza (só soma arquivo); **reorganizar** regras que já existem inline (extrair para `docs/regras/`) é onde um erro pode bagunçar um projeto que já está funcionando — por isso os dois fluxos abaixo têm níveis de cuidado diferentes.
+
+**B.1 — Adicionar o que falta (seguro, pode rodar direto):**
 
 1. Leia o `CLAUDE.md` existente do usuário
-2. Leia o template em `references/modelo-claude.md`
-3. Para cada seção do template que **não existe** no CLAUDE.md do usuário → adicione ao final
-4. Para seções que **já existem** → preserve o conteúdo do usuário sem alteração
-5. Se o CLAUDE.md do usuário tiver blocos de documentação longa (>30 linhas numa seção) que não são índices → mova-os para `docs/[NOME-DA-SECAO].md` e substitua no CLAUDE.md por uma linha de referência assim:
+2. Leia o índice em `references/modelo-claude.md` e os arquivos em `references/regras/`
+3. Para cada regra do template que **não existe** no projeto do usuário (nem como seção no CLAUDE.md, nem como arquivo em `docs/regras/`) → copie o arquivo correspondente de `references/regras/` para `docs/regras/` e adicione a linha de índice na tabela do CLAUDE.md do usuário
+4. Para qualquer bloco de documentação longa (>20 linhas) que o usuário tenha adicionado por conta própria e que não seja uma das regras do template → mova para `docs/[NOME-DA-SECAO].md` e substitua por uma linha de referência: `→ Documentação completa em \`docs/[NOME-DA-SECAO].md\``
 
-   ```
-   → Documentação completa em `docs/[NOME-DA-SECAO].md`
-   ```
+Isso é uma operação puramente aditiva — nenhum conteúdo existente é reescrito ou movido — então pode ser feita como parte normal do Passo 1 do setup, sem pedir confirmação extra além da já prevista para commits.
 
-6. Atualize a tabela "Índice de Documentos" do CLAUDE.md para listar os arquivos movidos para `docs/`
+**B.2 — Reorganizar regras já existentes inline (delicado, sempre com confirmação explícita e nunca automático):**
 
-**Regra de ouro do merge:** o usuário nunca perde informação. Tudo que estava lá continua — apenas reorganizado.
+Se o `CLAUDE.md` do usuário tem regras escritas por extenso (formato de versões anteriores da skill, antes da v1.17, ou qualquer `CLAUDE.md` customizado manualmente), **não** reescreva/mova esse conteúdo de forma automática durante o trabalho normal. Essa reorganização só roda quando:
+- O usuário pedir explicitamente (gatilhos: "reorganiza o CLAUDE.md", "migra pro novo formato", "deixa o CLAUDE.md enxuto", "atualiza o CLAUDE.md pro padrão de índice"), **ou**
+- For a primeira vez que o Passo 1 (Fase de Setup) roda neste projeto e o usuário confirmar que quer aplicar o padrão novo — nunca decida sozinho que "já é hora" de mexer num `CLAUDE.md` que já está em uso.
 
-Após concluir, atualize no state:
+Quando for rodar, siga esta ordem — ela existe para que, se algo parecer errado no meio do caminho, o projeto nunca fique num estado quebrado:
+
+1. **Checagem de segurança de Git primeiro:** rode `git status --short`. Se houver mudanças não commitadas no `CLAUDE.md`, no `AGENTS.md` ou em `docs/`, pare e peça ao usuário para commitar ou descartar antes de continuar — nunca reorganize por cima de trabalho não salvo.
+2. **Mostre o plano antes de tocar em qualquer arquivo:** liste para o usuário, seção por seção, o que vai virar arquivo em `docs/regras/` (com o nome do arquivo) e o que permanece inline no `CLAUDE.md`. Peça confirmação explícita ("sim", "pode migrar") antes do próximo passo.
+3. **Crie os arquivos novos primeiro, sem editar o `CLAUDE.md` ainda:** para cada seção mapeada no plano, copie o texto **literal** do usuário (não parafraseie, não resuma, não "melhore" a redação) para `docs/regras/<nome>.md`. Neste ponto o `CLAUDE.md` original continua 100% intacto — se algo for interrompido aqui, nada foi perdido nem quebrado.
+4. **Só depois de todos os arquivos em `docs/regras/` existirem, edite o `CLAUDE.md`:** substitua cada seção migrada pela linha de índice correspondente, mantendo tudo que não foi migrado como estava.
+5. **Diff antes de commitar:** rode `git diff -- CLAUDE.md AGENTS.md docs/regras/` e mostre ao usuário um resumo do que mudou antes do commit. Confirme que nenhuma regra sumiu — compare mentalmente a lista de seções do `CLAUDE.md` antigo com a lista de linhas do novo índice.
+6. **Um commit dedicado só para a reorganização** (nunca misture com mudanças de código/feature no mesmo commit): `docs: reorganiza CLAUDE.md para o padrão de índice com docs/regras/`. Isso dá ao usuário um `git revert` de uma linha caso queira desfazer.
+7. **Depois do commit, lembre o usuário:** nada foi apagado — se algo parecer errado, `git revert <hash>` restaura o `CLAUDE.md` antigo sem afetar código ou dados do projeto.
+
+**Regra de ouro do merge:** o usuário nunca perde informação. Tudo que estava lá continua — apenas reorganizado, e nunca resumido a ponto de perder uma regra ou detalhe que existia antes. Se em algum momento não for possível garantir isso com confiança (ex: seção ambígua, mistura de regra do template com anotação pessoal do usuário no meio do texto), pare e pergunte em vez de adivinhar.
+
+Após concluir (B.1 e/ou B.2), atualize no state:
 ```json
 "claude_md_installed": true,
 "claude_md_merged_at": "<data ISO atual>"
@@ -253,7 +279,7 @@ Este é o cenário de merge. O objetivo é enriquecer sem destruir:
 wc -c AGENTS.md
 ```
 
-Se ultrapassar 9.500 caracteres, avise o usuário que o Lovable pode truncar o arquivo e sugira mover seções menos críticas para `docs/`.
+Se ultrapassar 9.500 caracteres, avise o usuário que o Lovable pode truncar o arquivo e mova o texto das seções mais longas para `docs/regras/<nome>.md` (mesmo arquivo que o `CLAUDE.md` já referencia — ver Task 2 e regra 7), deixando no `AGENTS.md` só um resumo de poucas linhas por regra com o link. O `AGENTS.md` não precisa esperar estourar o limite para adotar esse padrão: por padrão, ele já nasce condensado (bullets curtos, não parágrafos), com o detalhamento completo delegado a `docs/regras/`.
 
 Após concluir, atualize no state:
 ```json
@@ -537,7 +563,7 @@ Nenhum sistema criado por esta skill pode ir para produção sem que `docs/NIVEI
 Código nasce de um modelo, não o contrário. Escrever classes, tabelas e fluxos direto no código sem modelar antes é como construir uma casa sem planta — funciona até o dia em que duas partes do sistema foram pensadas de formas incompatíveis e alguém só descobre isso depois de já ter código dos dois lados. O UML força essa conversa **antes** de custar caro.
 
 **Projeto novo:** nenhuma linha de código de domínio (models, entidades, schema de banco, fluxos entre serviços) é escrita antes de existir um UML mínimo e aprovado pelo usuário, cobrindo:
-1. **Diagrama de classes/entidades** — as entidades principais do domínio, seus atributos essenciais e os relacionamentos entre elas (inclui a arquitetura de usuários/multi-tenant da regra 21: tenant, membership, papéis)
+1. **Diagrama de classes/entidades** — as entidades principais do domínio, seus atributos essenciais e os relacionamentos entre elas (inclui a arquitetura de usuários/multi-tenant da regra 21: tenant, membership, papéis; e a arquitetura de apps da regra 24: `App` do catálogo e `TenantApp` de instalação por tenant)
 2. **Diagrama(s) de sequência** — para os 2-3 fluxos mais críticos do sistema (ex: cadastro/login, a ação principal que o produto existe para fazer, checkout/pagamento se houver)
 3. Opcional, mas recomendado quando o domínio tem estados relevantes (pedido, assinatura, workflow de aprovação): **diagrama de estados**
 
@@ -571,6 +597,8 @@ Todo sistema com interface visível ao usuário final vai quebrar em algum momen
 
 **2. Ler CLAUDE.md antes de começar**
 O `CLAUDE.md` é o ponto de entrada de todo projeto. Leia-o antes de qualquer decisão técnica. Não assuma nada que não esteja documentado lá.
+
+> **Compatibilidade com projetos de versões anteriores da skill (não-bloqueante):** o formato "CLAUDE.md como índice + `docs/regras/`" existe desde a v1.17. Um projeto configurado por uma versão anterior pode ter um `CLAUDE.md` com as regras escritas por extenso, sem `docs/regras/`, ou com um `CLAUDE.md` que já referencia `docs/regras/<nome>.md` mas o arquivo ainda não existe (ex: alguém copiou só o `CLAUDE.md` novo sem os arquivos de referência). Em qualquer um desses casos: **nunca trate isso como erro ou motivo para bloquear o trabalho normal.** Leia o que existir — se a regra está inline no `CLAUDE.md`, use o conteúdo inline; se o link para `docs/regras/<nome>.md` estiver quebrado, ignore o link e continue (não pare o trabalho por um link morto). A migração para o formato índice é oportunista (Task 2 Cenário B) ou sob pedido explícito do usuário — nunca um gate que impede codar, commitar ou fazer deploy.
 
 **3. Fazer higiene Git antes de tocar no código**
 Antes de implementar qualquer funcionalidade, correção ou documentação, verifique:
@@ -674,10 +702,12 @@ Exemplo ruim:
 update stuff
 ```
 
-**7. Documentar em `docs/`, indexar no CLAUDE.md**
+**7. Documentar em `docs/`, indexar no CLAUDE.md — regras inegociáveis vivem em `docs/regras/`**
 - Toda documentação técnica vai para `docs/[NOME].md`
 - O `CLAUDE.md` é um índice enxuto — aponta para os docs, não os contém
 - Após criar ou atualizar qualquer doc, atualize o campo "Atualizado em" da tabela no CLAUDE.md
+- As regras inegociáveis do projeto (segurança, multi-tenant, apps, UML, níveis de acesso, tickets, migrations, etc.) seguem o mesmo princípio, um nível mais estrito: cada uma é um arquivo completo em `docs/regras/<nome>.md`, e o `CLAUDE.md`/`AGENTS.md` trazem só um resumo de 1-2 frases + o link, nunca o texto inteiro. Isso não é opcional nem só para a instalação inicial — é um gate contínuo. **Regra prática:** se você (a IA) está prestes a escrever mais de ~15-20 linhas de explicação de uma regra direto no `CLAUDE.md` ou no `AGENTS.md` — seja porque o usuário pediu uma regra nova, seja porque uma seção existente cresceu enquanto o projeto evoluiu — pare, crie/atualize o arquivo em `docs/regras/<nome>.md` com o conteúdo completo, e deixe no `CLAUDE.md`/`AGENTS.md` apenas a linha de índice. O motivo: o `CLAUDE.md` é lido no início de toda sessão nova; cada linha a mais nele é um custo pago em toda ativação futura da skill, enquanto o conteúdo em `docs/regras/` só é lido quando a tarefa realmente precisa dele. Nada se perde — só muda de lugar.
+- Ao final de qualquer sessão em que **esta skill escreveu** conteúdo novo de regra direto no `CLAUDE.md`/`AGENTS.md` (não conteúdo que já estava lá antes, escrito por uma versão anterior da skill ou pelo próprio usuário), confira rapidamente se o arquivo ainda cabe no espírito de "índice" e extraia o que você acabou de escrever para `docs/regras/` se necessário. **Isso é diferente de reorganizar conteúdo pré-existente**: um `CLAUDE.md` antigo com regras já escritas por extenso não é "quebrado" nem precisa de correção automática — ele continua funcionando normalmente. Reorganizar o que já existia é a migração da Task 2, Cenário B.2, que só roda com plano mostrado e confirmação explícita do usuário, nunca como efeito colateral silencioso de uma tarefa de código.
 
 **8. Sem código morto, sem documentação morta**
 Ao remover uma feature ou componente:
@@ -781,6 +811,24 @@ Antes de escrever qualquer schema ou código de autenticação, a IA DEVE defini
 Ao criar a primeira migration do projeto, a tabela de tenants, a de membership e os papéis vêm **antes** de qualquer tabela de negócio — as demais tabelas já nascem com `tenant_id` e RLS correta, nunca são "corrigidas depois". Se a IA encontrar em um projeto existente uma tabela de negócio sem `tenant_id` (e o projeto for multi-tenant), interrompa e alerte o usuário antes de continuar — é uma falha de isolamento de dados, não um detalhe.
 
 Essa arquitetura de usuários só é válida se estiver documentada de forma que qualquer pessoa (ou IA) consiga responder "quem pode fazer o quê" sem ler código. Por isso, junto com o schema, a IA cria `docs/NIVEIS-DE-ACESSO.md` com a matriz completa de papéis × permissões (ver regra 1.6b) — **nenhum código de auth/permissão é commitado sem esse documento existir e estar completo.**
+
+**24. Arquitetura de Apps & Loja de Apps interna obrigatória em todo projeto novo (regra absoluta)**
+
+Todo sistema criado por esta skill nasce **modular por padrão**: nenhuma funcionalidade do produto é escrita como um bloco monolítico sempre ativo. Em vez disso, cada função ou conjunto coeso de funções do sistema é modelada como um **app** — um módulo autocontido que o tenant pode ativar ou desativar — e o produto expõe uma **Loja de Apps interna** (App Store) onde o administrador do tenant escolhe quais apps quer usar. A razão é a mesma do multi-tenant (regra 21): decompor em apps desde o início é barato; fatiar um monólito em módulos depois que já existe código e dados em produção é caro, arriscado, e cheio de acoplamento escondido para desfazer. Isso vale mesmo que hoje o produto pareça ter "uma função só" — nesse caso ele nasce como **um único app dentro da loja**, não como código solto sem fronteira.
+
+**Exceção:** o usuário pode pedir explicitamente para não usar esse modelo (ex: script interno de uso único, protótipo descartável, ferramenta de uma tela só sem intenção de crescer). Nesse caso, documente a decisão e o porquê em `docs/ARQUITETURA.md` antes de codar, e confirme com o usuário que ele entende o custo de modularizar depois.
+
+Antes de escrever qualquer schema ou tela, a IA DEVE definir e documentar em `docs/ARQUITETURA.md` (seção obrigatória "Arquitetura de Apps & Loja de Apps"):
+
+- **Catálogo de apps:** tabela global (não por tenant) listando cada app disponível no sistema — `slug`, `nome`, `descrição`, `ícone`, `categoria`, `is_core` (apps essenciais que não podem ser desativados, ex: configurações da conta) e dependências entre apps, se houver (um app pode exigir outro ativo)
+- **Instalação por tenant:** tabela de junção (ex: `tenant_apps`) ligando `tenant_id` × `app_id` com estado (`enabled`/`disabled`), quem ativou e quando — o mesmo padrão de membership da regra 21, mas para funcionalidades em vez de usuários
+- **Decomposição funcional:** todo requisito funcional do PRD é atribuído a um app específico desde a etapa de PRD (ver `docs/PRD.md`, seção "Apps do produto") — não existe funcionalidade "solta" sem app dono
+- **Gate de acesso em runtime:** toda rota, componente de UI e endpoint/RPC que pertence a um app não-core verifica se aquele app está `enabled` para o tenant atual antes de renderizar ou executar — igual a uma feature flag, mas por tenant e documentada. Isso vale tanto no frontend (esconder o menu/rota) quanto no backend (RLS/policy ou checagem na function não pode confiar só na UI escondida — um tenant sem o app ativo não pode acessar os dados dele nem pela API)
+- **Loja de Apps (App Store) na UI:** o produto tem uma tela onde o admin do tenant vê todos os apps do catálogo, os que já estão ativos, e pode ativar/desativar cada um — com efeito imediato (sem precisar de deploy) e sem apagar dados do app ao desativar (desativar oculta e bloqueia acesso; não deleta)
+
+Ao criar a primeira migration do projeto, a tabela de catálogo de apps e a de instalação por tenant vêm **junto** com a tabela de tenants e membership (regra 21) — antes de qualquer tabela de negócio específica de um app. Se a IA encontrar em um projeto existente uma funcionalidade de produto sem app correspondente no catálogo (ou uma tabela/rota de negócio sem checagem de `tenant_apps.enabled`), interrompa e alerte o usuário antes de continuar — é uma falha de modularização, não um detalhe.
+
+Essa arquitetura só é válida se o UML (regra 1.6c) modelar `App` e `TenantApp` como entidades, o PRD (`docs/PRD.md`) organizar os requisitos por app, e os mockups (fluxo de mockups desta skill) incluírem obrigatoriamente uma tela de Loja de Apps — ver ajustes nessas seções abaixo.
 
 **20. Toda alteração de banco via migration — SQL direto é proibido (regra absoluta)**
 
@@ -967,8 +1015,8 @@ Antes de gerar qualquer mockup, verifique a existência dos arquivos abaixo. A a
 
 | Arquivo | Por que é obrigatório | O que fazer se faltar |
 |---------|----------------------|----------------------|
-| `docs/PRD.md` | Fonte da verdade do produto | Criar seguindo a seção "Etapa 1 — PRD.md" desta skill. Só prosseguir com aprovação do usuário. |
-| `docs/ARQUITETURA.md` | Define estrutura técnica e decisões que impactam telas | Criar seguindo a seção "Etapa 3 — ARQUITETURA.md". |
+| `docs/PRD.md` | Fonte da verdade do produto | Criar seguindo "Etapa 1 — PRD.md" em `docs/regras/prd-roadmap-arquitetura.md`. Só prosseguir com aprovação do usuário. |
+| `docs/ARQUITETURA.md` | Define estrutura técnica e decisões que impactam telas | Criar seguindo "Etapa 3 — ARQUITETURA.md" em `docs/regras/prd-roadmap-arquitetura.md`. |
 | `docs/UML.md` + `docs/UML.html` | Modela entidades e fluxos críticos antes de desenhar telas | Criar conforme regra 1.6c. |
 | Design system (`docs/DESIGN.md` ou `docs/design-system/DESIGN.md` ou `docs/design-system/tokens.json`) | Garante fidelidade visual e consistência | Criar com o usuário, exigindo definição de cores, tipografia, espaçamento, componentes base e estados. |
 
@@ -1060,8 +1108,8 @@ Se tudo estiver OK, vá para Task 3. Se algo faltar, vá para Task 2.
 
 Siga os fluxos normais desta skill para cada documento ausente:
 
-- `docs/PRD.md` → seção "Etapa 1 — PRD.md" do CLAUDE.md
-- `docs/ARQUITETURA.md` → seção "Etapa 3 — ARQUITETURA.md"
+- `docs/PRD.md` → "Etapa 1 — PRD.md" em `docs/regras/prd-roadmap-arquitetura.md`
+- `docs/ARQUITETURA.md` → "Etapa 3 — ARQUITETURA.md" em `docs/regras/prd-roadmap-arquitetura.md`
 - `docs/UML.md` + `docs/UML.html` → regra 1.6c
 - Design system → crie no formato DESIGN.md mínimo descrito acima, validando cada seção com o usuário
 
@@ -1098,6 +1146,7 @@ Regras para o inventário:
 - Cada funcionalidade P0/P1 do PRD deve aparecer em pelo menos uma tela
 - Cada tela deve estar ligada a um ou mais requisitos do PRD
 - Liste todos os estados relevantes (vazio, erro, sucesso, carregando, sem permissão)
+- **Tela de Loja de Apps obrigatória** (ver regra 24): o inventário DEVE incluir uma tela (ex: `TEL-000 — Loja de Apps` ou numeração equivalente) listando todos os apps do catálogo definido em `docs/ARQUITETURA.md`, com indicação visual de quais estão ativos/inativos para o tenant e um controle (toggle/switch) para ativar/desativar cada um. Essa tela é tratada como P0 mesmo que o PRD não a mencione explicitamente por nome — ela é onde a arquitetura de apps vira produto. Se o projeto for uma exceção documentada (app único, sem loja — ver regra 24), registre no README de mockups por que essa tela foi omitida.
 
 Apresente o inventário ao usuário para validação. Só prossiga com aprovação.
 
@@ -1199,6 +1248,10 @@ Esta é a task mais importante. Não pule.
 
 Para cada requisito funcional P0/P1 do PRD, responda: "em qual tela isso aparece?". Se houver requisito sem tela, volte ao inventário e crie a tela correspondente.
 
+**Validação da Loja de Apps:**
+
+Confirme que existe uma tela de Loja de Apps (regra 24) listando todos os apps do catálogo documentado em `docs/ARQUITETURA.md`, com estado ativo/inativo visível e controle de ativação por app. Se o catálogo de apps mudou desde a última vez que essa tela foi gerada, atualize-a — ela não pode ficar desatualizada em relação a `docs/ARQUITETURA.md`.
+
 **Validação de fidelidade ao design system:**
 
 Faça uma revisão manual dos arquivos HTML:
@@ -1266,6 +1319,7 @@ Sempre que este fluxo for executado, atualize:
 | Deixar estados importantes de fora | O usuário não vê casos de erro/vazio | Representar todos os estados do inventário |
 | Mockup estático sem links | Não simula fluxo real | Sempre linkar próximas telas |
 | Ignorar requisitos P0/P1 "porque é só mockup" | Mockup pela metade | Cobrir todos os requisitos P0/P1 |
+| Gerar telas sem a Loja de Apps (regra 24) | Esconde a arquitetura de ativação por tenant, que é P0 mesmo sem estar no PRD por nome | Sempre incluir a tela de Loja de Apps no inventário, salvo exceção documentada |
 
 ---
 
