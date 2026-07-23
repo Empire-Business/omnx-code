@@ -54,9 +54,11 @@
 ## Regra de sistema de tickets de erro (inegociável) (detalhe: `docs/regras/sistema-de-tickets.md`)
 
 - Todo projeto com interface visível ao usuário final precisa de um botão/atalho "Reportar problema" acessível a partir de qualquer tela — nunca escondido em menu de terceiro nível
-- Ao reportar (ou ao ocorrer um erro não tratado, via error boundary + handler global), a aplicação captura automaticamente: print de tela, log/stack trace, rota atual, timestamp, navegador/dispositivo e usuário/tenant — sem exigir que o usuário descreva o erro tecnicamente
+- Um interceptor de `console.log/warn/error/info` e de `fetch`/XHR roda **desde o boot do app**, mantendo ring buffer em memória (últimas ~100-150 entradas de log, ~30-50 requisições) — sem isso "logs" no ticket fica sempre vazio, porque não dá pra capturar retroativamente o que já foi impresso antes do erro
+- A captura de tela é real (via `html2canvas` ou equivalente) e vem **anexada automaticamente por padrão** ao abrir o report — não é um checkbox que o usuário precisa lembrar de marcar
+- Ao reportar (ou ao ocorrer um erro não tratado, via error boundary + handler global), a aplicação captura automaticamente: print real, os dois ring buffers (console e rede), rota atual, timestamp, navegador/dispositivo e usuário/tenant — sem exigir que o usuário descreva o erro tecnicamente
 - Os tickets caem numa fila interna com status (`novo → em análise → em correção → resolvido`), seja tabela própria no Supabase (com RLS: usuário só cria os próprios, papel responsável lê/atualiza) ou integração com o sistema de suporte do time
-- **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
+- **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática (print real + logs reais, testados forçando um erro de propósito) e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
 - `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
 ## Regra de banco de dados (inegociável) (detalhe: `docs/regras/migrations.md` e `docs/regras/acesso-supabase.md`)
@@ -118,4 +120,4 @@ Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tor
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.17.1
+> Versão do template: omnx-code v1.18

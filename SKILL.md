@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.17.1"
+version: "1.18"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -53,7 +53,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.17.1** |
+| Versão da skill | **1.18** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -586,12 +586,17 @@ Todo sistema com interface visível ao usuário final vai quebrar em algum momen
 
 **Regra:** nenhum sistema criado por esta skill com UI voltada ao usuário final pode ir para produção sem um sistema de tickets de erro funcional. Não se aplica a scripts internos, jobs de background ou ferramentas sem interface — aplica-se a qualquer projeto que tenha uma tela.
 
+Um botão que só abre um formulário de texto livre **não cumpre este gate**, mesmo que se chame "Reportar problema" — isso é um formulário de contato, não captura automática. Da mesma forma, um campo `console_logs`/`screenshot_url` que existe no schema mas fica sempre vazio/nulo na prática também não cumpre — a especificação técnica completa (com o porquê de cada item) vive em `docs/regras/sistema-de-tickets.md`; leia antes de implementar, não invente a própria versão simplificada.
+
 - **Commit simples** (trabalho incremental, branch de feature, não é push/merge para `main`/`master` nem PR de release): se o commit introduz a primeira tela/fluxo com UI do projeto e o sistema de tickets ainda não existe, **avise** que ele precisa estar pronto antes do deploy e **sugira** implementar já. Não bloqueie o commit por isso.
 - **Antes de qualquer ação do gate 1.6** (push/merge para `main`/`master`, PR de release, deploy) você DEVE, de forma fail-closed:
   1. Verificar que existe uma forma de reportar erro **fácil de encontrar** na UI — um botão/atalho visível a partir de qualquer tela (ex: flutuante ou no menu principal), não escondido em configurações de terceiro nível.
-  2. Verificar que existe uma **função de captura automática** acionada tanto pelo botão de reportar quanto por um error boundary/handler global (erros não tratados, promises rejeitadas), que reúne sem exigir digitação técnica do usuário: print de tela da tela no momento do erro, logs do console/stack trace, rota atual, timestamp, navegador/dispositivo, e id do usuário/tenant quando aplicável — e envia tudo automaticamente para uma área interna organizada em fila (tabela dedicada no banco com status, ou integração com o sistema de suporte que o time já usa).
-  3. Verificar que `docs/SISTEMA-DE-TICKETS.md` existe e documenta: como o usuário reporta, o que é capturado automaticamente, onde a fila vive, os status do fluxo (`novo → em análise → em correção → resolvido`) e quem é notificado.
-  4. Se qualquer um dos três itens acima faltar ou estiver incompleto: **RECUSE** a publicação. Implemente junto com o usuário (a especificação técnica completa vive no template `CLAUDE.md`, seção "Sistema de Tickets de Erro") e só então prossiga. Não "informe e deixe o usuário decidir".
+  2. Verificar que existe um **interceptor de console (`console.log/warn/error/info`) e de rede (`fetch`/XHR) rodando desde o boot do app**, mantendo um ring buffer em memória (últimas ~100-150 entradas de log, ~30-50 requisições de rede) — sem isso, "logs" no ticket é sempre um campo vazio, porque o JS não tem acesso retroativo ao que já foi impresso no console antes do erro.
+  3. Verificar que existe **captura de tela real do DOM** (ex: via `html2canvas` ou equivalente, não a Screen Capture API que exige permissão manual a cada uso) anexada **automaticamente por padrão** ao abrir o modal de report — o usuário vê a prévia da imagem antes de enviar e pode remover se quiser, mas não precisa ativar nada para ela existir.
+  4. Verificar que essa mesma captura (print + buffers de log/rede + contexto) dispara também por um error boundary do React e um handler global (`window.onerror` + `unhandledrejection`) para erros não tratados, sem exigir clique do usuário.
+  5. **Rodar a verificação anti-teatro** (seção dedicada em `docs/regras/sistema-de-tickets.md`): forçar um erro de teste, abrir o ticket gerado e confirmar que `screenshot_url` abre uma imagem real da tela, `console_logs` tem entradas anteriores ao erro (prova que o buffer já estava rodando) e `network_logs` reflete requisições reais — não placeholders, não campos vazios.
+  6. Verificar que `docs/SISTEMA-DE-TICKETS.md` existe e documenta: como o usuário reporta, o que é capturado automaticamente (print real, ring buffer de console, ring buffer de rede), onde a fila vive, os status do fluxo (`novo → em análise → em correção → resolvido`) e quem é notificado.
+  7. Se qualquer um dos itens acima faltar, estiver incompleto, ou a verificação anti-teatro do item 5 falhar: **RECUSE** a publicação. Implemente junto com o usuário e só então prossiga. Não "informe e deixe o usuário decidir".
 
 > Este gate é independente dos gates 1.6, 1.6b e 1.6c: um projeto pode ter segurança, níveis de acesso e UML em dia e ainda estar bloqueado por falta de sistema de tickets de erro, e vice-versa. Todos precisam passar antes de PR/main.
 

@@ -32,7 +32,10 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Sistema de Tickets de Erro** — ver `docs/regras/sistema-de-tickets.md`
 - [ ] **Existe um botão/atalho de "Reportar problema" visível em qualquer tela da aplicação?** Sem isso, o deploy está BLOQUEADO (gate 1.6d).
-- [ ] **A captura automática (print de tela, log/stack trace, rota, timestamp, navegador, usuário/tenant) funciona tanto pelo botão de reportar quanto por um error boundary/handler global de erro não tratado?**
+- [ ] **Existe um interceptor de `console.log/warn/error/info` e de `fetch`/XHR rodando desde o boot do app**, mantendo ring buffer em memória (não é implementado "sob demanda" ao clicar no botão — se for, os logs anteriores ao clique já se perderam)?
+- [ ] **A captura de tela é real** (via `html2canvas` ou equivalente, gerando uma imagem de verdade do DOM) **e anexada automaticamente por padrão** ao abrir o report — não um checkbox que o usuário precisa lembrar de marcar?
+- [ ] A mesma captura (print + logs + rede + contexto) funciona tanto pelo botão de reportar quanto por um error boundary/handler global de erro não tratado, sem exigir clique do usuário?
+- [ ] **Verificação anti-teatro feita:** um erro de teste foi forçado, o ticket gerado foi aberto, e `screenshot_url` mostra uma imagem real, `console_logs` tem entradas anteriores ao erro, e `network_logs` reflete requisições reais — nenhum desses três campos está vazio, nulo ou com placeholder?
 - [ ] Os tickets caem numa fila interna organizada por status (`novo → em análise → em correção → resolvido`), seja tabela própria com painel ou integração com o sistema de suporte do time?
 - [ ] **`docs/SISTEMA-DE-TICKETS.md` existe e documenta o fluxo completo (como reportar, o que é capturado, onde a fila vive, status, quem é notificado)?** Sem esse documento, o deploy está BLOQUEADO (gate 1.6d).
 

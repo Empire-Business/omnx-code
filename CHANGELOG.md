@@ -4,6 +4,19 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.18 — 2026-07-23
+
+### Gate 1.6d endurecido — captura de tela e logs reais, não promessa vazia
+
+Adicionado a pedido do usuário: implementações do sistema de tickets de erro estavam saindo "pobres" — um botão que abre um formulário de texto, sem captura automática de verdade, e "logs do console" que na prática vinham vazios porque nenhuma implementação estava de fato interceptando o console desde o boot do app (o JS não tem acesso retroativo ao que já foi impresso).
+
+### Adicionado
+- **`docs/regras/sistema-de-tickets.md`**: nova seção explicando por que a captura costuma sair pobre (formulário de contato disfarçado de "sistema de tickets"; logs vazios por falta de interceptor). Especifica: interceptor de `console.log/warn/error/info` e de `fetch`/XHR rodando desde o boot do app com ring buffer em memória (~100-150 logs, ~30-50 requisições); captura de tela real via `html2canvas` (ou equivalente) anexada **automaticamente por padrão** no modal de report, com prévia visível antes de enviar; recomendação explícita de não depender da Screen Capture API do navegador como mecanismo principal (exige permissão manual a cada uso). Shape da tabela `error_tickets` ganhou as colunas `console_logs` e `network_logs`. Nova seção "Verificação anti-teatro": forçar um erro de teste e conferir que `screenshot_url`, `console_logs` e `network_logs` do ticket gerado têm dado real, não vazio/placeholder.
+- **`SKILL.md`, gate 1.6d**: passos de verificação reescritos para exigir interceptor de console/rede desde o boot, captura de tela real (não a Screen Capture API), a mesma captura funcionando em error boundary/handler global, e a verificação anti-teatro como parte do próprio gate — sem isso, RECUSA a publicação.
+- **`references/regras/checklist-de-entrega.md`** e **`references/modelo-agents.md`**: itens novos cobrindo interceptor de logs, captura automática por padrão (não opt-in) e a verificação anti-teatro.
+
+---
+
 ## v1.17.1 — 2026-07-23
 
 ### Migração de CLAUDE.md antigo para o formato índice — segura, opt-in, não-bloqueante
