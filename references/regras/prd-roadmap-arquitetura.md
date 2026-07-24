@@ -47,7 +47,7 @@ Após PRD e ROADMAP aprovados, criar `docs/ARQUITETURA.md` com:
 
 ## Etapa 3b — Mockups navegáveis (quando solicitado)
 
-Se o usuário pedir mockups, protótipos ou "ver as telas" antes de codar, siga o fluxo de mockups da skill `omnx-code`:
+Se o usuário pedir mockups, protótipos ou "ver as telas" antes de codar, siga o fluxo de mockups da skill `mestre-code`:
 
 ### Pré-requisitos (gate fail-closed)
 
@@ -76,4 +76,4 @@ Se algum item estiver faltando, crie-o primeiro com o usuário. Não "dê um jei
 - Toda funcionalidade P0/P1 do PRD deve aparecer em pelo menos uma tela
 - **Tela de Loja de Apps é obrigatória** — lista o catálogo de apps definido em `docs/ARQUITETURA.md`, com estado ativo/inativo por app e controle de ativação para o tenant (ver `docs/regras/apps-loja-de-apps.md`). Só pode ser omitida em projeto explicitamente definido como app único.
 
-> Detalhes completos do fluxo estão na seção "Fluxo de Mockups" do `SKILL.md` da `omnx-code`.
+> Detalhes completos do fluxo estão na seção "Fluxo de Mockups" do `SKILL.md` da `mestre-code`.

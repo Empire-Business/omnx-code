@@ -15,22 +15,22 @@
 
 ### Claude Code
 ```bash
-git clone https://github.com/Empire-Business/omnx-code ~/.claude/skills/omnx-code
+git clone https://github.com/Empire-Business/omnx-code ~/.claude/skills/mestre-code
 ```
 
 ### OpenAI Codex
 ```bash
-git clone https://github.com/Empire-Business/omnx-code ~/.codex/skills/omnx-code
+git clone https://github.com/Empire-Business/omnx-code ~/.codex/skills/mestre-code
 ```
 
 Pronto. A skill aparece automaticamente na lista de skills do Claude Code e do Codex.
 
 ## Como usar
 
-No Claude Code, mencione `omnx-code` ou peça para "ativar o framework":
+No Claude Code, mencione `mestre-code` ou peça para "ativar o framework":
 
 ```
-/omnx-code
+/mestre-code
 ```
 
 Na primeira execução faz o setup completo. Nas seguintes, vai direto ao trabalho guiado pelo `CLAUDE.md`.
@@ -44,7 +44,7 @@ React · TypeScript · Supabase · Vercel
 Atualização verificada (nunca `git pull` cego):
 
 ```bash
-cd ~/.claude/skills/omnx-code
+cd ~/.claude/skills/mestre-code
 git fetch origin --tags && git log --oneline HEAD..origin/main   # ver o que mudou ANTES de aplicar
 # verificar ANTES de trocar o código (confirme antes de alterar a skill):
 git verify-tag <TAG> && git checkout <TAG>
@@ -53,7 +53,7 @@ git verify-tag <TAG> && git checkout <TAG>
 
 ## Skills relacionadas
 
-- [security-auditor](https://github.com/Empire-Business/security-auditor) — auditoria de segurança com correção assistida (instalada e mantida pelo omnx-code; gate de deploy em P0/P1)
+- [security-auditor](https://github.com/Empire-Business/security-auditor) — auditoria de segurança com correção assistida (instalada e mantida pelo mestre-code; gate de deploy em P0/P1)
 
 ## Versão
 

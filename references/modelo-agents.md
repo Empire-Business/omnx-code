@@ -2,7 +2,7 @@
 
 > Este arquivo sincroniza as regras do CLAUDE.md para todos os agentes de AI
 > (Lovable, Cursor, Windsurf, Codex, Jules, etc.). Fonte de verdade: `CLAUDE.md`.
-> Gerado e mantido automaticamente pela skill omnx-code. Não edite manualmente.
+> Gerado e mantido automaticamente pela skill mestre-code. Não edite manualmente.
 
 ---
 
@@ -126,6 +126,6 @@ Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tor
 
 ---
 
-> Sincronizado com `CLAUDE.md` pela skill omnx-code.
+> Sincronizado com `CLAUDE.md` pela skill mestre-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.18
+> Versão do template: mestre-code v1.18

@@ -30,7 +30,7 @@
 | 📋 Checklist de entrega | Checklist completo antes de considerar qualquer tarefa concluída | `docs/regras/checklist-de-entrega.md` |
 | 🧪 Testes | Vitest, integração e Playwright — o que cada camada cobre | `docs/regras/testes.md` |
 
-> **Regra de manutenção deste índice:** toda vez que a skill `omnx-code` adicionar uma regra nova ou expandir uma existente além de um resumo curto, o conteúdo completo vai para um arquivo novo ou existente em `docs/regras/`, e aqui entra só a linha da tabela. Ver regra 7 (`SKILL.md` da `omnx-code`) para o gate que garante isso continuamente, não só na instalação inicial.
+> **Regra de manutenção deste índice:** toda vez que a skill `mestre-code` adicionar uma regra nova ou expandir uma existente além de um resumo curto, o conteúdo completo vai para um arquivo novo ou existente em `docs/regras/`, e aqui entra só a linha da tabela. Ver regra 7 (`SKILL.md` da `mestre-code`) para o gate que garante isso continuamente, não só na instalação inicial.
 
 ---
 
