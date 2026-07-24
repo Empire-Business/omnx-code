@@ -1634,8 +1634,8 @@ git --no-pager diff HEAD..origin/main -- SKILL.md
 
 Mostre o diff ao usuário e peça confirmação. Aplique **verificando antes**, por referência imutável (nunca `git pull` em `main`):
 ```bash
-PINNED_TAG=v1.13.0
-PINNED_SHA=0cea2e46c38a97d39035be4020f3661c1421662e
+PINNED_TAG=v1.20.0
+PINNED_SHA=565b9e85c009382377d44a954ca2f4e0f7dff55c
 if git verify-tag "$PINNED_TAG" 2>/dev/null; then git checkout "$PINNED_TAG";
 elif [ "$(git rev-list -n1 "$PINNED_TAG")" = "$PINNED_SHA" ]; then echo "tag anotada validada por SHA pinado" && git checkout "$PINNED_TAG";
 else echo "FALHA: tag nao aponta para o SHA pinado; abortando" && exit 1; fi
