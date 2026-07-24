@@ -1,6 +1,6 @@
 ---
 name: mestre-code
-version: "1.19"
+version: "1.20"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -55,7 +55,7 @@ description: |
 |-------|-------|
 | Versão da skill | **1.19** |
 | Security-auditor mínimo requerido | **v1.11** |
-| GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
+| GitHub (esta skill) | https://github.com/Empire-Business/mestre-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
 | State document | `.empire/state.json` (na raiz do projeto do usuário) |
 
@@ -94,6 +94,19 @@ Se o usuário pediu explicitamente "verificar atualizações" ou "atualizar skil
 
 Antes de criar qualquer task — seja de Fase de Setup, seja de Modo de Trabalho Normal — verifique se **esta instalação da mestre-code** está na versão mais recente. A razão é a mesma do gate de segurança (regra 1.6): codar sob uma versão desatualizada da skill significa codar sob regras que já foram corrigidas ou endurecidas upstream (um gate novo, uma correção de fluxo, um pin de tag atualizado) sem que ninguém perceba. Este gate roda **toda vez** que a skill é ativada, não só na primeira vez — inclusive com `setup_complete: true`.
 
+**Passo A0 — Migração de pasta local (rename omnx-code → mestre-code, roda antes de tudo, idempotente):**
+
+Instalações antigas ainda têm o clone em `~/.claude/skills/omnx-code/`. Antes de ler qualquer versão, migre a pasta se necessário:
+```bash
+if [ -d ~/.claude/skills/omnx-code ] && [ ! -L ~/.claude/skills/omnx-code ] && [ ! -e ~/.claude/skills/mestre-code ]; then
+  mv ~/.claude/skills/omnx-code ~/.claude/skills/mestre-code
+  ln -s mestre-code ~/.claude/skills/omnx-code
+  git -C ~/.claude/skills/mestre-code remote set-url origin https://github.com/Empire-Business/mestre-code 2>/dev/null
+  echo "Migrado: ~/.claude/skills/omnx-code -> ~/.claude/skills/mestre-code (symlink de compatibilidade deixado; remote atualizado)"
+fi
+```
+Condições da checagem: só migra se `omnx-code` existir como diretório real (não symlink — já migrado) **e** `mestre-code` ainda não existir (evita sobrescrever instalação já migrada ou conflito). Se `mestre-code` já existir E `omnx-code` também existir como diretório real (não symlink), **não mexa automaticamente** — avise o usuário que há duas cópias e peça para ele decidir qual manter (mesma regra de nunca apagar customização sem confirmação usada no resto deste documento).
+
 **Passo A — Versão local instalada (sem rede — já está em disco):**
 ```bash
 cat ~/.claude/skills/mestre-code/CHANGELOG.md 2>/dev/null | grep -m1 "^## v"
@@ -105,7 +118,7 @@ git -C ~/.claude/skills/mestre-code describe --tags --always 2>/dev/null
 Leia `last_version_gate_check` em `.empire/state.json` (do projeto do usuário). Se o campo existir, tiver menos de 24h e o resultado registrado for `"up_to_date"`, pule a checagem de rede desta vez e vá direto para a task normal. Caso contrário (sem registro, expirado, ou último resultado não foi "up_to_date"):
 
 ```bash
-curl -fsSL --max-time 15 --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/Empire-Business/omnx-code/main/CHANGELOG.md | grep -m1 "^## v"
+curl -fsSL --max-time 15 --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/Empire-Business/mestre-code/main/CHANGELOG.md | grep -m1 "^## v"
 ```
 
 **Passo C — Decisão (comparação semver via `sort -V`, nunca lexicográfica):**

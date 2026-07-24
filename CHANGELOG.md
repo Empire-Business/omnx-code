@@ -1,6 +1,20 @@
-# Changelog — omnx-code
+# Changelog — mestre-code
 
 Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui a versão, data e o que foi adicionado/modificado.
+
+---
+
+## v1.20 — 2026-07-24
+
+### Renomeação omnx-code → mestre-code — repositório GitHub e migração local automática
+
+Repositório no GitHub renomeado de `Empire-Business/omnx-code` para `Empire-Business/mestre-code` (o GitHub mantém redirect automático de `git clone/fetch/pull` e `raw.githubusercontent.com` para o nome antigo, então clones existentes continuam funcionando até atualizarem). Esta versão adiciona a migração local que faltava: instalações antigas têm a pasta em `~/.claude/skills/omnx-code/`, mas o self-update passou a referenciar `~/.claude/skills/mestre-code/` — sem essa migração, o gate de versão quebraria silenciosamente no primeiro update de quem já tinha a skill instalada.
+
+### Adicionado
+- **`SKILL.md`, Passo 1.5 — novo Passo A0**: roda em toda ativação, antes de qualquer leitura de versão. Detecta pasta local `~/.claude/skills/omnx-code/` (diretório real, não symlink), migra para `~/.claude/skills/mestre-code/` via `mv`, deixa um symlink `omnx-code -> mestre-code` para compatibilidade com qualquer referência antiga, e atualiza o `git remote` para a URL nova. É idempotente (não repete a migração se já tiver rodado) e não mexe automaticamente se detectar duas cópias conflitantes — nesse caso avisa o usuário e pede decisão.
+
+### Alterado
+- **`SKILL.md`**: URLs do repositório desta skill (tabela de versão/configuração e comando de verificação de versão remota) atualizadas de `Empire-Business/omnx-code` para `Empire-Business/mestre-code`.
 
 ---
 
