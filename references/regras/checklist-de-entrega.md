@@ -30,6 +30,14 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] Desativar um app oculta e bloqueia acesso sem apagar dados?
 - [ ] A tela de Loja de Apps existe, lista o catálogo completo e permite ativar/desativar cada app com efeito imediato — exceto se o projeto foi explicitamente definido como app único (documentado em `docs/ARQUITETURA.md`)?
 
+**API & Webhooks por App** — ver `docs/regras/api-webhooks-por-app.md` (só se o app tiver integração externa)
+- [ ] `docs/apps/<app-slug>/API.md` existe (se o app expõe endpoints), com autenticação, endpoints, exemplos `curl` e códigos de erro?
+- [ ] `docs/apps/<app-slug>/WEBHOOKS.md` existe (se o app recebe/dispara webhooks), com seções "recebidos" e "disparados" separadas, payloads reais e política de retry?
+- [ ] Existe tela de "Integrações" dentro do app com geração/rotação de chave, cadastro de webhook, botão de teste e histórico de entregas?
+- [ ] Chaves/secrets são gerados pelo sistema (nunca digitados pelo tenant) e armazenados como hash, nunca em texto plano?
+- [ ] Apenas papel administrativo consegue gerenciar chaves/webhooks (conferido contra `docs/NIVEIS-DE-ACESSO.md`)?
+- [ ] Desativar o app na Loja de Apps derruba imediatamente as chaves/webhooks daquele app?
+
 **Sistema de Tickets de Erro** — ver `docs/regras/sistema-de-tickets.md`
 - [ ] **Existe um botão/atalho de "Reportar problema" visível em qualquer tela da aplicação?** Sem isso, o deploy está BLOQUEADO (gate 1.6d).
 - [ ] **Existe um interceptor de `console.log/warn/error/info` e de `fetch`/XHR rodando desde o boot do app**, mantendo ring buffer em memória (não é implementado "sob demanda" ao clicar no botão — se for, os logs anteriores ao clique já se perderam)?

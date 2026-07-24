@@ -21,3 +21,4 @@
 - Desativar um app **oculta e bloqueia acesso, nunca apaga dados** — reativar deve trazer tudo de volta como estava.
 - O produto tem uma tela de **Loja de Apps** onde o admin do tenant vê o catálogo completo, o que já está ativo, e ativa/desativa cada app com efeito imediato (sem deploy).
 - A matriz de apps do catálogo (nome, descrição, categoria, `is_core`, dependências) fica documentada em `docs/ARQUITETURA.md`, seção "Arquitetura de Apps & Loja de Apps".
+- Todo app do catálogo que expõe API própria e/ou recebe/dispara webhooks segue `docs/regras/api-webhooks-por-app.md`: documentação em `docs/apps/<app-slug>/API.md` + `WEBHOOKS.md`, e uma tela de "Integrações" dentro do próprio app para o tenant gerenciar chaves e webhooks com segurança. Desativar o app na Loja de Apps derruba imediatamente o acesso das chaves/webhooks daquele app — nenhuma credencial fica "esquecida" ativa com o app desligado.

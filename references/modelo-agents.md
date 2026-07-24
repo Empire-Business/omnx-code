@@ -51,6 +51,14 @@
 - Exceção só é válida se o usuário confirmar explicitamente um app único sem loja, documentado em `docs/ARQUITETURA.md`
 - **Gate obrigatório (fail-closed):** mockups gerados por esta skill incluem obrigatoriamente uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada
 
+## Regra de API & webhooks por app (inegociável) (detalhe: `docs/regras/api-webhooks-por-app.md`)
+
+- Todo app do catálogo que expõe API própria e/ou recebe/dispara webhooks documenta em `docs/apps/<app-slug>/API.md` (auth, endpoints, exemplos `curl`, códigos de erro) e/ou `docs/apps/<app-slug>/WEBHOOKS.md` (payloads recebidos e disparados, assinatura HMAC, retry) — nunca um arquivo genérico misturando vários apps
+- Cada app com integração tem uma tela de "Integrações" dentro dele mesmo na Loja de Apps: gerar/rotacionar chave de API, cadastrar webhook (URL, eventos, secret gerado pelo sistema), botão de teste e histórico de entregas
+- Chaves e secrets nunca ficam em texto plano no banco (hash, mesmo padrão de senha) e nunca são digitados pelo tenant — o sistema sempre gera
+- Apenas papel administrativo (conforme `docs/NIVEIS-DE-ACESSO.md`) cria, rotaciona ou revoga chaves/webhooks; toda ação fica auditada
+- **Gate obrigatório:** desativar um app na Loja de Apps derruba imediatamente o acesso das chaves/webhooks daquele app — nenhuma credencial fica ativa "esquecida" com o app desligado
+
 ## Regra de sistema de tickets de erro (inegociável) (detalhe: `docs/regras/sistema-de-tickets.md`)
 
 - Todo projeto com interface visível ao usuário final precisa de um botão/atalho "Reportar problema" acessível a partir de qualquer tela — nunca escondido em menu de terceiro nível

@@ -4,6 +4,22 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.19 — 2026-07-23
+
+### API & Webhooks por app — documentação completa e gerenciamento seguro na Loja de Apps
+
+Adicionado a pedido do usuário: a regra 23 (documentação de API/webhook) já existia, mas era genérica e desconectada da arquitetura modular de apps (regra 24) — não deixava claro que cada app do catálogo precisa da sua própria documentação e da sua própria tela de gerenciamento, nem detalhava os requisitos de segurança para chaves e webhooks.
+
+### Adicionado
+- **Novo arquivo `references/regras/api-webhooks-por-app.md`**: regra completa cobrindo (1) documentação por app em `docs/apps/<app-slug>/API.md` + `WEBHOOKS.md` (endpoints, exemplos `curl`, webhooks recebidos vs. disparados, assinatura HMAC, retry), (2) tela de "Integrações" dentro de cada app na Loja de Apps para o tenant gerar/rotacionar chaves e cadastrar webhooks sem precisar ler código, e (3) requisitos de segurança mínimos (chaves/secrets como hash, geração pelo sistema nunca pelo tenant, escopo por tenant, papel administrativo obrigatório, auditoria de criação/rotação/revogação, e desativação do app na Loja de Apps derrubando o acesso na hora).
+- **`SKILL.md`, regra 23**: reescrita para apontar para o novo arquivo de regra e deixar explícito o vínculo com a regra 24 (arquitetura de apps).
+- **`references/regras/apps-loja-de-apps.md`**: nova linha cruzando com a regra de API/webhooks por app.
+- **`references/modelo-claude.md`**: nova linha no índice de regras e duas linhas no índice de documentos (`docs/apps/<app-slug>/API.md` e `WEBHOOKS.md`).
+- **`references/modelo-agents.md`**: nova seção "Regra de API & webhooks por app" no mesmo padrão das demais regras inegociáveis.
+- **`references/regras/checklist-de-entrega.md`**: novo bloco de checklist para apps com integração externa.
+
+---
+
 ## v1.18 — 2026-07-23
 
 ### Gate 1.6d endurecido — captura de tela e logs reais, não promessa vazia

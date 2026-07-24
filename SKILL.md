@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.18"
+version: "1.19"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -53,7 +53,7 @@ description: |
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.18** |
+| Versão da skill | **1.19** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -968,15 +968,11 @@ Princípios:
 
 **Regra prática:** se uma informação já existe em um arquivo versionado do projeto (`CLAUDE.md`, `docs/handoffs/latest.md`, `docs/PRD.md`, etc.), prefira citar o arquivo a reproduzi-la na resposta.
 
-**23. Toda integração de API/webhook precisa ser documentada e configurável na UI**
+**23. Toda API/webhook de app precisa ser documentada por app e gerenciável de forma segura na UI**
 
-Integrações externas (API que o app consome, webhook que o app recebe/dispara, endpoint público que outro sistema vai chamar) são o ponto onde mais projetos "vibe coded" quebram silenciosamente: funcionam no dia em que foram feitas, ninguém mais lembra como configurar de novo, e o próximo sistema que precisa integrar não tem para onde olhar além de ler o código-fonte. Trate toda integração como uma interface pública — mesmo que hoje só exista um consumidor — porque o custo de documentar bem no momento em que o código é escrito é uma fração do custo de reconstruir esse conhecimento depois.
+Integrações externas (API que um app expõe, webhook que um app recebe/dispara) são o ponto onde mais projetos "vibe coded" quebram silenciosamente: funcionam no dia em que foram feitas, ninguém mais lembra como configurar de novo, e o próximo sistema que precisa integrar não tem para onde olhar além de ler o código-fonte. Trate toda integração como uma interface pública do app dono dela — mesmo que hoje só exista um consumidor — porque o custo de documentar bem no momento em que o código é escrito é uma fração do custo de reconstruir esse conhecimento depois.
 
-Sempre que o app tiver (ou passar a ter) qualquer integração de API externa ou webhook (recebido ou disparado), exija três coisas antes de considerar a integração pronta:
-
-1. **Documentação ampla em `docs/`** (ex: `docs/INTEGRACOES.md` ou um arquivo por integração em `docs/integracoes/<nome>.md`, indexado no `CLAUDE.md` como as demais docs — ver regra 7): o que a integração faz, quem consome/dispara, autenticação exigida, rate limits conhecidos, e o que acontece em caso de falha (retry? fila? erro visível ao usuário?).
-2. **Parte didática na UI para configurar** — se a integração exige alguma credencial, URL, chave ou parâmetro por parte do usuário (ex: conectar uma conta de terceiro, gerar uma API key própria para expor a outro sistema), a tela de configuração não pode ser só um campo de texto vazio: inclua instruções no próprio fluxo (tooltips, texto de apoio, link para onde obter a credencial, exemplo do formato esperado) para que a pessoa configure sem precisar abrir um chat de suporte ou ler o código.
-3. **Contrato de dados claro no lado que recebe** — se o app é quem **recebe** dados (endpoint de webhook, API própria exposta a terceiros), documente de forma explícita e testável como os dados devem chegar: método HTTP, formato do payload (schema/exemplo de JSON real, não só "um JSON"), campos obrigatórios vs. opcionais, tipo de autenticação esperada (header, assinatura HMAC, etc.), código de resposta esperado em sucesso/erro, e pelo menos um exemplo de request funcional (`curl` ou equivalente) que qualquer sistema externo consiga copiar e adaptar. O objetivo é que qualquer time de fora consiga integrar lendo só essa documentação, sem precisar perguntar nada.
+Como todo sistema gerado por esta skill nasce modular (regra 24, `docs/regras/apps-loja-de-apps.md`), API e webhook nunca são documentados soltos: cada app do catálogo que expõe endpoints ou consome/dispara webhooks ganha sua própria pasta `docs/apps/<app-slug>/API.md` + `WEBHOOKS.md`, e uma tela de "Integrações" dentro do próprio app na Loja de Apps para o tenant gerar/rotacionar chaves, cadastrar webhooks e ver o histórico de entregas — sem precisar ler código nem abrir chat de suporte. Regras completas (estrutura de cada doc, o que a tela de gerenciamento precisa ter, e os requisitos de segurança de chaves/secrets — hash em vez de texto plano, escopo por tenant, papel administrativo obrigatório, e desativação do app derrubando o acesso na hora) vivem em `docs/regras/api-webhooks-por-app.md`.
 
 Isso vale tanto para a primeira versão da integração quanto para qualquer mudança de contrato depois — se o formato do payload mudar, a documentação muda no mesmo commit (mesmo princípio da regra 20 para migrations: o que descreve o comportamento não pode ficar defasado em relação ao código).
 

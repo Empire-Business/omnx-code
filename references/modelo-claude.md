@@ -14,6 +14,7 @@
 | 🗄️ Banco de dados | Supabase direto ou local-primeiro-depois-migra — escolha documentada em `docs/ARQUITETURA.md` | `docs/regras/banco-de-dados.md` |
 | 🏢 Multi-tenant | Todo sistema nasce multi-tenant (tenant + membership + papéis), `tenant_id` em toda tabela de negócio, RLS por tenant | `docs/regras/multi-tenant.md` |
 | 🧩 Apps & Loja de Apps | Todo sistema nasce modular: catálogo de apps + instalação por tenant, com tela de Loja de Apps para ativar/desativar | `docs/regras/apps-loja-de-apps.md` |
+| 🔌 API & Webhooks por app | Cada app com integração tem `docs/apps/<app-slug>/API.md` + `WEBHOOKS.md` e tela própria de "Integrações" (chaves, webhooks, histórico) — desativar o app derruba o acesso na hora | `docs/regras/api-webhooks-por-app.md` |
 | 📐 UML | Nenhum código de domínio sem `docs/UML.md` (+`UML.html`) aprovado antes — bloqueia código e commit | `docs/regras/uml.md` |
 | 🛂 Níveis de acesso | `docs/NIVEIS-DE-ACESSO.md` com matriz papel × recurso × ação completa — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
 | 🎫 Sistema de tickets de erro | Botão de reportar + captura automática (print, log, rota) + fila por status — bloqueia deploy | `docs/regras/sistema-de-tickets.md` |
@@ -52,7 +53,9 @@ A IA deve saber que os arquivos abaixo existem e consultá-los quando a tarefa t
 | `docs/ROADMAP.md`            | Tarefas pendentes, em andamento e concluídas             | —             |
 | `docs/MUDANCAS.md`           | Changelog de todas as alterações relevantes              | —             |
 | `docs/integracoes/vercel.md` | Configuração de deploy, domínio e segurança no Vercel    | —             |
-| `docs/integracoes/README.md` | Índice de todas as integrações externas documentadas     | —             |
+| `docs/integracoes/README.md` | Índice de todas as integrações externas documentadas, agrupado por app | — |
+| `docs/apps/<app-slug>/API.md` | Documentação da API própria do app (auth, endpoints, exemplos `curl`) — um arquivo por app com API | — |
+| `docs/apps/<app-slug>/WEBHOOKS.md` | Webhooks recebidos e disparados pelo app (payloads, assinatura, retry) — um arquivo por app com webhook | — |
 
 > **Regra:** toda vez que um arquivo acima for alterado, atualizar o campo "Atualizado em" com data/hora BRT (ex: `20/03/2025 às 14h32 BRT`).
 
