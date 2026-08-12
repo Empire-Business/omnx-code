@@ -18,6 +18,7 @@
 | 📐 UML | Nenhum código de domínio sem `docs/UML.md` (+`UML.html`) aprovado antes — bloqueia código e commit | `docs/regras/uml.md` |
 | 🛂 Níveis de acesso | `docs/NIVEIS-DE-ACESSO.md` com matriz papel × recurso × ação completa — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
 | 🎫 Sistema de tickets de erro | Botão de reportar + captura automática (print, log, rota) + fila por status — bloqueia deploy | `docs/regras/sistema-de-tickets.md` |
+| 🧭 UX: referência & Guardião | Sistema novo exige sistema de referência real + `docs/UX-MAP.md` (rotas, navegação, botões — fácil de usar SEMPRE) e aprovação do UX-Guardião — bloqueia aprovação de PRD/UML/mockups | `docs/regras/ux-referencia-e-guardiao.md` |
 | 🔑 Acesso ao Supabase | Nunca `service_role_key` no client; tokens temporários (7 dias) via `supabase login` | `docs/regras/acesso-supabase.md` |
 | 🗃️ Migrations | Toda mudança de banco via migration versionada — SQL direto proibido | `docs/regras/migrations.md` |
 | 🚫 Git | `.env` e credenciais sempre no `.gitignore`, nunca commitados | `docs/regras/git.md` |
@@ -46,6 +47,8 @@ A IA deve saber que os arquivos abaixo existem e consultá-los quando a tarefa t
 | `docs/UML.md` + `docs/UML.html` | Diagramas de classes/entidades e sequência (Mermaid + versão visual) — **bloqueia código novo/commit se ausente/desatualizado** | — |
 | `docs/NIVEIS-DE-ACESSO.md`   | Matriz de papéis × permissões — **bloqueia commit e deploy se ausente/incompleta** | — |
 | `docs/SISTEMA-DE-TICKETS.md` | Como o usuário reporta erro, o que é capturado automaticamente e a fila de correção — **bloqueia deploy se ausente/incompleto** | — |
+| `docs/UX-MAP.md` | Mapa da experiência: sistemas de referência, rotas, grafo de navegação, ações por tela, fluxos com cliques — **bloqueia aprovação de PRD/UML/mockups se ausente** | — |
+| `docs/UX-REVIEW.md` | Reclamações e veredictos do UX-Guardião sobre a fundação — **PRD/UML/mockups não são aprovados sem veredicto ✅/⚠️** | — |
 | `docs/DESIGN.md`             | Design system (cores, tipografia, componentes, espaçamento) — **gate para mockups** | — |
 | `docs/mockups/`              | Mockups navegáveis (um arquivo HTML por tela), gerados a partir do PRD e design system | — |
 | `docs/handoffs/latest.md`    | Estado atual do projeto para retomada entre sessões      | —             |

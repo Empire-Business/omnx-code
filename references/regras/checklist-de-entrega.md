@@ -18,6 +18,13 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] **`docs/UML.html` foi gerado junto com `docs/UML.md` no mesmo commit?** O HTML renderiza todos os diagramas visualmente com abas navegáveis e abre em qualquer navegador sem servidor.
 - [ ] Toda entidade/relacionamento/fluxo crítico alterado nesta entrega está refletido no `docs/UML.md` e `docs/UML.html`, no mesmo commit?
 
+**Experiência do Usuário (UX)** — ver `docs/regras/ux-referencia-e-guardiao.md`
+- [ ] **O sistema tem sistema(s) de referência real escolhido(s) pelo usuário e `docs/UX-MAP.md` existe?** (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques). Em sistema novo, sem isso o PRD/UML não foi aprovado validamente — a fundação está BLOQUEADA (gate 1.6e).
+- [ ] **`docs/UX-REVIEW.md` tem veredicto ✅ ou ⚠️ do UX-Guardião sobre a fundação (PRD, UML, mockups), com a checklist de reclamações preenchida item a item?** Veredicto ❌ ou ausência de review = fundação não aprovada. Objeções dispensadas pelo usuário estão registradas uma a uma, com data?
+- [ ] Todo fluxo crítico da entrega é alcançável em ≤3 cliques a partir da home, nenhum botão novo ficou sem destino e nenhuma rota ficou órfã?
+- [ ] Todo estado vazio/erro/carregando das telas novas foi pensado e rotulado na língua do usuário (sem jargão técnico)?
+- [ ] `docs/UX-MAP.md` foi atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo?
+
 **Arquitetura de Usuários & Multi-Tenant** — ver `docs/regras/multi-tenant.md`
 - [ ] **`docs/NIVEIS-DE-ACESSO.md` existe e cobre todos os papéis do sistema, sem células em branco na matriz?** Sem esse documento completo, o commit de código de auth/permissão e o deploy estão BLOQUEADOS (gate 1.6b — anti-teatro: um papel no código sem entrada no documento é bug).
 - [ ] Toda tabela de negócio nova tem coluna `tenant_id` (FK not-null), exceto se o projeto foi explicitamente definido como single-tenant e isso está documentado em `docs/ARQUITETURA.md`?

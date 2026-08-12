@@ -4,6 +4,24 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.21 — 2026-08-12
+
+### Gate 1.6e — UX na fundação: sistema de referência obrigatório + UX-Guardião ("o chato")
+
+Adicionado a pedido do usuário: nenhum sistema novo era planejado com uma referência de experiência explícita — a IA improvisava navegação, e falhas de UX (rota que ninguém acha, botão sem destino, fluxo com cliques demais) só apareciam depois de pronto, quando custam caro. Segurança tinha gate adversarial (`/security-auditor`), UML tinha gate de modelagem; experiência do usuário não tinha nenhum. Esta versão fecha o buraco com duas peças que andam juntas: um sistema de referência real obrigatório e um agente adversarial de UX que precisa aprovar a fundação antes de PRD/UML/mockups serem dados como aprovados.
+
+### Adicionado
+- **Novo arquivo `references/regras/ux-referencia-e-guardiao.md`**: especificação completa em duas partes. **Parte A — Sistema de referência obrigatório:** antes do PRD, o usuário escolhe pelo menos um sistema de referência real (a IA pode propor 3-5 candidatos, mas nunca escolhe sozinha; "sem referência" não é aceito), e a IA cria `docs/UX-MAP.md` com mapa de rotas, grafo de navegação (Mermaid), inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário, caminho de volta, feedback imediato, confirmação em ações destrutivas). **Parte B — UX-Guardião ("o chato"):** antes de aprovar qualquer documento de fundação (PRD, UML, mockups, o próprio UX-MAP), um agente adversarial (subagente dedicado ou passada separada com troca explícita de papel) revisa exclusivamente sob a ótica de UX, com checklist de reclamações obrigatórias (10 itens — silêncio não é aprovação), e registra reclamações + veredicto (✅ / ⚠️ / ❌) em `docs/UX-REVIEW.md`. Gate fail-closed: ❌ bloqueia; ⚠️ exige ressalvas como tasks; o usuário pode dispensar objeções apenas uma a uma, registradas com data (dispensa genérica não vale); veredicto ✅ sem checklist preenchida é inválido (anti-teatro).
+- **`SKILL.md`, regra 1.6e**: nova regra obrigatória no Modo de Trabalho Normal, apontando para o arquivo de regra; independente dos gates 1.6/1.6b/1.6c/1.6d — trava a aprovação da fundação, não commits simples.
+- **`SKILL.md`, Fluxo de Mockups**: `docs/UX-MAP.md` + veredicto do UX-Guardião entram como pré-requisito fail-closed na tabela de pré-requisitos.
+- **`references/regras/prd-roadmap-arquitetura.md`**: nova "Etapa 0 — Referência de UX & UX-MAP.md" antes do PRD; aviso da Etapa 1 atualizado — aprovação do PRD só é válida após veredicto ✅/⚠️ do Guardião (idem UML e mockups); UX-MAP + UX-REVIEW entram nos pré-requisitos de mockups.
+- **`references/regras/trilha-obrigatoria.md`**: FASE 0 agora começa com escolha da referência + UX-MAP, e PRD/UML/mockups passam pelo UX-Guardião antes da aprovação.
+- **`references/regras/checklist-de-entrega.md`**: novo bloco "Experiência do Usuário (UX)" com itens de gate (UX-MAP, veredicto, ≤3 cliques, sem botão sem destino, UX-MAP atualizado no mesmo commit).
+- **`references/modelo-claude.md`**: nova linha no índice de regras (🧭 UX: referência & Guardião) e duas linhas no índice de documentos (`docs/UX-MAP.md`, `docs/UX-REVIEW.md`).
+- **`references/modelo-agents.md`**: nova seção "Regra de UX na fundação (inegociável)" no mesmo padrão das demais.
+
+---
+
 ## v1.20 — 2026-07-24
 
 ### Renomeação omnx-code → mestre-code — repositório GitHub e migração local automática

@@ -1,5 +1,14 @@
 # 📋 Etapas 1-3b — PRD, ROADMAP, ARQUITETURA e Mockups
 
+## Etapa 0 — Referência de UX & UX-MAP.md (obrigatório antes do PRD)
+
+Nenhum sistema novo começa pelo PRD: começa pela experiência. Antes de escrever qualquer requisito:
+
+1. O usuário escolhe pelo menos um **sistema de referência real** (se não souber, a IA propõe 3-5 candidatos e o usuário decide — a IA nunca escolhe sozinha)
+2. A IA cria `docs/UX-MAP.md`: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE"
+
+> ⚠️ Sem `docs/UX-MAP.md`, o PRD não é escrito. A especificação completa desta etapa vive em `docs/regras/ux-referencia-e-guardiao.md` (gate 1.6e).
+
 ## Etapa 1 — PRD.md (obrigatório antes de qualquer código)
 
 A IA deve criar `docs/PRD.md` com as seguintes seções:
@@ -16,7 +25,7 @@ A IA deve criar `docs/PRD.md` com as seguintes seções:
 10. **Critérios de Aceitação** — Como saber quando cada feature está "pronta"
 11. **Fora de Escopo** — O que NÃO será feito nesta versão
 
-> ⚠️ A IA **não pode avançar para o ROADMAP** sem PRD aprovado pelo usuário.
+> ⚠️ A IA **não pode avançar para o ROADMAP** sem PRD aprovado pelo usuário — e a aprovação do PRD **só é válida depois da revisão do UX-Guardião** (veredicto ✅ ou ⚠️ registrado em `docs/UX-REVIEW.md`, conforme `docs/regras/ux-referencia-e-guardiao.md`). Veredicto ❌ bloqueia: corrige e roda o Guardião de novo. O mesmo vale para o UML (regra 1.6c) e para os mockups.
 
 ## Etapa 2 — ROADMAP.md
 
@@ -55,6 +64,7 @@ Nenhum mockup é gerado sem:
 - `docs/PRD.md` aprovado
 - `docs/ARQUITETURA.md` aprovado
 - `docs/UML.md` + `docs/UML.html` criados
+- `docs/UX-MAP.md` existente e veredicto ✅/⚠️ do UX-Guardião em `docs/UX-REVIEW.md`
 - Design system completo em `docs/DESIGN.md` ou `docs/design-system/`
 
 Se algum item estiver faltando, crie-o primeiro com o usuário. Não "dê um jeitinho" e gere mockup pela metade.

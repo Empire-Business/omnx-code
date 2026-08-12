@@ -1,6 +1,6 @@
 ---
 name: mestre-code
-version: "1.20"
+version: "1.21"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -15,6 +15,13 @@ description: |
   (o usuário decide quando CHAMAR a auditoria).
   Também cria mockups navegáveis 100% fiéis ao PRD e ao design system, em arquivos
   separados por tela, dentro de docs/mockups/.
+  Nenhum sistema novo é planejado sem um sistema de referência real escolhido pelo
+  usuário, a partir do qual a experiência é mapeada por completo em docs/UX-MAP.md
+  (rotas, navegação, botões, fluxos com contagem de cliques — fácil de usar SEMPRE).
+  E nenhuma fundação (PRD, UML, mockups) é aprovada antes de passar pelo
+  UX-Guardião: um agente adversarial cuja única função é reclamar da experiência
+  do usuário e exigir essa documentação, com veredicto registrado em
+  docs/UX-REVIEW.md (gate 1.6e, fail-closed).
   Todo sistema gerado nasce modular por padrão: cada funcionalidade vira um app
   independente listado num catálogo, com uma Loja de Apps interna onde o tenant
   ativa/desativa cada um — nunca um monólito de funções sempre ligadas.
@@ -89,7 +96,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.19** |
+| Versão da skill | **1.21** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/mestre-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -666,6 +673,10 @@ Um botão que só abre um formulário de texto livre **não cumpre este gate**, 
 
 > Este gate é independente dos gates 1.6, 1.6b e 1.6c: um projeto pode ter segurança, níveis de acesso e UML em dia e ainda estar bloqueado por falta de sistema de tickets de erro, e vice-versa. Todos precisam passar antes de PR/main.
 
+**1.6e. Gate de UX na fundação — sistema de referência + UX-Guardião (fail-closed antes de aprovar PRD/UML/mockups)**
+Nenhum sistema novo nasce "do zero" na cabeça da IA: antes de escrever PRD ou UML, o usuário escolhe pelo menos um **sistema de referência real** (produto existente cuja experiência o projeto segue — "navegação tipo Linear", "pedido tipo iFood"), e a partir dele a experiência inteira é mapeada em `docs/UX-MAP.md`: mapa de rotas, grafo de navegação, inventário de botões/ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário em vez de jargão técnico). Depois, antes de qualquer aprovação da fundação (PRD, UML, mockups), um agente adversarial — o **UX-Guardião**, "o chato" — revisa o documento exclusivamente sob a ótica de UX: sua única função é reclamar de cada fluxo confuso, clique a mais, botão sem destino e estado vazio não pensado, registrando reclamações item a item e veredicto (✅ / ⚠️ / ❌) em `docs/UX-REVIEW.md`. Sem `docs/UX-MAP.md` + veredicto ✅ (ou ⚠️ com ressalvas virando tasks, ou objeções dispensadas uma a uma pelo usuário e registradas no review), PRD e UML **não são aprovados** e nenhum código nasce — recuse e rode o Guardião de novo. A especificação completa (checklist de reclamações, formato do UX-MAP e do UX-REVIEW, válvula de escape e anti-teatro) vive em `docs/regras/ux-referencia-e-guardiao.md` — leia antes de planejar qualquer sistema novo, não invente a própria versão simplificada.
+> Este gate é independente dos gates 1.6, 1.6b, 1.6c e 1.6d: um projeto pode ter segurança, níveis de acesso, UML e sistema de tickets em dia e ainda estar bloqueado na fundação por falta de referência de UX ou por rejeição do UX-Guardião. Ele trava a **aprovação da fundação** (PRD/UML/mockups), não commits simples em branch de feature — mas nenhuma tela nova de produto deve ser planejada sem atualizar o `UX-MAP.md` e, se o fluxo mudar, rodar o Guardião de novo.
+
 **2. Ler CLAUDE.md antes de começar**
 O `CLAUDE.md` é o ponto de entrada de todo projeto. Leia-o antes de qualquer decisão técnica. Não assuma nada que não esteja documentado lá.
 
@@ -1085,6 +1096,7 @@ Antes de gerar qualquer mockup, verifique a existência dos arquivos abaixo. A a
 | `docs/PRD.md` | Fonte da verdade do produto | Criar seguindo "Etapa 1 — PRD.md" em `docs/regras/prd-roadmap-arquitetura.md`. Só prosseguir com aprovação do usuário. |
 | `docs/ARQUITETURA.md` | Define estrutura técnica e decisões que impactam telas | Criar seguindo "Etapa 3 — ARQUITETURA.md" em `docs/regras/prd-roadmap-arquitetura.md`. |
 | `docs/UML.md` + `docs/UML.html` | Modela entidades e fluxos críticos antes de desenhar telas | Criar conforme regra 1.6c. |
+| `docs/UX-MAP.md` + `docs/UX-REVIEW.md` | Mapa da experiência (rotas, navegação, ações por tela) e veredicto do UX-Guardião | Criar conforme regra 1.6e. Mockup só começa com UX-MAP existente e veredicto ✅/⚠️ do Guardião sobre a fundação. |
 | Design system (`docs/DESIGN.md` ou `docs/design-system/DESIGN.md` ou `docs/design-system/tokens.json`) | Garante fidelidade visual e consistência | Criar com o usuário, exigindo definição de cores, tipografia, espaçamento, componentes base e estados. |
 
 **Design system mínimo exigido:**

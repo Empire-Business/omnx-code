@@ -69,6 +69,14 @@
 - **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática (print real + logs reais, testados forçando um erro de propósito) e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
 - `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
+## Regra de UX na fundação (inegociável) (detalhe: `docs/regras/ux-referencia-e-guardiao.md`)
+
+- Nenhum sistema novo é planejado "do zero": antes do PRD, o usuário escolhe pelo menos um sistema de referência real (produto existente cuja experiência o projeto segue) — a IA pode propor candidatos, mas nunca escolhe sozinha, e "sem referência" não é aceito
+- A partir da referência, a IA cria `docs/UX-MAP.md`: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário sem jargão técnico)
+- **Gate obrigatório (fail-closed):** nenhum PRD, UML ou conjunto de mockups é aprovado sem passar pelo UX-Guardião — um agente adversarial cuja única função é reclamar da experiência do usuário, com checklist de reclamações obrigatórias (cliques demais, botão sem destino, rota órfã, estado vazio não pensado, jargão técnico, inconsistência com a referência) e veredicto registrado em `docs/UX-REVIEW.md` (✅ / ⚠️ / ❌)
+- Veredicto ❌ bloqueia a aprovação até correção e nova rodada; ⚠️ exige ressalvas registradas como tasks; o usuário só dispensa objeções uma a uma, com registro no review
+- `docs/UX-MAP.md` é atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo — e mudança relevante no PRD ou no mapa reaciona o Guardião
+
 ## Regra de banco de dados (inegociável) (detalhe: `docs/regras/migrations.md` e `docs/regras/acesso-supabase.md`)
 
 - TODA alteração no banco Supabase é feita via migration versionada em `supabase/migrations/`

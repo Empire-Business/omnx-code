@@ -5,12 +5,13 @@ Para quem está começando um app do zero, esta é a ordem que **deve ser seguid
 ```
 FASE 0 — Segurança & Planejamento
   └─ Executar skill /security-auditor
-  └─ Criar PRD.md (aprovação obrigatória do usuário)
+  └─ Escolher sistema(s) de referência real com o usuário e criar docs/UX-MAP.md (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques — gate 1.6e)
+  └─ Criar PRD.md → revisão do UX-Guardião (docs/UX-REVIEW.md, veredicto ✅/⚠️) → aprovação obrigatória do usuário
   └─ Criar ROADMAP.md (aprovação obrigatória do usuário)
   └─ Criar ARQUITETURA.md (inclui Arquitetura de Usuários & Multi-Tenant e Arquitetura de Apps & Loja de Apps)
-  └─ Criar UML.md (classes/entidades + sequência dos fluxos críticos) — aprovação obrigatória antes de codar domínio
+  └─ Criar UML.md (classes/entidades + sequência dos fluxos críticos) — aprovação obrigatória antes de codar domínio, com UX-Guardião revalidando contra o UX-MAP
   └─ Criar design system em docs/DESIGN.md ou docs/design-system/ (gate para mockups)
-  └─ Criar mockups navegáveis em docs/mockups/ (quando solicitado; só após PRD, UML e design system aprovados — inclui obrigatoriamente a tela de Loja de Apps)
+  └─ Criar mockups navegáveis em docs/mockups/ (quando solicitado; só após PRD, UML, design system aprovados e UX-Guardião ✅/⚠️ — inclui obrigatoriamente a tela de Loja de Apps)
   └─ Definir estratégia de banco (Supabase direto ou local primeiro)
   └─ Definir modelo de tenant, membership e papéis (multi-tenant por padrão)
   └─ Definir catálogo de apps e modelo de instalação por tenant (modular por padrão)
