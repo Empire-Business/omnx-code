@@ -19,7 +19,7 @@ A `/security-auditor` é uma skill especializada em auditoria de segurança. Seu
 
 | Momento | Obrigatório? | Observação |
 |---------|--------------|------------|
-| Instalação/atualização | ✅ Sim, automática | A `mestre-code` instala e mantém a `/security-auditor` atualizada sempre (compatibilidade de versão e princípios). |
+| Instalação/atualização | ✅ Sim, automática | A `omnx-code` instala e mantém a `/security-auditor` atualizada sempre (compatibilidade de versão e princípios). |
 | Fundação do app (primeiro setup) | ✅ Sim | Acionada automaticamente para revisar PRD, ARQUITETURA e NIVEIS-DE-ACESSO. |
 | Antes de deploy em produção | ⚠️ Recomendado / opt-in | O usuário pode CHAMAR explicitamente. Sem auditoria, o deploy só prossegue se todos os princípios acima estiverem verificados. |
 | Antes de merge em `main` ou PR de release | ⚠️ Recomendado / opt-in | O usuário pode CHAMAR explicitamente. |

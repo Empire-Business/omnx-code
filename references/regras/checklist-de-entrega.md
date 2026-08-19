@@ -64,7 +64,7 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Segurança** — ver `docs/regras/seguranca.md`
 - [ ] Skill `/security-auditor` foi executada nesta entrega?
-- [ ] **`security-report/verdict.json` desta sessão existe com `"gate": "PASS"`?** Sem o artefato, ou com `gate != PASS`, o deploy está BLOQUEADO — P0/P1 em aberto (inclui `❔ não verificado`/`⚠️ ação manual`) derrubam o gate. Marcar este item sem o `verdict.json` é inválido (anti-teatro). A auditoria é report-only; auto-fix é opt-in.
+- [ ] **`security-report/verdict.json` desta sessão existe com `"gate": "PASS"?** O gate de segurança é opt-in: se o usuário escolher pular o audit, o deploy pode prosseguir. Se o audit rodou, prefira só prosseguir com `gate: PASS`; P0/P1 em aberto são alertas, não bloqueios automáticos. Marcar este item sem o `verdict.json` só faz sentido quando o audit foi executado. A auditoria é report-only; auto-fix é opt-in.
 - [ ] Headers de segurança estão configurados no `vercel.json`?
 - [ ] Rate limiting está ativo nas rotas novas?
 

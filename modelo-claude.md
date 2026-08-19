@@ -6,21 +6,21 @@
 
 ---
 
-## 🔐 Segurança — Skill Obrigatória
+## 🔐 Segurança — Skill Recomendada (Opt-in)
 
-**A IA DEVE executar a skill `/security-auditor` nos seguintes momentos, sem exceção, e só liberar com `security-report/verdict.json` em `"gate": "PASS"`:**
+**A IA DEVE oferecer a skill `/security-auditor` nos seguintes momentos, mas o usuário decide se roda ou pula. O gate deixou de ser fail-closed:**
 
-| Momento                                          | Obrigatório? |
-|--------------------------------------------------|--------------|
-| Início do projeto (antes de codar)               | ✅ Sim        |
-| Antes de qualquer deploy em produção             | ✅ Sim        |
-| Antes de merge em `main` ou PR de release        | ✅ Sim        |
-| Após adicionar qualquer integração               | ✅ Sim        |
-| Após rotacionar/trocar secrets ou env vars       | ✅ Sim        |
-| Após migrations/RLS ou troca de projeto Supabase | ✅ Sim        |
-| Quando solicitado pelo usuário                   | ✅ Sim        |
+| Momento                                          | Obrigatório?                          |
+|--------------------------------------------------|---------------------------------------|
+| Início do projeto (antes de codar)               | ⚠️ Recomendado (opt-in)               |
+| Antes de qualquer deploy em produção             | ⚠️ Recomendado (opt-in)               |
+| Antes de merge em `main` ou PR de release        | ⚠️ Recomendado (opt-in)               |
+| Após adicionar qualquer integração               | ⚠️ Recomendado (opt-in)               |
+| Após rotacionar/trocar secrets ou env vars       | ⚠️ Recomendado (opt-in)               |
+| Após migrations/RLS ou troca de projeto Supabase | ⚠️ Recomendado (opt-in)               |
+| Quando solicitado pelo usuário                   | ✅ Sim (quando o usuário pede)        |
 
-> Toda diretriz, checklist e política de segurança deste projeto vive dentro da skill `/security-auditor`. A IA não deve tentar replicar ou substituir essas instruções aqui.
+> Toda diretriz, checklist e política de segurança deste projeto vive dentro da skill `/security-auditor`. A IA não deve tentar replicar ou substituir essas instruções aqui. Se o usuário optar por pular, prossiga após avisar o risco e registrar a escolha.
 
 ---
 
@@ -317,7 +317,7 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Segurança**
 - [ ] Skill `/security-auditor` foi executada nesta entrega?
-- [ ] **`security-report/verdict.json` desta sessão existe com `"gate": "PASS"`?** Sem o artefato, ou com `gate != PASS`, o deploy está BLOQUEADO — P0/P1 em aberto (inclui `❔ não verificado`/`⚠️ ação manual`) derrubam o gate. Marcar este item sem o `verdict.json` é inválido (anti-teatro). A auditoria é report-only; auto-fix é opt-in.
+- [ ] **`security-report/verdict.json` desta sessão existe com `"gate": "PASS"?** O gate de segurança é opt-in: se o usuário escolher pular o audit, o deploy pode prosseguir. Se o audit rodou, prefira só prosseguir com `gate: PASS`; P0/P1 em aberto são alertas, não bloqueios automáticos. Marcar este item sem o `verdict.json` só faz sentido quando o audit foi executado. A auditoria é report-only; auto-fix é opt-in.
 - [ ] Headers de segurança estão configurados no `vercel.json`?
 - [ ] Rate limiting está ativo nas rotas novas?
 

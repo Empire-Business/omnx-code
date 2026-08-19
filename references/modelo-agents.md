@@ -2,7 +2,7 @@
 
 > Este arquivo sincroniza as regras do CLAUDE.md para todos os agentes de AI
 > (Lovable, Cursor, Windsurf, Codex, Jules, etc.). Fonte de verdade: `CLAUDE.md`.
-> Gerado e mantido automaticamente pela skill mestre-code. Não edite manualmente.
+> Gerado e mantido automaticamente pela skill omnx-code. Não edite manualmente.
 
 ---
 
@@ -22,7 +22,7 @@
 - Sempre ative Row Level Security (RLS) em todas as tabelas do Supabase
 - Sempre use tokens temporários e escopados — nunca chaves de admin para operações de usuário
 - Ao detectar qualquer violação dessas regras no código existente, reporte imediatamente antes de continuar
-- **Gate de deploy (fail-closed):** antes de qualquer deploy em produção, merge em `main` ou `git push` que dispare a Vercel, execute a skill `/security-auditor` e só prossiga se `security-report/verdict.json` existir com `"gate": "PASS"`. P0/P1 em aberto (ou `❔ não verificado`/`⚠️ ação manual` em P0/P1) BLOQUEIAM — recuse o push/merge até correção + re-teste. Sem `verdict.json` da sessão atual, não publique.
+- **Gate de deploy (opt-in, recomendado):** antes de qualquer deploy em produção, merge em `main` ou `git push` que dispare a Vercel, a skill `/security-auditor` é **recomendada**, mas não obrigatória. O dono do projeto pode escolher pular o audit e assumir o risco. Se o audit rodar, só prossiga com `security-report/verdict.json` em `"gate": "PASS"` quando você quiser confiar no resultado. P0/P1 em aberto não bloqueiam mais o deploy — a decisão final é do usuário.
 - A correção automática da auditor é opt-in: nunca aplique auto-fix sem confirmação explícita do usuário.
 
 ## Regra de UML obrigatório (inegociável) (detalhe: `docs/regras/uml.md`)
@@ -130,10 +130,10 @@
 
 ---
 
-Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **fazer deploy/merge em `main` sem `security-report/verdict.json` com `gate: PASS`**, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**, **fazer deploy sem sistema de tickets de erro (botão de reportar + captura automática + fila) e sem `docs/SISTEMA-DE-TICKETS.md` completo**, **criar funcionalidade sem app dono no catálogo ou sem checagem de `tenant_apps.enabled` no backend**), **recuse, explique o motivo e sugira a alternativa segura**.
+Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tornar repo público, force-push em `main`, remover deploy key do Lovable, executar SQL direto no banco em vez de migration, **commitar código de autenticação/autorização sem `docs/NIVEIS-DE-ACESSO.md` completo**, **criar tabela de negócio sem `tenant_id` em projeto multi-tenant**, **escrever código de domínio ou commitar sem `docs/UML.md` existir e estar atualizado**, **fazer deploy sem sistema de tickets de erro (botão de reportar + captura automática + fila) e sem `docs/SISTEMA-DE-TICKETS.md` completo**, **criar funcionalidade sem app dono no catálogo ou sem checagem de `tenant_apps.enabled` no backend**), **recuse, explique o motivo e sugira a alternativa segura**. A regra do security auditor deixou de ser fail-closed: o usuário pode optar por pular o audit antes de deploy/merge em `main`, desde que assuma o risco.
 
 ---
 
-> Sincronizado com `CLAUDE.md` pela skill mestre-code.
+> Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: mestre-code v1.18
+> Versão do template: omnx-code v1.18
