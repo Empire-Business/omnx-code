@@ -377,3 +377,8 @@ Ao fazer qualquer atualização na skill, adicione uma entrada no topo deste arq
 ```
 
 Use **vX.Y** onde X é versão major (mudanças grandes de arquitetura) e Y é minor (novas features ou melhorias). Bump minor para adições; bump major para refatorações completas.
+
+## Local — melhorias da sessão omnx-sdrai (22/08/2026, branch local/melhorias-sessao-sdrai)
+
+- **Nova regra 1.7** (Modo de Trabalho Normal): confiabilidade de edições de documentos longos por subagentes — retorno obrigatório não-vazio com `git diff --stat`, verificação do diff real pelo orquestrador, 1 retry em falha silenciosa, sincronia de documentos gêmeos e arquivamento do conjunto anterior antes de regenerar mockups.
+- **Gate 1.6e**: formato de rodadas do UX-Guardião validado em campo — "Correções exigidas por item" + "Verificado, sem reclamação" + rodadas aditivas convergem em 2–3 iterações.
