@@ -10,7 +10,7 @@
 |------|---------|------------------|
 | **Tenant** | A entidade que isola os dados (empresa, conta, time) | `tenants` / `organizations` |
 | **Membership** | Liga `auth.users` ao tenant — um usuário pode pertencer a vários tenants | `tenant_members` |
-| **Papéis (roles)** | Nível de permissão do usuário dentro do tenant | `owner`, `admin`, `member` |
+| **Perfis de acesso** | Conjunto de permissões com nome, **montado pelo tenant** (nunca papel fixo na policy). O sistema semeia perfis padrão editáveis; a autorização passa por `has_permission(tenant_id, 'recurso.acao')`. Ver `docs/regras/niveis-de-acesso.md` | `tenant_access_profiles` + `permission_catalog` |
 | **Isolamento** | Toda tabela de negócio carrega `tenant_id` (FK not-null) | `orders.tenant_id`, `projects.tenant_id` |
 
 ## Regras

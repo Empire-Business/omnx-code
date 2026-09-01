@@ -1,0 +1,28 @@
+{
+  "skill_name": "omnx-code",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Você está no diretório /tmp/omnx-test-project. O projeto já tem setup OMNX completo. O usuário pediu: 'atualiza o handoff do projeto'. Execute o pedido usando a skill omnx-code. Crie/atualize docs/handoffs/latest.md, docs/handoffs/HISTORY.md e docs/handoffs/README.md conforme as regras de handoff da skill.",
+      "expected_output": "A skill cria docs/handoffs/latest.md, docs/handoffs/HISTORY.md e docs/handoffs/README.md no projeto /tmp/omnx-test-project, com estado atual e próximos passos.",
+      "files": [],
+      "expectations": [
+        "docs/handoffs/latest.md existe e contém sessão, fase atual, o que foi feito, o que falta fazer e próximo passo recomendado",
+        "docs/handoffs/HISTORY.md existe e contém uma entrada cronológica da sessão",
+        "docs/handoffs/README.md existe e explica como usar os handoffs",
+        "latest.md tem no máximo 200 linhas"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Você está no diretório /tmp/omnx-test-project-retomada. O projeto já tem setup OMNX completo e um handoff anterior em docs/handoffs/latest.md. O usuário pediu: 'continua os handoffs'. Execute o pedido usando a skill omnx-code. A skill deve ler o handoff existente, resumir o estado para o usuário e começar a executar o próximo passo recomendado (implementar tela de login conforme RF-01).",
+      "expected_output": "A skill lê docs/handoffs/latest.md, resume o estado em até 5 bullets e inicia o trabalho no próximo passo recomendado (RF-01 login).",
+      "files": [],
+      "expectations": [
+        "A skill menciona que leu docs/handoffs/latest.md ou resume o estado contido nele",
+        "O resumo inclui o que estava sendo feito, a fase atual e o próximo passo recomendado",
+        "A skill cria tasks para continuar o trabalho no RF-01 login"
+      ]
+    }
+  ]
+}

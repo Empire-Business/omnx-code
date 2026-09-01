@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.21"
+version: "1.22"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -10,6 +10,11 @@ description: |
   trabalho de desenvolvimento guiado pelo CLAUDE.md — com tasks 100% do tempo.
   Sempre aplica os princípios de segurança do OMNX (RLS, isolamento de tenant,
   não exposição de secrets, headers seguros, etc.) em todas as fases.
+  Todo sistema nasce com PERFIS DE ACESSO montados pelo próprio tenant — um
+  catálogo global de permissões e perfis que o cliente edita numa tela, nunca
+  papéis fixos gravados nas policies (que transformam cada ajuste de permissão
+  em migration). O perfil de dono concede tudo implicitamente e é imutável, o
+  que torna impossível um cliente se trancar para fora da própria conta.
   A skill /security-auditor é acionada automaticamente na fundação do app para garantir
   que o planejamento inicial nasça seguro; auditorias periódicas e deploy são opt-in
   (o usuário decide quando CHAMAR a auditoria).
@@ -96,7 +101,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.21** |
+| Versão da skill | **1.22** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -624,12 +629,16 @@ Antes de qualquer ação que publique em produção — `git push` para `main`/`
 **1.6b. Gate de documentação de níveis de acesso (fail-closed antes de PR/main; sugestão em commit simples)**
 Nenhum sistema criado por esta skill pode ir para produção sem que `docs/NIVEIS-DE-ACESSO.md` exista e esteja completo. Isso vale mesmo em projeto de um único tenant — se existe qualquer distinção de permissão entre usuários (ex: admin vs usuário comum), a documentação é obrigatória antes do deploy.
 
-- **Commit simples** (trabalho incremental, ainda em branch de feature, não é push/merge para `main`/`master` nem abertura de PR de release): se o commit cria ou altera tabelas de papéis/membership, políticas RLS, middleware/guards de auth, rotas ou componentes protegidos por permissão, **avise** que `docs/NIVEIS-DE-ACESSO.md` precisa ser atualizado antes do deploy e **sugira** atualizar já. Não bloqueie o commit por causa disso — informe e prossiga.
+> **Modelo obrigatório: perfis por tenant, não papéis fixos.** Todo sistema desta skill nasce com um catálogo global de permissões e perfis que cada tenant monta marcando essas permissões. Papel fixo gravado na policy transforma cada ajuste de permissão em migration e deixa o cliente dependente do desenvolvedor para qualquer mudança de operação. O modelo completo, as cinco travas anti-tiro-no-pé e o caminho seguro de conversão de projeto legado estão em `docs/regras/niveis-de-acesso.md`.
+
+- **Commit simples** (trabalho incremental, ainda em branch de feature, não é push/merge para `main`/`master` nem abertura de PR de release): se o commit cria ou altera catálogo de permissões, perfis de acesso, membership, políticas RLS, middleware/guards de auth, rotas ou componentes protegidos por permissão, **avise** que `docs/NIVEIS-DE-ACESSO.md` precisa ser atualizado antes do deploy e **sugira** atualizar já. Não bloqueie o commit por causa disso — informe e prossiga.
 - **Antes de qualquer ação do gate 1.6** (push/merge para `main`/`master`, PR de release, deploy) você DEVE, de forma fail-closed:
   1. Verificar que `docs/NIVEIS-DE-ACESSO.md` existe.
-  2. Conferir que ele cobre **todos** os papéis atualmente definidos no schema/código (todo `role`/`enum` de permissão precisa ter uma linha na matriz do documento) e que a matriz permissão × recurso × ação está preenchida (não pode haver célula em branco ou "TBD").
-  3. Se o arquivo não existir, estiver incompleto, ou houver um papel/permissão no código sem entrada correspondente no documento: **RECUSE** a publicação. Crie ou atualize o documento primeiro (junto com o usuário, se as regras de negócio não estiverem claras), e só então prossiga. Não "informe e deixe o usuário decidir".
-  4. Sempre que um papel novo for criado ou a matriz de permissões mudar, atualize `docs/NIVEIS-DE-ACESSO.md` o mais tardar até este ponto — nunca deixe passar para produção sem isso.
+  2. Conferir que ele cobre **todas** as permissões definidas no catálogo do projeto (toda chave `recurso.acao` precisa de linha no documento) e que a matriz do que cada perfil padrão concede está preenchida (nenhuma célula em branco ou "TBD").
+  3. **Conferir que o modelo é o de perfis, não o de papéis fixos:** nenhuma policy RLS nova pode checar papel diretamente (`role = 'admin'`, `has_org_role(...)`, lista de papéis). A checagem é sempre `has_permission(tenant_id, chave)`. Um bom teste automático: uma query em `pg_policies` procurando por checagem de papel deve voltar vazia.
+  4. **Conferir as cinco travas anti-tiro-no-pé** de `docs/regras/niveis-de-acesso.md` §2 — em especial que o perfil de dono concede tudo *implicitamente* (sem linhas de permissão) e é imutável. Sem isso, o cliente consegue se trancar para fora da própria conta, e quem gerencia perfis consegue se auto-promover.
+  5. Se o arquivo não existir, estiver incompleto, houver permissão no código sem entrada no documento, ou o projeto ainda usar papéis fixos nas policies: **RECUSE** a publicação. Corrija primeiro (junto com o usuário, se as regras de negócio não estiverem claras), e só então prossiga. Não "informe e deixe o usuário decidir".
+  6. Sempre que uma permissão nova nascer ou mudar de dono, atualize `docs/NIVEIS-DE-ACESSO.md` o mais tardar até este ponto — nunca deixe passar para produção sem isso.
 > Este gate é independente do 1.6: um deploy pode ter `security-report` com `gate: PASS` e ainda assim estar bloqueado por falta de documentação de acesso, e vice-versa. Os dois precisam passar antes de PR/main — nenhum dos dois trava commit simples em branch de feature.
 
 **1.6c. Gate de UML antes de codar (fail-closed, obrigatório)**
@@ -894,14 +903,14 @@ Antes de escrever qualquer schema ou código de autenticação, a IA DEVE defini
 
 - **Modelo de tenant:** a entidade que isola os dados (`tenants`, `organizations`, `accounts`, etc. — nome adaptado ao domínio do produto)
 - **Modelo de membership:** tabela de junção entre `auth.users` e o tenant (ex: `tenant_members`), permitindo um usuário pertencer a múltiplos tenants
-- **Modelo de papéis (roles):** papéis bem definidos por tenant (ex: `owner`, `admin`, `member`), com a matriz de permissões de cada papel documentada — nunca "todo usuário autenticado pode tudo"
+- **Modelo de permissões e perfis:** um **catálogo global de permissões** (`recurso.acao`, com rótulo e descrição em português) e **perfis de acesso que cada tenant monta** marcando essas permissões. O sistema nasce com perfis padrão semeados (dono/administrador/membro), mas eles são um ponto de partida editável — **nunca papéis fixos gravados nas policies**. Toda autorização passa por uma função só: `has_permission(tenant_id, 'recurso.acao')`. Nunca "todo usuário autenticado pode tudo", e nunca `role = 'admin'` dentro de uma policy. Modelo completo, travas anti-lockout e caminho de conversão em `docs/regras/niveis-de-acesso.md` (regra 1.6b)
 - **Isolamento de dados:** toda tabela de negócio (não-catálogo, não-config global) carrega uma coluna `tenant_id` (FK not-null para a tabela de tenants) desde a primeira migration
 - **RLS por tenant:** toda política RLS de tabela com `tenant_id` filtra por `tenant_id = <tenant do usuário autenticado>` (via função `current_tenant_id()`/claim no JWT ou subquery em `tenant_members`) **e** por papel quando a operação exigir (ex: só `owner`/`admin` pode `DELETE`)
 - **Troca de tenant:** se o produto permite um usuário pertencer a mais de um tenant, defina como o tenant ativo é selecionado/trocado na sessão (claim, cookie, parâmetro de rota) — nunca infira o tenant a partir de dado enviado pelo cliente sem validar contra o `tenant_members`
 
 Ao criar a primeira migration do projeto, a tabela de tenants, a de membership e os papéis vêm **antes** de qualquer tabela de negócio — as demais tabelas já nascem com `tenant_id` e RLS correta, nunca são "corrigidas depois". Se a IA encontrar em um projeto existente uma tabela de negócio sem `tenant_id` (e o projeto for multi-tenant), interrompa e alerte o usuário antes de continuar — é uma falha de isolamento de dados, não um detalhe.
 
-Essa arquitetura de usuários só é válida se estiver documentada de forma que qualquer pessoa (ou IA) consiga responder "quem pode fazer o quê" sem ler código. Por isso, junto com o schema, a IA cria `docs/NIVEIS-DE-ACESSO.md` com a matriz completa de papéis × permissões (ver regra 1.6b) — **nenhum código de auth/permissão é commitado sem esse documento existir e estar completo.**
+Essa arquitetura de usuários só é válida se estiver documentada de forma que qualquer pessoa (ou IA) consiga responder "quem pode fazer o quê" sem ler código. Por isso, junto com o schema, a IA cria `docs/NIVEIS-DE-ACESSO.md` com o modelo de perfis, o catálogo de permissões e a matriz do que cada perfil padrão concede (ver regra 1.6b) — **nenhum código de auth/permissão é commitado sem esse documento existir e estar completo.**
 
 **24. Arquitetura de Apps & Loja de Apps interna obrigatória em todo projeto novo (regra absoluta)**
 

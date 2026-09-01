@@ -16,7 +16,7 @@
 | 🧩 Apps & Loja de Apps | Todo sistema nasce modular: catálogo de apps + instalação por tenant, com tela de Loja de Apps para ativar/desativar | `docs/regras/apps-loja-de-apps.md` |
 | 🔌 API & Webhooks por app | Cada app com integração tem `docs/apps/<app-slug>/API.md` + `WEBHOOKS.md` e tela própria de "Integrações" (chaves, webhooks, histórico) — desativar o app derruba o acesso na hora | `docs/regras/api-webhooks-por-app.md` |
 | 📐 UML | Nenhum código de domínio sem `docs/UML.md` (+`UML.html`) aprovado antes — bloqueia código e commit | `docs/regras/uml.md` |
-| 🛂 Níveis de acesso | `docs/NIVEIS-DE-ACESSO.md` com matriz papel × recurso × ação completa — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
+| 🛂 Níveis de acesso | Permissões em catálogo global + **perfis que cada tenant monta** (nunca papéis fixos nas policies); `has_permission()` como única checagem; 5 travas anti-lockout; `docs/NIVEIS-DE-ACESSO.md` completo — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
 | 🎫 Sistema de tickets de erro | Botão de reportar + captura automática (print, log, rota) + fila por status — bloqueia deploy | `docs/regras/sistema-de-tickets.md` |
 | 🧭 UX: referência & Guardião | Sistema novo exige sistema de referência real + `docs/UX-MAP.md` (rotas, navegação, botões — fácil de usar SEMPRE) e aprovação do UX-Guardião — bloqueia aprovação de PRD/UML/mockups | `docs/regras/ux-referencia-e-guardiao.md` |
 | 🔑 Acesso ao Supabase | Nunca `service_role_key` no client; tokens temporários (7 dias) via `supabase login` | `docs/regras/acesso-supabase.md` |

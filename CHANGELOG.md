@@ -4,6 +4,27 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.22 — 2026-08-28
+
+### Níveis de acesso: perfis por tenant substituem papéis fixos (regra 21 + gate 1.6b)
+
+Adicionado depois de um caso real doer em produção: um projeto da OMNX precisou de **duas migrations no mesmo dia** só para destravar um único usuário que tinha que criar e publicar um formulário. O modelo de 4 papéis fixos gravados nas policies transformava cada ajuste de permissão em trabalho de desenvolvedor — e deixava o cliente sem nenhuma autonomia sobre a própria operação.
+
+A partir desta versão, **todo sistema criado pela skill nasce com permissões em catálogo global + perfis que cada tenant monta**, pelo mesmo raciocínio do multi-tenant (regra 21): nascer assim custa quase nada, converter depois é caro e arriscado.
+
+**O que mudou:**
+
+- `references/regras/niveis-de-acesso.md` reescrito: passa de "documente a matriz de papéis" para o modelo completo — as três peças (permissão global, perfil por tenant, atribuição), `has_permission()` como única checagem de autorização, e o schema mínimo.
+- **As cinco travas anti-tiro-no-pé** viram parte inegociável da regra. A central: o perfil de dono concede tudo **implicitamente** (a função nem consulta lista de permissões), é imutável e o tenant nunca fica sem ele. É isso — e não validação de formulário — que torna impossível um cliente se trancar para fora. Somam-se a não-escalação ("ninguém concede o que não tem") e "só dono cria dono".
+- **Gate 1.6b ganha duas verificações novas e fail-closed:** nenhuma policy pode checar papel diretamente (query em `pg_policies` deve voltar vazia), e as cinco travas precisam estar aplicadas.
+- **Caminho seguro de conversão de projeto legado** documentado, com a regra que torna isso verificável: *a migration prova a si mesma* — compara o modelo novo com o antigo para todo membro real × toda permissão, dentro da transação, e aborta se divergir. Mais os dois buracos do corte que quebram em silêncio se esquecidos (tenant novo sem perfis, convite novo sem perfil).
+- Regra 21 (multi-tenant) e `references/regras/multi-tenant.md`: o bullet "Modelo de papéis" virou "Modelo de permissões e perfis".
+- Índice do `modelo-claude.md` atualizado.
+
+**Origem:** implementado e validado em produção no projeto `omnx-type` em 28/08/2026 — 22 policies RLS convertidas com prova de equivalência, zero mudança de acesso na virada.
+
+---
+
 ## v1.21 — 2026-08-12
 
 ### Gate 1.6e — UX na fundação: sistema de referência obrigatório + UX-Guardião ("o chato")
