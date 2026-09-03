@@ -10,6 +10,7 @@
 
 | Regra | Resumo | Arquivo completo |
 |-------|--------|-------------------|
+| 🖼️ Mockup-first (Regra Zero) | **Telas primeiro:** o dono do produto VISUALIZA e aprova os mockups antes de existir PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou código — os documentos são escritos a partir das telas aprovadas | `docs/regras/mockup-first.md` |
 | 🔐 Segurança | `/security-auditor` obrigatória em todo início de projeto, deploy, merge em `main`, integração nova e troca de secrets — só libera com `gate: PASS` | `docs/regras/seguranca.md` |
 | 🗄️ Banco de dados | Supabase direto ou local-primeiro-depois-migra — escolha documentada em `docs/ARQUITETURA.md` | `docs/regras/banco-de-dados.md` |
 | 🏢 Multi-tenant | Todo sistema nasce multi-tenant (tenant + membership + papéis), `tenant_id` em toda tabela de negócio, RLS por tenant | `docs/regras/multi-tenant.md` |
@@ -18,12 +19,12 @@
 | 📐 UML | Nenhum código de domínio sem `docs/UML.md` (+`UML.html`) aprovado antes — bloqueia código e commit | `docs/regras/uml.md` |
 | 🛂 Níveis de acesso | Permissões em catálogo global + **perfis que cada tenant monta** (nunca papéis fixos nas policies); `has_permission()` como única checagem; 5 travas anti-lockout; `docs/NIVEIS-DE-ACESSO.md` completo — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
 | 🎫 Sistema de tickets de erro | Botão de reportar + captura automática (print, log, rota) + fila por status — bloqueia deploy | `docs/regras/sistema-de-tickets.md` |
-| 🧭 UX: referência & Guardião | Sistema novo exige sistema de referência real + `docs/UX-MAP.md` (rotas, navegação, botões — fácil de usar SEMPRE) e aprovação do UX-Guardião — bloqueia aprovação de PRD/UML/mockups | `docs/regras/ux-referencia-e-guardiao.md` |
+| 🧭 UX: referência & Guardião | Referência real escolhida antes de desenhar; UX-Guardião revisa as telas antes de você vê-las; `docs/UX-MAP.md` transcreve as telas aprovadas — bloqueia aprovação de PRD/UML | `docs/regras/ux-referencia-e-guardiao.md` |
 | 🔑 Acesso ao Supabase | Nunca `service_role_key` no client; tokens temporários (7 dias) via `supabase login` | `docs/regras/acesso-supabase.md` |
 | 🗃️ Migrations | Toda mudança de banco via migration versionada — SQL direto proibido | `docs/regras/migrations.md` |
 | 🚫 Git | `.env` e credenciais sempre no `.gitignore`, nunca commitados | `docs/regras/git.md` |
-| 🚦 Trilha obrigatória | Ordem das fases do zero à produção (FASE 0 a FASE 6) | `docs/regras/trilha-obrigatoria.md` |
-| 📋 PRD, ROADMAP, ARQUITETURA e Mockups | Etapas 1-3b: o que cada documento precisa ter, nessa ordem, antes de codar | `docs/regras/prd-roadmap-arquitetura.md` |
+| 🚦 Trilha obrigatória | Ordem das fases do zero à produção (FASE 0 = telas aprovadas, até FASE 6) | `docs/regras/trilha-obrigatoria.md` |
+| 📋 Mockups, UX-MAP, PRD, ROADMAP e ARQUITETURA | Etapas 0-3: telas aprovadas primeiro, depois o que cada documento precisa ter, nessa ordem, antes de codar | `docs/regras/prd-roadmap-arquitetura.md` |
 | 🧱 Stack obrigatória | React + TypeScript + Supabase + Vercel — a stack padrão Lovable | `docs/regras/stack.md` |
 | 🧠 Comunicação | Como a IA deve falar com o usuário (didático, português, sem jargão) | `docs/regras/comunicacao.md` |
 | 🔄 Deploy | Fluxo automático GitHub → Vercel, config Cloudflare, checklist de deploy | `docs/regras/deploy.md` |
@@ -42,15 +43,15 @@ A IA deve saber que os arquivos abaixo existem e consultá-los quando a tarefa t
 | Arquivo                      | Descrição                                                | Atualizado em |
 |------------------------------|----------------------------------------------------------|---------------|
 | `docs/regras/`               | Todas as regras inegociáveis do projeto, uma por arquivo (ver índice acima) | — |
-| `docs/PRD.md`                | Requisitos completos do produto                          | —             |
+| `docs/mockups/`              | **Telas aprovadas — o primeiro entregável do produto.** Um HTML autocontido por tela + `index.html` navegável; `APROVACAO.md` é a fonte da verdade do gate mockup-first | — |
+| `docs/PRD.md`                | Requisitos completos do produto, descrevendo as telas aprovadas | —             |
 | `docs/ARQUITETURA.md`        | Estrutura, decisões técnicas, fluxo de dados, e seções de Multi-Tenant e Apps | —             |
 | `docs/UML.md` + `docs/UML.html` | Diagramas de classes/entidades e sequência (Mermaid + versão visual) — **bloqueia código novo/commit se ausente/desatualizado** | — |
 | `docs/NIVEIS-DE-ACESSO.md`   | Matriz de papéis × permissões — **bloqueia commit e deploy se ausente/incompleta** | — |
 | `docs/SISTEMA-DE-TICKETS.md` | Como o usuário reporta erro, o que é capturado automaticamente e a fila de correção — **bloqueia deploy se ausente/incompleto** | — |
-| `docs/UX-MAP.md` | Mapa da experiência: sistemas de referência, rotas, grafo de navegação, ações por tela, fluxos com cliques — **bloqueia aprovação de PRD/UML/mockups se ausente** | — |
-| `docs/UX-REVIEW.md` | Reclamações e veredictos do UX-Guardião sobre a fundação — **PRD/UML/mockups não são aprovados sem veredicto ✅/⚠️** | — |
-| `docs/DESIGN.md`             | Design system (cores, tipografia, componentes, espaçamento) — **gate para mockups** | — |
-| `docs/mockups/`              | Mockups navegáveis (um arquivo HTML por tela), gerados a partir do PRD e design system | — |
+| `docs/UX-MAP.md` | Mapa da experiência transcrito das telas aprovadas: referências, rotas, grafo de navegação, ações por tela, fluxos com cliques — **bloqueia aprovação de PRD/UML se ausente** | — |
+| `docs/UX-REVIEW.md` | Reclamações e veredictos do UX-Guardião — telas não são apresentadas, e PRD/UML não são aprovados, sem veredicto ✅/⚠️ | — |
+| `docs/DESIGN.md`             | Design system (cores, tipografia, componentes, espaçamento) — nasce da **promoção** do baseline visual aprovado nas telas, não como pré-requisito delas | — |
 | `docs/handoffs/latest.md`    | Estado atual do projeto para retomada entre sessões      | —             |
 | `docs/handoffs/HISTORY.md`   | Histórico cronológico das sessões anteriores             | —             |
 | `docs/ROADMAP.md`            | Tarefas pendentes, em andamento e concluídas             | —             |

@@ -4,6 +4,30 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.23 — 2026-09-03
+
+### Regra Zero: MOCKUP-FIRST — a pessoa VISUALIZA as telas antes de qualquer documento (gate 1.6f)
+
+A ordem da fundação foi **invertida**. Até a v1.22, o mockup era o último passo do planejamento e tinha um gate fail-closed exigindo PRD + ARQUITETURA + UML + UX-MAP + UX-REVIEW + design system completo antes de desenhar qualquer tela. O efeito prático era pedir ao dono do produto que aprovasse o produto **lendo** — e um PRD parece certo para quem escreveu e para quem leu, até a tela existir e a pessoa dizer "não era isso". Quando isso acontecia, a correção já estava espalhada por cinco documentos e um schema.
+
+A partir desta versão, **a tela é o primeiro entregável de todo pedido de produto**. Nenhum gate foi afrouxado: só mudou a ordem — os documentos passam a ser escritos a partir das telas aprovadas.
+
+**O que mudou:**
+
+- **Nova "Regra Zero"** no topo do `SKILL.md`, com o porquê da inversão e a válvula de escape (o usuário pode pedir documento primeiro; a dispensa fica registrada).
+- **Novo gate 1.6f (fail-closed):** não se escreve nem se aprova `PRD.md`, `ROADMAP.md`, `ARQUITETURA.md`, `UML.md`, `UX-MAP.md` nem código de produto de uma tela que o usuário ainda não viu e aprovou. Vale para projeto novo **e** para tela nova em projeto existente; não vale para bug, refactor, migration, ajuste de estilo ou script sem UI. Proíbe explicitamente "escrever um rascunho do PRD enquanto espera" — rascunho vira âncora e inverte a regra de volta sozinho.
+- **Novo arquivo de regra** `references/regras/mockup-first.md`, instalado como `docs/regras/mockup-first.md` nos projetos.
+- **"Fluxo de Mockups" reescrito de ponta a ponta** (9 tasks): os pré-requisitos passam de seis documentos para dois itens de conversa (brief mínimo de 6 perguntas mandadas de uma vez + sistema de referência real). Novidades operacionais: baseline visual provisório embutido nas telas; **suposições declaradas no rodapé de cada tela** (para o usuário corrigir em vez de ser interrogado); abertura das telas no navegador dele (`open`/`xdg-open`/`explorer.exe`); loop de aprovação tela por tela com regeneração apenas das telas afetadas; saída para loop que não converge (pergunta única ou 2-3 variantes lado a lado); `docs/mockups/APROVACAO.md` como fonte da verdade do gate.
+- **Design system deixa de ser pré-requisito e passa a ser consequência:** a IA propõe o baseline inline, o usuário aprova vendo, e só então ele é **promovido** a `docs/DESIGN.md` como fonte da verdade.
+- **Gate 1.6e (UX) reordenado:** a referência continua obrigatória, mas agora como insumo do mockup; o **UX-Guardião revisa as telas ANTES de o usuário vê-las** (veredicto ❌ não sobe para o usuário) — o tempo do dono do produto é o recurso mais escasso do projeto e não deve ser gasto caçando botão sem destino; e o `UX-MAP.md` passa a ser escrito **depois**, transcrevendo as telas aprovadas, o que o torna verificável (rota no mapa sem HTML é bug do mapa).
+- **`.empire/state.json`** ganha `mockups_approved`, `mockups_approved_at`, `mockups_round` e `mockups_screens`; o Passo 1 (detecção de fase) passa a considerar `mockups_approved`.
+- **Trilha obrigatória** reorganizada: FASE 0 agora é "TELAS PRIMEIRO"; o planejamento e a segurança viram FASE 0b.
+- Atualizados: `references/regras/prd-roadmap-arquitetura.md` (Etapa 0 = mockups, Etapa 0b = UX-MAP, Etapa 3b = manutenção), `references/regras/ux-referencia-e-guardiao.md`, `references/regras/checklist-de-entrega.md` (novo bloco "Telas aprovadas"), `references/modelo-claude.md` e `references/modelo-agents.md` (nova seção "Regra Zero — Mockup-first").
+
+**Anti-teatro desta versão:** mockup gerado e nunca aberto pelo usuário não cumpre o gate — o ponto não é o arquivo existir, é a pessoa ter visto. E `APROVACAO.md` preenchido sem uma fala correspondente do usuário é falsificação de aprovação, não adiantamento de trabalho.
+
+---
+
 ## v1.22 — 2026-08-28
 
 ### Níveis de acesso: perfis por tenant substituem papéis fixos (regra 21 + gate 1.6b)

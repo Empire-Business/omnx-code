@@ -2,16 +2,25 @@
 
 Para quem está começando um app do zero, esta é a ordem que **deve ser seguida**. Nenhuma etapa pode ser pulada.
 
+> **A FASE 0 é a tela, não o documento.** O dono do produto precisa VISUALIZAR e aprovar as telas antes de existir PRD, ROADMAP, ARQUITETURA, UML ou UX-MAP — esses documentos são escritos a partir das telas aprovadas, nunca o contrário. O porquê e o gate completo estão em `docs/regras/mockup-first.md`.
+
 ```
-FASE 0 — Segurança & Planejamento
+FASE 0 — TELAS PRIMEIRO (mockup-first, gate 1.6f — nada antes disto)
+  └─ Colher o brief mínimo (6 perguntas) e escolher sistema(s) de referência real (gate 1.6e)
+  └─ Propor o baseline visual provisório, embutido nas telas (NÃO exigir design system escrito)
+  └─ Gerar mockups navegáveis em docs/mockups/ — um HTML por tela, autocontido, com a tela de Loja de Apps obrigatória
+  └─ Rodada do UX-Guardião nas telas e correção ANTES de mostrar (docs/UX-REVIEW.md, veredicto ✅/⚠️)
+  └─ ABRIR as telas no navegador do usuário → ele VISUALIZA e aprova ou pede alteração, tela por tela
+  └─ Registrar aprovação em docs/mockups/APROVACAO.md (fonte da verdade do gate 1.6f)
+  └─ Promover o baseline aprovado para docs/DESIGN.md (agora sim como fonte da verdade)
+
+FASE 0b — Segurança & Planejamento (só depois das telas aprovadas)
   └─ Executar skill /security-auditor
-  └─ Escolher sistema(s) de referência real com o usuário e criar docs/UX-MAP.md (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques — gate 1.6e)
-  └─ Criar PRD.md → revisão do UX-Guardião (docs/UX-REVIEW.md, veredicto ✅/⚠️) → aprovação obrigatória do usuário
+  └─ Criar docs/UX-MAP.md TRANSCREVENDO as telas aprovadas (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques — gate 1.6e)
+  └─ Criar PRD.md descrevendo o que está nas telas aprovadas → revisão do UX-Guardião (docs/UX-REVIEW.md, veredicto ✅/⚠️) → aprovação obrigatória do usuário
   └─ Criar ROADMAP.md (aprovação obrigatória do usuário)
   └─ Criar ARQUITETURA.md (inclui Arquitetura de Usuários & Multi-Tenant e Arquitetura de Apps & Loja de Apps)
-  └─ Criar UML.md (classes/entidades + sequência dos fluxos críticos) — aprovação obrigatória antes de codar domínio, com UX-Guardião revalidando contra o UX-MAP
-  └─ Criar design system em docs/DESIGN.md ou docs/design-system/ (gate para mockups)
-  └─ Criar mockups navegáveis em docs/mockups/ (quando solicitado; só após PRD, UML, design system aprovados e UX-Guardião ✅/⚠️ — inclui obrigatoriamente a tela de Loja de Apps)
+  └─ Criar UML.md (classes/entidades + sequência dos fluxos críticos) — aprovação obrigatória antes de codar domínio, com UX-Guardião revalidando contra as telas e o UX-MAP
   └─ Definir estratégia de banco (Supabase direto ou local primeiro)
   └─ Definir modelo de tenant, membership e papéis (multi-tenant por padrão)
   └─ Definir catálogo de apps e modelo de instalação por tenant (modular por padrão)

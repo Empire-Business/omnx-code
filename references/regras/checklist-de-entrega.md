@@ -2,8 +2,12 @@
 
 A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
+**Telas aprovadas (Regra Zero)** — ver `docs/regras/mockup-first.md`
+- [ ] **Toda tela nova ou visivelmente alterada nesta entrega tem mockup em `docs/mockups/` e status `aprovada` em `docs/mockups/APROVACAO.md`, com a fala do usuário e data/hora BRT?** Sem isso, o documento e o código dessa tela estão BLOQUEADOS (gate 1.6f). Aprovação inferida de "ok" ambíguo não conta.
+- [ ] Os documentos que descrevem essas telas (PRD, UX-MAP, UML) foram atualizados no mesmo commit em que a tela mudou?
+
 **Documentação**
-- [ ] PRD.md existe e foi aprovado pelo usuário?
+- [ ] PRD.md existe, foi aprovado pelo usuário e descreve as telas já aprovadas (cada requisito P0/P1 aponta para uma `TEL-XXX`)?
 - [ ] ROADMAP.md existe e está atualizado?
 - [ ] MUDANCAS.md foi atualizado com a descrição da entrega?
 
@@ -19,8 +23,8 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] Toda entidade/relacionamento/fluxo crítico alterado nesta entrega está refletido no `docs/UML.md` e `docs/UML.html`, no mesmo commit?
 
 **Experiência do Usuário (UX)** — ver `docs/regras/ux-referencia-e-guardiao.md`
-- [ ] **O sistema tem sistema(s) de referência real escolhido(s) pelo usuário e `docs/UX-MAP.md` existe?** (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques). Em sistema novo, sem isso o PRD/UML não foi aprovado validamente — a fundação está BLOQUEADA (gate 1.6e).
-- [ ] **`docs/UX-REVIEW.md` tem veredicto ✅ ou ⚠️ do UX-Guardião sobre a fundação (PRD, UML, mockups), com a checklist de reclamações preenchida item a item?** Veredicto ❌ ou ausência de review = fundação não aprovada. Objeções dispensadas pelo usuário estão registradas uma a uma, com data?
+- [ ] **O sistema tem sistema(s) de referência real escolhido(s) pelo usuário, registrado em `docs/mockups/README.md`, e `docs/UX-MAP.md` existe transcrevendo as telas aprovadas?** (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques). Em sistema novo, sem isso o PRD/UML não foi aprovado validamente — a fundação está BLOQUEADA (gate 1.6e).
+- [ ] **`docs/UX-REVIEW.md` tem veredicto ✅ ou ⚠️ do UX-Guardião sobre as telas (antes de terem sido apresentadas ao usuário) e sobre a fundação (PRD, UML), com a checklist de reclamações preenchida item a item?** Veredicto ❌ ou ausência de review = fundação não aprovada. Objeções dispensadas pelo usuário estão registradas uma a uma, com data?
 - [ ] Todo fluxo crítico da entrega é alcançável em ≤3 cliques a partir da home, nenhum botão novo ficou sem destino e nenhuma rota ficou órfã?
 - [ ] Todo estado vazio/erro/carregando das telas novas foi pensado e rotulado na língua do usuário (sem jargão técnico)?
 - [ ] `docs/UX-MAP.md` foi atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo?

@@ -13,12 +13,20 @@
 Esta regra tem duas partes que andam juntas. Nenhuma das duas é opcional em
 sistema novo.
 
+> **Onde cada parte entra na linha do tempo (mockup-first, gate 1.6f):**
+> a **referência** é insumo do mockup — escolhida ANTES de desenhar as telas.
+> O **UX-Guardião** revisa as telas ANTES de o usuário vê-las, para que ele
+> gaste o tempo dele dizendo o que o produto é, não caçando botão sem destino.
+> O **`UX-MAP.md`** é escrito DEPOIS das telas aprovadas, transcrevendo a
+> navegação que já existe nos HTMLs. Ver `docs/regras/mockup-first.md`.
+
 ---
 
 ## Parte A — Sistema de referência obrigatório
 
-**Regra:** antes de escrever o PRD de um sistema novo, o usuário precisa
-indicar pelo menos **um sistema de referência real** — um produto existente
+**Regra:** antes de **desenhar as telas** de um sistema novo — portanto antes
+de tudo, já que a tela é o primeiro entregável — o usuário precisa indicar
+pelo menos **um sistema de referência real** — um produto existente
 cuja experiência o projeto quer seguir (ex: "navegação tipo Linear", "fluxo de
 pedido tipo iFood", "organização tipo Notion", "checkout tipo Shopify").
 
@@ -32,10 +40,17 @@ pedido tipo iFood", "organização tipo Notion", "checkout tipo Shopify").
   "navegação do Linear + formulários do Typeform"). Mais de 3 vira bagunça —
   nesse caso, ajude o usuário a priorizar.
 
-### Entregável: `docs/UX-MAP.md`
+### Entregável imediato: registro da referência no mockup
 
-Com a referência escolhida, a IA cria `docs/UX-MAP.md` — o mapa completo da
-experiência — com estas seções:
+Na hora de desenhar, a referência escolhida (e o que se copia / não se copia
+dela) é registrada em `docs/mockups/README.md`. **O `UX-MAP.md` NÃO é escrito
+nesta fase** — ele viria antes de qualquer tela existir, e um mapa de rotas
+escrito no vácuo é uma previsão que ninguém consegue conferir.
+
+### Entregável depois das telas aprovadas: `docs/UX-MAP.md`
+
+Com as telas aprovadas pelo usuário, a IA cria `docs/UX-MAP.md` — o mapa
+completo da experiência, transcrito dos HTMLs aprovados — com estas seções:
 
 1. **Sistemas de referência** — quais são, **o que se copia** de cada um e
    **o que se NÃO se copia** (desvio consciente, com motivo). O que não é
@@ -80,9 +95,17 @@ metas aspiracionais — são critérios de reprovação:
 
 ## Parte B — UX-Guardião ("o chato")
 
-**Regra:** antes de aprovar **qualquer** documento de fundação — PRD, UML,
-mockups ou o próprio `docs/UX-MAP.md` — o documento passa pelo **UX-Guardião**:
-um agente cuja **única função é reclamar da experiência do usuário**.
+**Regra:** o **UX-Guardião** — um agente cuja **única função é reclamar da
+experiência do usuário** — revisa duas coisas, em dois momentos:
+
+1. **Os mockups, antes de o usuário vê-los.** Esta é a passada mais
+   importante. As reclamações são corrigidas antes de as telas chegarem ao
+   dono do produto: o tempo dele é o recurso mais escasso do projeto, e
+   gastá-lo apontando um beco sem saída que um agente pega de graça é
+   desperdício. Veredicto ❌ **não sobe para o usuário** — corrige e roda de
+   novo.
+2. **Os documentos de fundação, depois** — PRD, UML e o próprio
+   `docs/UX-MAP.md` — revalidando cada um contra as telas já aprovadas.
 
 Ele não existe para elogiar, sugerir paleta de cores nem dizer "no geral está
 bom". Ele existe para responder, com mau humor profissional: *"onde um usuário
@@ -92,7 +115,8 @@ está apaixonado pela própria solução — o Guardião é o contrapeso.
 ### Como executar o Guardião
 
 - **Com subagentes disponíveis:** dispare um subagente dedicado, passando o
-  documento em revisão + `docs/UX-MAP.md` + esta checklist. A instrução dele é
+  material em revisão (os HTMLs das telas, na primeira passada; o documento,
+  nas seguintes) + a referência declarada + esta checklist. A instrução dele é
   ser adversarial: presumir o usuário mais apressado, mais leigo e mais
   distraído possível.
 - **Sem subagentes:** a própria IA faz uma **passada separada**, anunciando
@@ -112,7 +136,10 @@ passa** — silêncio não é aprovação:
    mensagens de erro de sistema).
 6. **Inconsistência com o sistema de referência declarado** — se disse que
    seria "tipo Linear" e a navegação não lembra Linear em nada, reclamar.
-7. **UX-MAP ausente ou desatualizado** em relação ao documento em revisão.
+7. **UX-MAP ausente ou desatualizado** em relação ao documento em revisão —
+   na passada sobre os mockups, o equivalente é: tela desenhada que não
+   aparece no inventário do `docs/mockups/README.md`, ou item do inventário
+   sem HTML correspondente.
 8. **Navegação que exige memória** — informação vista numa tela que o usuário
    precisa lembrar na próxima.
 9. **Formulário longo** sem divisão em etapas, sem salvamento parcial ou sem
@@ -125,7 +152,7 @@ passa** — silêncio não é aprovação:
 O Guardião registra o resultado em `docs/UX-REVIEW.md` (uma seção nova por
 rodada, com data/hora BRT), contendo:
 
-- **Documento revisado** (PRD, UML, mockups, UX-MAP) e versão/data
+- **Material revisado** (mockups, PRD, UML, UX-MAP) e versão/data
 - **Reclamações, item a item**, da checklist acima — o que falhou e onde
 - **Veredicto**, um de:
   - ✅ **APROVADO** — nenhuma reclamação aberta
@@ -135,8 +162,10 @@ rodada, com data/hora BRT), contendo:
 
 ### Gate (fail-closed)
 
-- Nenhum PRD, UML ou conjunto de mockups é "aprovado" sem veredicto ✅ ou ⚠️
-  com as ressalvas registradas como tasks. Com ❌ REJEITADO, **recuse** a
+- Nenhum conjunto de mockups é **apresentado ao usuário** sem veredicto ✅ ou
+  ⚠️ (com as ressalvas declaradas a ele junto com as telas), e nenhum PRD ou
+  UML é "aprovado" sem veredicto ✅ ou ⚠️ com as ressalvas registradas como
+  tasks. Com ❌ REJEITADO, **recuse** a
   aprovação, corrija junto com o usuário e rode o Guardião de novo. Não
   "informe e deixe o usuário decidir" de forma informal.
 - **Válvula de escape:** o usuário pode dispensar objeções **especificamente**
@@ -150,7 +179,9 @@ rodada, com data/hora BRT), contendo:
 
 ### Quando o Guardião roda de novo
 
-- Na primeira aprovação de PRD, UML e mockups (fundação)
+- **Antes de cada apresentação de mockups ao usuário** — inclusive nas rodadas
+  de alteração, rodando nas telas que foram mexidas
+- Na primeira aprovação de PRD e UML (agora contra as telas aprovadas)
 - Sempre que o PRD mudar de forma relevante (requisito novo, fluxo alterado)
 - Sempre que o `UX-MAP.md` mudar (rota nova, navegação alterada)
 

@@ -49,7 +49,7 @@
 - Toda rota, componente e endpoint/RPC de um app não-core verifica se o app está ativo para o tenant atual, no frontend E no backend (RLS/policy) — nunca confie só na UI escondida
 - Desativar um app oculta e bloqueia acesso, nunca apaga dados
 - Exceção só é válida se o usuário confirmar explicitamente um app único sem loja, documentado em `docs/ARQUITETURA.md`
-- **Gate obrigatório (fail-closed):** mockups gerados por esta skill incluem obrigatoriamente uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada
+- **Gate obrigatório (fail-closed):** os mockups incluem obrigatoriamente uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada — e ela é desenhada já na primeira rodada de telas, não depois
 
 ## Regra de API & webhooks por app (inegociável) (detalhe: `docs/regras/api-webhooks-por-app.md`)
 
@@ -69,12 +69,22 @@
 - **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática (print real + logs reais, testados forçando um erro de propósito) e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
 - `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
+## Regra Zero — Mockup-first (inegociável) (detalhe: `docs/regras/mockup-first.md`)
+
+- **Telas primeiro, documento depois.** Em todo pedido de produto — sistema novo ou tela nova em projeto existente — o primeiro entregável é o mockup navegável das telas em `docs/mockups/`, aberto no navegador e aprovado pelo dono do produto
+- **Gate obrigatório (fail-closed):** não se escreve nem se aprova `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`, `docs/UML.md`, `docs/UX-MAP.md` nem código de produto de uma tela que o usuário ainda não viu e aprovou. Esses documentos descrevem as telas aprovadas — nunca o contrário
+- Nenhum documento é pré-requisito para desenhar: bastam um brief curto e um sistema de referência real. O design system é **consequência** (o baseline visual é proposto inline nas telas e promovido a `docs/DESIGN.md` depois de aprovado), nunca pré-condição
+- Aprovação é uma frase do usuário, registrada em `docs/mockups/APROVACAO.md` com data/hora BRT — "ok" ambíguo ou silêncio não aprovam tela
+- Tela nova ou mudança visível em tela aprovada: desenha, mostra, aprova, e só então atualiza PRD/UML/código, no mesmo commit
+- Não se aplica a bug, refactor, migration, ajuste de estilo, script sem UI — aí é o fluxo normal
+- Válvula de escape: o usuário pode pedir explicitamente o documento antes das telas; a dispensa fica registrada em `docs/mockups/APROVACAO.md`. No silêncio, telas primeiro
+
 ## Regra de UX na fundação (inegociável) (detalhe: `docs/regras/ux-referencia-e-guardiao.md`)
 
-- Nenhum sistema novo é planejado "do zero": antes do PRD, o usuário escolhe pelo menos um sistema de referência real (produto existente cuja experiência o projeto segue) — a IA pode propor candidatos, mas nunca escolhe sozinha, e "sem referência" não é aceito
-- A partir da referência, a IA cria `docs/UX-MAP.md`: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário sem jargão técnico)
-- **Gate obrigatório (fail-closed):** nenhum PRD, UML ou conjunto de mockups é aprovado sem passar pelo UX-Guardião — um agente adversarial cuja única função é reclamar da experiência do usuário, com checklist de reclamações obrigatórias (cliques demais, botão sem destino, rota órfã, estado vazio não pensado, jargão técnico, inconsistência com a referência) e veredicto registrado em `docs/UX-REVIEW.md` (✅ / ⚠️ / ❌)
-- Veredicto ❌ bloqueia a aprovação até correção e nova rodada; ⚠️ exige ressalvas registradas como tasks; o usuário só dispensa objeções uma a uma, com registro no review
+- Nenhum sistema novo é desenhado "do zero": antes de desenhar as telas, o usuário escolhe pelo menos um sistema de referência real (produto existente cuja experiência o projeto segue) — a IA pode propor candidatos, mas nunca escolhe sozinha, e "sem referência" não é aceito
+- **Gate obrigatório (fail-closed):** nenhum conjunto de mockups é apresentado ao usuário sem passar antes pelo UX-Guardião — um agente adversarial cuja única função é reclamar da experiência do usuário, com checklist de reclamações obrigatórias (cliques demais, botão sem destino, rota órfã, estado vazio não pensado, jargão técnico, inconsistência com a referência) e veredicto registrado em `docs/UX-REVIEW.md` (✅ / ⚠️ / ❌). Veredicto ❌ não sobe para o usuário: corrige e roda de novo
+- Depois das telas aprovadas, a IA cria `docs/UX-MAP.md` **transcrevendo** os HTMLs aprovados: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário sem jargão técnico). Rota no mapa sem HTML é bug do mapa; link em HTML sem rota no mapa é buraco no mapa
+- Nenhum PRD ou UML é aprovado sem o Guardião revalidando contra as telas aprovadas e o UX-MAP; ❌ bloqueia até correção e nova rodada; ⚠️ exige ressalvas registradas como tasks; o usuário só dispensa objeções uma a uma, com registro no review
 - `docs/UX-MAP.md` é atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo — e mudança relevante no PRD ou no mapa reaciona o Guardião
 
 ## Regra de banco de dados (inegociável) (detalhe: `docs/regras/migrations.md` e `docs/regras/acesso-supabase.md`)
@@ -105,10 +115,11 @@
 
 ## Fluxo de desenvolvimento
 
-- Antes de codar qualquer feature: verifique se existem `PRD.md`, `ROADMAP.md` e `ARQUITETURA.md`
-- Se não existirem → crie esses documentos primeiro. Não comece a codar sem eles
-- Antes de criar mockups/protótipos: exija `PRD.md`, `ARQUITETURA.md`, `UML.md` e design system (`docs/DESIGN.md` ou `docs/design-system/`) completos
-- Mockups vão em `docs/mockups/`, um arquivo HTML por tela, navegáveis via `docs/mockups/index.html`
+- **Tela nova, antes de tudo:** gere o mockup em `docs/mockups/`, mostre ao usuário e obtenha aprovação registrada em `docs/mockups/APROVACAO.md`. Nenhum documento e nenhum código de tela nova antes disso (Regra Zero)
+- Para criar mockups **não** exija `PRD.md`, `UML.md` nem design system — eles vêm depois. Exija apenas um brief curto e um sistema de referência real
+- Antes de codar qualquer feature: verifique se as telas dela estão aprovadas e se existem `PRD.md`, `ROADMAP.md` e `ARQUITETURA.md`
+- Se não existirem → telas aprovadas primeiro, depois esses documentos. Não comece a codar sem eles
+- Mockups vão em `docs/mockups/`, um arquivo HTML por tela (`tel-XXX-nome.html`), autocontidos com CSS inline, navegáveis via `docs/mockups/index.html`
 - Handoffs vão em `docs/handoffs/` (`latest.md`, `HISTORY.md`, `README.md`) — atualize ao final de toda sessão significativa e leia na retomada
 - Toda documentação técnica vai para `docs/[NOME].md`
 - O `CLAUDE.md` é um índice enxuto — nunca coloque documentação longa diretamente nele
@@ -119,7 +130,7 @@
 - `docs/handoffs/latest.md` guarda o estado atual do projeto e deve ser lido primeiro quando o usuário pedir para continuar, retomar ou limpar contexto
 - `docs/handoffs/HISTORY.md` guarda o histórico cronológico — acrescente, nunca apague
 - Atualize o handoff ao final de toda sessão que produzir mudanças significativas
-- O handoff é um resumo, não substitui `PRD.md`, `ARQUITETURA.md`, `UML.md` ou outros docs
+- O handoff é um resumo, não substitui `PRD.md`, `ARQUITETURA.md`, `UML.md`, `docs/mockups/APROVACAO.md` ou outros docs
 
 ## Comunicação (detalhe: `docs/regras/comunicacao.md`)
 

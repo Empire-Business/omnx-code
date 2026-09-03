@@ -1,6 +1,6 @@
 ---
 name: omnx-code
-version: "1.22"
+version: "1.23"
 min_security_auditor: "1.11"
 contract_version: 1
 description: |
@@ -18,15 +18,20 @@ description: |
   A skill /security-auditor é acionada automaticamente na fundação do app para garantir
   que o planejamento inicial nasça seguro; auditorias periódicas e deploy são opt-in
   (o usuário decide quando CHAMAR a auditoria).
-  Também cria mockups navegáveis 100% fiéis ao PRD e ao design system, em arquivos
-  separados por tela, dentro de docs/mockups/.
-  Nenhum sistema novo é planejado sem um sistema de referência real escolhido pelo
-  usuário, a partir do qual a experiência é mapeada por completo em docs/UX-MAP.md
-  (rotas, navegação, botões, fluxos com contagem de cliques — fácil de usar SEMPRE).
-  E nenhuma fundação (PRD, UML, mockups) é aprovada antes de passar pelo
-  UX-Guardião: um agente adversarial cuja única função é reclamar da experiência
-  do usuário e exigir essa documentação, com veredicto registrado em
-  docs/UX-REVIEW.md (gate 1.6e, fail-closed).
+  MOCKUP-FIRST (Regra Zero, gate 1.6f, fail-closed): em todo pedido de produto —
+  sistema novo ou tela nova em projeto existente — o PRIMEIRO entregável é sempre
+  o mockup navegável das telas em docs/mockups/, aberto no navegador e aprovado
+  pelo dono do produto. A pessoa VISUALIZA e aprova (ou pede alteração) ANTES de
+  existir PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou qualquer linha de código —
+  esses documentos passam a ser escritos a partir das telas aprovadas, nunca o
+  contrário. Nenhum gate é afrouxado por isso: só muda a ordem.
+  Nenhum sistema novo é desenhado sem um sistema de referência real escolhido pelo
+  usuário; depois das telas aprovadas, a experiência é transcrita por completo em
+  docs/UX-MAP.md (rotas, navegação, botões, fluxos com contagem de cliques —
+  fácil de usar SEMPRE).
+  E nenhuma tela chega ao usuário antes de passar pelo UX-Guardião: um agente
+  adversarial cuja única função é reclamar da experiência do usuário, com
+  veredicto registrado em docs/UX-REVIEW.md (gate 1.6e, fail-closed).
   Todo sistema gerado nasce modular por padrão: cada funcionalidade vira um app
   independente listado num catálogo, com uma Loja de Apps interna onde o tenant
   ativa/desativa cada um — nunca um monólito de funções sempre ligadas.
@@ -49,8 +54,10 @@ description: |
   é sempre feita com plano mostrado e confirmação explícita antes de mexer em qualquer
   arquivo (nunca automática nem silenciosa em projeto já configurado).
   Em projetos novos, esta skill é o primeiro passo obrigatório antes de qualquer código.
-  Em pedidos de mockup, esta skill exige PRD, ARQUITETURA, UML e design system
-  aprovados antes de gerar qualquer tela.
+  Em pedidos de mockup, esta skill NÃO exige PRD, UML nem design system prontos:
+  ela colhe um brief mínimo, gera as telas com um baseline visual provisório e
+  entrega para o usuário ver. O design system só é extraído para docs/DESIGN.md
+  depois que o visual foi aprovado nas telas.
   Quando o pedido envolver multi-tenancy, sub-contas, agência, tenant,
   workspace isolation, BYOK, isolamento de credenciais, roteamento de webhooks
   por tenant, ou offboarding LGPD de tenant, esta skill é a porta de entrada e
@@ -63,6 +70,26 @@ description: |
 
 > Framework de desenvolvimento orientado a clareza, segurança e documentação viva.
 > Tudo que você faz aqui é guiado pelo `CLAUDE.md` do projeto e executado com tasks visíveis.
+
+---
+
+## Regra Zero — Telas primeiro (a pessoa VISUALIZA antes de qualquer documento)
+
+**Em qualquer pedido de produto — sistema novo do zero ou tela nova em projeto que já existe — o primeiro entregável é o mockup visual das telas, aberto no navegador e aprovado pelo dono do produto. Só depois disso nasce PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou qualquer linha de código.**
+
+Por que esta ordem, e não a inversa: ninguém consegue revisar um produto lendo requisitos. Um PRD de onze seções parece certo para quem escreveu e parece certo para quem leu — até a tela existir e a pessoa dizer "não era isso". Quando essa frase aparece depois do PRD, do ROADMAP, do UML e do schema modelado, a correção já está espalhada por cinco documentos e um banco. Quando aparece na tela HTML, custa apagar um arquivo e desenhar de novo.
+
+Tela é a única linguagem em que o dono do produto é fluente. É nela que ele enxerga o campo que falta, o botão que não existe, o passo que está sobrando — coisas que ele nunca vai achar numa lista de requisitos funcionais, porque para achá-las ele teria primeiro que traduzir a lista em imagem mental, e essa tradução é justamente o trabalho que você está aqui para fazer. O documento não perde valor nessa inversão: ganha. Ele deixa de ser uma aposta sobre o que o produto vai ser e passa a ser a transcrição de algo que já foi visto e aceito.
+
+**Isso não afrouxa nenhum gate desta skill.** PRD, UML, UX-MAP, níveis de acesso, sistema de tickets e segurança continuam todos obrigatórios, com o mesmo rigor. Só muda a ordem: eles passam a ser escritos **a partir** das telas aprovadas.
+
+| Onde isto vive | O quê |
+|----------------|-------|
+| Gate operacional | **Regra 1.6f** (fail-closed), no Modo de Trabalho Normal |
+| Procedimento completo | **"Fluxo de Mockups"**, mais adiante nesta skill |
+| Regra instalada no projeto do usuário | `docs/regras/mockup-first.md` |
+
+> **Válvula de escape (explícita e registrada):** se o usuário disser claramente que quer o documento antes das telas ("já sei exatamente o que quero, escreve o PRD primeiro"), respeite — o produto é dele. Mas antes explique em **uma frase** o que ele está trocando, e registre a dispensa em `docs/mockups/APROVACAO.md` com data. Dispensa não pedida não existe: no silêncio, telas primeiro.
 
 ---
 
@@ -101,7 +128,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.22** |
+| Versão da skill | **1.23** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -132,7 +159,8 @@ cat .empire/state.json
 |----------|------|
 | `.empire/state.json` não existe | → Fase de Setup (primeira vez) |
 | `setup_complete: false` | → Continuar Setup incompleto |
-| `setup_complete: true` | → Modo de Trabalho Normal |
+| `setup_complete: true` e `mockups_approved: false` | → Modo de Trabalho Normal, **mas** o gate 1.6f está fechado: pedido de produto/tela nova entra pelo **Fluxo de Mockups**, não pelo PRD |
+| `setup_complete: true` e `mockups_approved: true` | → Modo de Trabalho Normal; o gate 1.6f só reabre para telas que ainda não estão em `docs/mockups/APROVACAO.md` |
 
 Se o usuário pediu explicitamente "verificar atualizações" ou "atualizar skill" → ir direto para a seção **Auto-atualização**.
 
@@ -254,9 +282,15 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
   "last_version_gate_check": null,
   "last_version_gate_checked_at": null,
   "handoffs_enabled": true,
-  "last_handoff_at": null
+  "last_handoff_at": null,
+  "mockups_approved": false,
+  "mockups_approved_at": null,
+  "mockups_round": 0,
+  "mockups_screens": 0
 }
 ```
+
+> `mockups_approved` é o registro no state do gate 1.6f (Regra Zero): `false` significa que nenhuma tela foi aprovada pelo usuário e, portanto, PRD/ROADMAP/ARQUITETURA/UML/UX-MAP e código de produto estão bloqueados. Ele espelha `docs/mockups/APROVACAO.md`, que continua sendo a fonte da verdade detalhada (por tela); o state serve para você detectar a situação numa ativação nova sem reler tudo. `mockups_round` conta as rodadas de revisão e `mockups_screens` quantas telas estão aprovadas.
 
 > `last_version_gate_check` guarda o resultado da última passagem pelo gate da regra "Passo 1.5" (`"up_to_date"` ou `"network_failure_user_override"`) e `last_version_gate_checked_at` o timestamp ISO — usados para o cache de 24h que evita bater na rede a cada ativação da skill.
 
@@ -599,7 +633,11 @@ Apresente ao usuário um resumo do que foi feito:
 - State document: .empire/state.json criado
 - Handoffs: docs/handoffs/ preparada para salvar estado entre sessões
 
-Agora você pode usar esta skill a qualquer momento para codar,
+Próximo passo: as TELAS. Antes de PRD, banco ou código, eu desenho os
+mockups navegáveis e você abre no navegador para aprovar ou pedir
+alteração (Regra Zero). Me responda 6 perguntas curtas e eu desenho.
+
+Depois disso a skill fica disponível a qualquer momento para codar,
 documentar ou auditar segurança. O CLAUDE.md é o seu índice — tudo parte dele.
 Para pausar e retomar depois, peça "handoff" ou "atualiza o handoff".
 ```
@@ -616,7 +654,7 @@ Quando `setup_complete: true` e o usuário pede qualquer coisa (codar, refatorar
 Antes de qualquer ação, crie tasks com `TaskCreate` descrevendo cada etapa. Nunca execute sem tasks visíveis.
 
 **1.5. Sugerir, não forçar — EXCETO UML sempre; segurança e níveis de acesso antes de PR/main são recomendados**
-Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceção inegociável:** o gate de UML (regra 1.6c) é **fail-closed** em todo commit relevante — ali você NÃO "informa e deixa decidir"; você **recusa** o commit/publicação até o gate passar. O gate de segurança antes de deploy (regra 1.6) e o gate de documentação de níveis de acesso (regra 1.6b) são **recomendados e opt-in** antes de publicar (push/merge para `main`/`master`, PR de release, deploy): avise o risco, ofereça rodar a `/security-auditor`, mas prossiga se o usuário optar por pular. Em commit simples de trabalho incremental em branch de feature, eles só avisam e sugerem — não bloqueiam.
+Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceções inegociáveis:** o gate de **mockup-first** (regra 1.6f) e o gate de **UML** (regra 1.6c) são **fail-closed** — ali você NÃO "informa e deixa decidir"; você **recusa** escrever o documento, o commit ou a publicação até o gate passar. No 1.6f a única saída é o usuário pedir explicitamente a dispensa, que fica registrada. O gate de segurança antes de deploy (regra 1.6) e o gate de documentação de níveis de acesso (regra 1.6b) são **recomendados e opt-in** antes de publicar (push/merge para `main`/`master`, PR de release, deploy): avise o risco, ofereça rodar a `/security-auditor`, mas prossiga se o usuário optar por pular. Em commit simples de trabalho incremental em branch de feature, eles só avisam e sugerem — não bloqueiam.
 
 **1.6. Gate de segurança antes de deploy (opt-in, recomendado)**
 Antes de qualquer ação que publique em produção — `git push` para `main`/`master` ou branch ligada à Vercel, `git merge` em `main`, abrir PR de release, `supabase functions deploy`, `vercel --prod` — você DEVE:
@@ -682,11 +720,46 @@ Um botão que só abre um formulário de texto livre **não cumpre este gate**, 
 
 > Este gate é independente dos gates 1.6, 1.6b e 1.6c: um projeto pode ter segurança, níveis de acesso e UML em dia e ainda estar bloqueado por falta de sistema de tickets de erro, e vice-versa. Todos precisam passar antes de PR/main.
 
-**1.6e. Gate de UX na fundação — sistema de referência + UX-Guardião (fail-closed antes de aprovar PRD/UML/mockups)**
-Nenhum sistema novo nasce "do zero" na cabeça da IA: antes de escrever PRD ou UML, o usuário escolhe pelo menos um **sistema de referência real** (produto existente cuja experiência o projeto segue — "navegação tipo Linear", "pedido tipo iFood"), e a partir dele a experiência inteira é mapeada em `docs/UX-MAP.md`: mapa de rotas, grafo de navegação, inventário de botões/ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário em vez de jargão técnico). Depois, antes de qualquer aprovação da fundação (PRD, UML, mockups), um agente adversarial — o **UX-Guardião**, "o chato" — revisa o documento exclusivamente sob a ótica de UX: sua única função é reclamar de cada fluxo confuso, clique a mais, botão sem destino e estado vazio não pensado, registrando reclamações item a item e veredicto (✅ / ⚠️ / ❌) em `docs/UX-REVIEW.md`. Sem `docs/UX-MAP.md` + veredicto ✅ (ou ⚠️ com ressalvas virando tasks, ou objeções dispensadas uma a uma pelo usuário e registradas no review), PRD e UML **não são aprovados** e nenhum código nasce — recuse e rode o Guardião de novo. A especificação completa (checklist de reclamações, formato do UX-MAP e do UX-REVIEW, válvula de escape e anti-teatro) vive em `docs/regras/ux-referencia-e-guardiao.md` — leia antes de planejar qualquer sistema novo, não invente a própria versão simplificada.
+**1.6e. Gate de UX na fundação — sistema de referência + UX-Guardião (fail-closed)**
 
-> **Formato de rodadas que converge rápido (validado em campo):** cada rodada do Guardião deve incluir, além da tabela de reclamações ID/seção/descrição/gravidade, uma seção "**Correções exigidas por item**" dizendo EXATAMENTE o que mudar no documento para virar ✅, e uma seção "Verificado, sem reclamação" (para não inventar problema). Com esse formato, um mapa médio converge em 2–3 rodadas. Rodadas seguintes são ADITIVAS ao review (nada apagado), e o review registra também objeções dispensadas pelo usuário uma a uma com justificativa.
-> Este gate é independente dos gates 1.6, 1.6b, 1.6c e 1.6d: um projeto pode ter segurança, níveis de acesso, UML e sistema de tickets em dia e ainda estar bloqueado na fundação por falta de referência de UX ou por rejeição do UX-Guardião. Ele trava a **aprovação da fundação** (PRD/UML/mockups), não commits simples em branch de feature — mas nenhuma tela nova de produto deve ser planejada sem atualizar o `UX-MAP.md` e, se o fluxo mudar, rodar o Guardião de novo.
+Duas peças, cada uma no ponto do tempo em que ela paga.
+
+**Antes de desenhar as telas (insumo do mockup):** o usuário escolhe pelo menos um **sistema de referência real** — produto existente cuja experiência o projeto segue ("navegação tipo Linear", "pedido tipo iFood", "organização tipo Notion"). Se ele não souber, proponha 3-5 candidatos com uma frase sobre o que cada um faz bem e deixe ele decidir; você nunca escolhe sozinho, e "sem referência, inventa" não é aceito. A referência é o insumo mínimo do mockup: sem ela você improvisa uma navegação que mistura padrões de dez produtos diferentes, e o usuário final paga a conta. Nesta fase **não se escreve o `UX-MAP.md`** — registre apenas a referência e o que se copia / não se copia dela em `docs/mockups/README.md`.
+
+**Antes de o usuário ver as telas:** o **UX-Guardião** ("o chato") — agente adversarial cuja única função é reclamar da experiência — revisa os mockups gerados, e as reclamações são corrigidas **antes** de as telas chegarem ao usuário. O motivo é econômico: o tempo do dono do produto é o recurso mais escasso do projeto, e gastá-lo apontando um botão sem destino que um agente pega de graça é desperdício. Ele deve gastar esse tempo dizendo o que o produto **é** — não caçando defeito óbvio. Cada rodada fica em `docs/UX-REVIEW.md` com veredicto ✅ / ⚠️ / ❌; **veredicto ❌ não sobe para o usuário** — corrija e rode de novo.
+
+**Depois das telas aprovadas:** `docs/UX-MAP.md` é escrito **a partir das telas aprovadas** — mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário em vez de jargão técnico). Escrito nessa ordem ele deixa de ser previsão e passa a ser transcrição — o que também o torna verificável: rota no mapa sem HTML correspondente é bug do mapa, e link em HTML sem rota no mapa é buraco no mapa. Em seguida o Guardião revalida PRD e UML contra as telas aprovadas e o UX-MAP.
+
+**Gate:** sem `docs/UX-MAP.md` + veredicto ✅ (ou ⚠️ com ressalvas virando tasks, ou objeções dispensadas uma a uma pelo usuário e registradas no review), PRD e UML **não são aprovados** e nenhum código nasce — recuse e rode o Guardião de novo. A especificação completa (checklist de reclamações, formato do UX-MAP e do UX-REVIEW, válvula de escape e anti-teatro) vive em `docs/regras/ux-referencia-e-guardiao.md` — leia antes de planejar qualquer sistema novo, não invente a própria versão simplificada.
+
+> **Formato de rodadas que converge rápido (validado em campo):** cada rodada do Guardião deve incluir, além da tabela de reclamações ID/seção/descrição/gravidade, uma seção "**Correções exigidas por item**" dizendo EXATAMENTE o que mudar para virar ✅, e uma seção "Verificado, sem reclamação" (para não inventar problema). Com esse formato, um conjunto médio de telas converge em 2–3 rodadas. Rodadas seguintes são ADITIVAS ao review (nada apagado), e o review registra também objeções dispensadas pelo usuário uma a uma com justificativa.
+> Este gate é independente dos gates 1.6, 1.6b, 1.6c e 1.6d: um projeto pode ter segurança, níveis de acesso, UML e sistema de tickets em dia e ainda estar bloqueado na fundação por falta de referência de UX ou por rejeição do UX-Guardião. Ele trava a **aprovação da fundação** (telas, PRD, UML), não commits simples em branch de feature — mas nenhuma tela nova de produto vai ao ar sem atualizar o `UX-MAP.md` e, se o fluxo mudar, rodar o Guardião de novo.
+
+**1.6f. Gate de Mockup-First — nada de documento antes da tela aprovada (fail-closed, obrigatório)**
+
+Este gate é a forma executável da **Regra Zero** (topo desta skill). O princípio e o porquê estão lá; aqui está o que fazer.
+
+**O que ele trava:** escrever ou aprovar `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`, `docs/UML.md`, `docs/UX-MAP.md` ou qualquer código de produto **de uma tela que o usuário ainda não viu e aprovou**.
+
+| Situação | Mockup primeiro? |
+|----------|------------------|
+| Projeto novo, do zero | **Sim, sempre.** O primeiro entregável da fundação é `docs/mockups/`, não o PRD |
+| Projeto existente, tela ou feature nova com UI | **Sim.** Mockupe só a(s) tela(s) nova(s) e os pontos de entrada afetados — não o app inteiro |
+| Mudança visível numa tela já aprovada (campo novo, coluna nova, passo novo no fluxo) | **Sim, versão leve.** Atualize o HTML daquela tela e mostre antes de codar |
+| Correção de bug, refactor, migration, ajuste de copy/estilo, performance | Não. Siga o Modo de Trabalho Normal direto |
+| Script interno, job de background, CLI, integração sem tela | Não. Não há o que visualizar |
+
+**Procedimento (fail-closed):**
+1. Antes de criar/editar qualquer documento de fundação ou codar tela nova, verifique: existe `docs/mockups/APROVACAO.md` com aprovação explícita do usuário cobrindo as telas em questão?
+2. Se não existe, ou existe mas não cobre a tela nova: **pare e rode o "Fluxo de Mockups"** desta skill. Não escreva "só um rascunho do PRD enquanto isso" — rascunho vira âncora, e a partir daí o mockup passa a servir o documento em vez do contrário; a regra se inverte sozinha por esse caminho, sem ninguém decidir isso.
+3. Só depois da aprovação registrada, siga para PRD → ROADMAP → ARQUITETURA → UML → código, cada documento descrevendo o que as telas aprovadas mostram.
+4. Se as telas mudarem numa revisão posterior, os documentos que descrevem aquelas telas são atualizados **no mesmo commit** — tela e documento nunca divergem.
+
+**O que conta como aprovação:** uma **frase do usuário**, nunca uma inferência sua. "Ok", "legal", "entendi" em contexto ambíguo não aprovam oito telas. O registro em `docs/mockups/APROVACAO.md` tem que citar o que ele disse, com data/hora BRT. `APROVACAO.md` preenchido sem fala correspondente do usuário é falsificação de aprovação, não adiantamento de trabalho.
+
+**Projeto que já tem PRD/UML aprovados:** mockup-first não é licença para contradizer a fundação existente. A tela nova respeita o que já está documentado. Se ela exigir mudar o PRD (requisito novo, regra de negócio diferente), a mudança do PRD acontece **depois** da aprovação da tela, no mesmo commit dela — e o Guardião revalida, porque o fluxo mudou.
+
+> Este gate é independente dos gates 1.6, 1.6b, 1.6c, 1.6d e 1.6e — mas é o **primeiro na linha do tempo**: todos os outros passam a operar sobre telas que o dono do produto já viu e aceitou. A especificação completa vive em `docs/regras/mockup-first.md`.
 
 **1.7. Confiabilidade de edições de documentos longos por subagentes (lição de campo, 22/08)**
 Quando delegar a um subagente a edição de um documento longo (>500 linhas — PRD, ARQUITETURA, UML, roadmap):
@@ -1080,196 +1153,153 @@ Para tarefas que envolvem múltiplos domínios em paralelo (ex: migração de ba
 
 ---
 
-## Fluxo de Mockups (prototipagem fiel ao PRD)
+## Fluxo de Mockups (o PRIMEIRO passo de todo produto)
 
-> Mockups não são "rascunhos bonitos". São representações visuais rigorosas do produto descrito no PRD, construídas **antes** de gastar tempo escrevendo código de produção. Um mockup pela metade é pior que nenhum mockup: ele esconde gaps de UX que só aparecem depois, quando custam caro para corrigir.
+> Este é o fluxo de abertura da skill, não um extra. Ele existe para pôr as telas na frente do dono do produto **antes** de qualquer documento, porque é olhando a tela que ele descobre o que realmente quer — ver a Regra Zero (topo desta skill) e o gate 1.6f. Um mockup pela metade é pior que nenhum: ele esconde os gaps que deveria revelar.
 
 ### Quando ativar este fluxo
 
-Este fluxo é acionado quando o usuário pedir qualquer coisa relacionada a:
-- mockup, mockups, protótipo, protótipos, wireframe, wireframes
-- "telas do app", "telas do sistema", "fluxo de telas"
-- "quero ver como fica" antes de codar
-- "gerar as telas" a partir do PRD
+**Ativamente, por conta própria**, sempre que o pedido envolver uma tela que ainda não existe:
+- "quero fazer um sistema de...", "preciso de um app para...", "vamos começar um projeto"
+- qualquer pedido de feature nova com interface, em projeto novo ou existente
+- mockup, mockups, protótipo, wireframe, "telas do app", "fluxo de telas", "quero ver como fica"
+- **e também quando o usuário pedir direto o PRD** ("escreve o PRD do meu sistema"): nesse caso, ofereça as telas primeiro, explique em uma frase o porquê, e só siga para o PRD se ele insistir (válvula de escape do gate 1.6f).
 
-A skill deve se candidatar ativamente a esses triggers e **recusar** criar mockups sem os pré-requisitos documentados.
+Não ative para bug, refactor, migration, ajuste em tela já aprovada, script sem UI — ver a tabela do gate 1.6f.
 
 ### Princípios inegociáveis
 
-1. **Sem documentação, sem mockup.** Se `docs/PRD.md`, `docs/ARQUITETURA.md`, `docs/UML.md` ou o design system não existirem, a skill primeiro cria/atualiza esses documentos com o usuário. Mockup só começa depois da aprovação.
-2. **100% fiel ao PRD.** Toda funcionalidade P0/P1 do PRD deve aparecer em alguma tela. Toda tela deve estar rastreável a uma seção do PRD.
-3. **100% fiel ao design system.** Cores, tipografia, espaçamento, componentes e estados vêm do design system. Nenhuma cor ou fonte arbitrária.
-4. **Uma tela por arquivo.** Cada tela vira um arquivo HTML separado em `docs/mockups/`.
-5. **Navegável.** Há um `index.html` central que lista todas as telas e cada tela possui links para as próximas telas do fluxo.
-6. **Autocontido.** Os mockups abrem direto no navegador (`file://`) sem precisar de servidor, build ou dependências externas.
+1. **Visualizar antes de documentar.** Nada de PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou código antes das telas aprovadas. Você **não precisa** desses documentos para desenhar — precisa de um brief curto e de um sistema de referência.
+2. **O usuário aprova vendo, não lendo.** O entregável desta fase é uma pasta que abre no navegador. Se ele não abriu, o fluxo não terminou.
+3. **Fiel ao brief, honesto sobre o resto.** Toda capacidade que o usuário mencionou aparece em alguma tela. Tudo que você preencheu por conta própria vai declarado como **suposição** no rodapé da tela — é assim que ele corrige em vez de ter que perguntar.
+4. **Design system provisório inline, promovido depois.** Você propõe o baseline visual (cores, tipografia, espaçamento) já embutido nas telas; ele aprova olhando. Só depois da aprovação isso é extraído para `docs/DESIGN.md` como fonte da verdade. Nunca peça um design system escrito como pré-condição para desenhar.
+5. **Uma tela por arquivo.** Cada tela é um HTML separado em `docs/mockups/`.
+6. **Navegável.** Existe um `index.html` central e cada tela linka as próximas do fluxo. Fluxo se aprova clicando, não imaginando.
+7. **Autocontido.** Abre em `file://` sem servidor, build ou dependência externa. CSS inline em cada arquivo.
+8. **Guardião antes do usuário.** As telas passam pelo UX-Guardião e as reclamações são corrigidas antes de ele ver (gate 1.6e).
 
 ---
 
-### Pré-requisitos (gate fail-closed)
+### Pré-requisitos (só dois, e os dois são conversa)
 
-Antes de gerar qualquer mockup, verifique a existência dos arquivos abaixo. A ausência de qualquer um deles **bloqueia** o fluxo de mockup até que seja criado/aprovado.
+O único gate desta fase é ter insumo suficiente para desenhar algo que não seja genérico:
 
-| Arquivo | Por que é obrigatório | O que fazer se faltar |
-|---------|----------------------|----------------------|
-| `docs/PRD.md` | Fonte da verdade do produto | Criar seguindo "Etapa 1 — PRD.md" em `docs/regras/prd-roadmap-arquitetura.md`. Só prosseguir com aprovação do usuário. |
-| `docs/ARQUITETURA.md` | Define estrutura técnica e decisões que impactam telas | Criar seguindo "Etapa 3 — ARQUITETURA.md" em `docs/regras/prd-roadmap-arquitetura.md`. |
-| `docs/UML.md` + `docs/UML.html` | Modela entidades e fluxos críticos antes de desenhar telas | Criar conforme regra 1.6c. |
-| `docs/UX-MAP.md` + `docs/UX-REVIEW.md` | Mapa da experiência (rotas, navegação, ações por tela) e veredicto do UX-Guardião | Criar conforme regra 1.6e. Mockup só começa com UX-MAP existente e veredicto ✅/⚠️ do Guardião sobre a fundação. |
-| Design system (`docs/DESIGN.md` ou `docs/design-system/DESIGN.md` ou `docs/design-system/tokens.json`) | Garante fidelidade visual e consistência | Criar com o usuário, exigindo definição de cores, tipografia, espaçamento, componentes base e estados. |
+| Pré-requisito | Por que | Como obter |
+|---------------|---------|------------|
+| **Brief mínimo** | Sem saber o que o produto faz e quem usa, a tela sai como template de portfólio | Task 1 — 6 perguntas, respondidas de uma vez |
+| **Sistema de referência real** | Sem referência você mistura padrões de dez produtos e a navegação sai incoerente (gate 1.6e) | Task 1 — o usuário escolhe; se não souber, proponha 3-5 candidatos |
 
-**Design system mínimo exigido:**
-
-Se o design system estiver incompleto, recuse criar mockups e peça ao usuário para completar. O mínimo é:
-
-```markdown
-# Design System
-
-## Cores
-- Primária: `#...`
-- Secundária: `#...`
-- Background: `#...`
-- Surface: `#...`
-- Texto primário: `#...`
-- Texto secundário: `#...`
-- Estados: sucesso, erro, aviso, info
-
-## Tipografia
-- Fonte de títulos: ...
-- Fonte de corpo: ...
-- Escala: H1, H2, H3, body, small, label (com tamanhos e pesos)
-
-## Espaçamento
-- Base: ...px
-- Escalas: xs, sm, md, lg, xl, 2xl
-
-## Componentes base
-- Botão primário/secundário/terciário: padding, border-radius, estados (hover, disabled)
-- Input, select, textarea: padding, border, focus, erro
-- Card: padding, sombra, borda, radius
-- Navegação: header, sidebar, tabs
-
-## Layout
-- Container máximo: ...px
-- Grid: ...colunas, gutters
-- Breakpoints: mobile, tablet, desktop
-```
-
-> **Anti-teatro:** não basta o arquivo existir. A skill deve LER o design system e confirmar que ele cobre os itens acima. Se houver seção marcada "TBD" ou vazia, o gate falha.
+**Explicitamente NÃO são pré-requisitos:** `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`, `docs/UML.md`, `docs/UX-MAP.md`, `docs/DESIGN.md`. Todos vêm **depois**. Se você se pegar pedindo qualquer um deles para começar a desenhar, você inverteu a Regra Zero.
 
 ---
 
 ### Task 0 — Criar tasks do fluxo de mockup
 
-Antes de qualquer coisa, liste as tasks:
-
 ```
-Task 1: Verificar pré-requisitos (PRD, ARQUITETURA, UML, design system)
-Task 2: Criar/atualizar documentação faltante (se houver)
-Task 3: Inventariar telas a partir do PRD e UML
-Task 4: Criar estrutura docs/mockups/ e README.md de rastreabilidade
-Task 5: Gerar HTML de cada tela (um arquivo por tela)
-Task 6: Criar docs/mockups/index.html como hub de navegação
-Task 7: Validar cobertura do PRD e fidelidade ao design system
-Task 8: Commitar alterações
+Task 1: Colher o brief mínimo + sistema de referência
+Task 2: Propor o baseline visual provisório
+Task 3: Inventariar as telas (a partir do brief, não de um PRD)
+Task 4: Criar a estrutura docs/mockups/
+Task 5: Gerar o HTML de cada tela + index.html
+Task 6: Rodada do UX-Guardião e correção ANTES de mostrar
+Task 7: Abrir as telas para o usuário e rodar o loop visualizar → aprovar/alterar
+Task 8: Registrar a aprovação e promover o design system para docs/DESIGN.md
+Task 9: Commitar e só então liberar a fundação (PRD, UML, UX-MAP)
 ```
 
 ---
 
-### Task 1 — Verificar pré-requisitos
+### Task 1 — Brief mínimo + sistema de referência
 
-Leia os arquivos e registre o status:
-
-```bash
-for f in docs/PRD.md docs/ARQUITETURA.md docs/UML.md docs/DESIGN.md docs/design-system/DESIGN.md docs/design-system/tokens.json; do
-  echo "=== $f ==="
-  [ -f "$f" ] && echo "EXISTS" || echo "MISSING"
-done
-```
-
-Apresente ao usuário:
+Mande as perguntas **todas de uma vez**, numeradas, em linguagem de dono de negócio. Perguntar uma por vez transforma cinco minutos em meia hora e faz a pessoa desistir antes de ver a primeira tela.
 
 ```
-📋 Pré-requisitos para mockup:
-✅ docs/PRD.md
-✅ docs/ARQUITETURA.md
-✅ docs/UML.md
-✅ docs/UML.html
-❌ Design system (docs/DESIGN.md ou docs/design-system/*)
+Antes de desenhar, preciso de 6 respostas curtas (pode responder em tópicos):
+
+1. O que é o produto, em uma frase — e para quem?
+2. Quem usa? (ex: dono da empresa, funcionário, cliente final) E quem
+   administra a conta?
+3. Quais são as 3 a 5 coisas que a pessoa precisa conseguir fazer? Essas
+   viram as telas principais.
+4. Tem algum sistema que você já usa e gosta, cuja experiência quer seguir?
+   (ex: "navegação tipo Linear", "pedido tipo iFood"). Se não souber, eu
+   proponho 3 opções.
+5. Já existe marca? (nome, logo, cores) Ou eu proponho o visual?
+6. Vai ser mais usado no celular ou no computador?
+
+Se preferir, responda só o que souber — eu preencho o resto com uma
+suposição declarada e você corrige olhando a tela.
 ```
 
-Se tudo estiver OK, vá para Task 3. Se algo faltar, vá para Task 2.
+**Aceite resposta parcial.** Esse é o ponto: o objetivo é chegar à tela rápido, não montar um questionário completo. O que faltar você preenche com uma escolha razoável e **declara como suposição** no rodapé da tela e na lista da Task 7. Suposição visível é mais barata que pergunta não respondida — ele corrige um item na tela em dois segundos.
+
+**Referência (obrigatória, gate 1.6e):** se ele não escolher, proponha 3-5 candidatos com uma frase sobre o que cada um faz bem em UX. Nunca escolha sozinho. Registre a referência escolhida e o que se copia / não se copia dela em `docs/mockups/README.md`.
 
 ---
 
-### Task 2 — Criar documentação faltante
+### Task 2 — Baseline visual provisório
 
-Siga os fluxos normais desta skill para cada documento ausente:
+Proponha o visual **você mesmo**, a partir da referência e da marca (se houver), e embuta direto nas telas. O usuário aprova vendo — se ele tivesse que aprovar lendo uma lista de hex, estaríamos de volta ao problema que este fluxo resolve.
 
-- `docs/PRD.md` → "Etapa 1 — PRD.md" em `docs/regras/prd-roadmap-arquitetura.md`
-- `docs/ARQUITETURA.md` → "Etapa 3 — ARQUITETURA.md" em `docs/regras/prd-roadmap-arquitetura.md`
-- `docs/UML.md` + `docs/UML.html` → regra 1.6c
-- Design system → crie no formato DESIGN.md mínimo descrito acima, validando cada seção com o usuário
+Defina, e escreva uma vez em `docs/mockups/README.md` (na seção "Baseline visual provisório"), replicando os tokens no `:root` de cada HTML:
 
-**Nunca gere mockups nesta task.** Só crie a documentação. Após cada documento, peça aprovação explícita do usuário antes de prosseguir.
+```
+Cores       primária, secundária, background, surface, texto primário,
+            texto secundário, borda, e os estados sucesso/erro/aviso/info
+Tipografia  fonte de título, fonte de corpo, escala (H1/H2/H3/body/small/label)
+Espaçamento base + escala xs/sm/md/lg/xl/2xl
+Raio/sombra padrão de card, botão e input
+```
+
+Regras:
+- **Provisório é declarado como provisório.** O README diz: "baseline proposto pela IA, sujeito à aprovação visual; promovido a `docs/DESIGN.md` na Task 8".
+- **Fontes:** use pilha do sistema ou fontes locais. Nada de `<link>` para CDN — o mockup tem que abrir offline em `file://`.
+- **Coerente com a referência.** Se a referência é "tipo Linear", não entregue um visual de banco dos anos 2000. Isso é parte do que ele vai avaliar.
+- Se já existe marca com cores/logo, use — e diga no README de onde tirou.
 
 ---
 
-### Task 3 — Inventariar telas
+### Task 3 — Inventariar as telas (a partir do brief)
 
-Com PRD, ARQUITETURA, UML e design system em mãos, crie o inventário de telas em `docs/mockups/README.md` (sobrescreva se já existir, mantendo histórico em `docs/MUDANCAS.md`).
-
-Cada entrada deve ter:
+Monte o inventário em `docs/mockups/README.md`. A fonte aqui é o **brief**, não um PRD — a rastreabilidade é ao que o usuário disse:
 
 ```markdown
 ### TEL-001 — Login
 - **Nome:** Tela de login
-- **PRD refs:** RF-03 (Autenticação), RF-04 (Recuperação de senha)
+- **De onde veio:** brief item 2 (quem usa / administra a conta)
 - **Fluxo:** Entrada no app → Login → Dashboard
-- **URL do mockup:** `tel-001-login.html`
-- **Conteúdo obrigatório:** logo, email, senha, botão "Entrar", link "Esqueci senha", link "Criar conta"
+- **Arquivo:** `tel-001-login.html`
+- **Conteúdo:** logo, email, senha, botão "Entrar", link "Esqueci senha", link "Criar conta"
 - **Estados:** vazio, erro de credenciais, carregando
-
-### TEL-002 — Dashboard
-- **Nome:** Dashboard principal
-- **PRD refs:** RF-05 (Home), RF-06 (Métricas)
-- **Fluxo:** Login → Dashboard → Detalhe
-- **URL do mockup:** `tel-002-dashboard.html`
-- **Conteúdo obrigatório:** header com menu, cards de métricas, lista de atividades recentes
-- **Estados:** vazio (primeiro acesso), com dados
+- **Suposições:** login por email/senha (não foi dito se terá login social)
 ```
 
-Regras para o inventário:
-- IDs sequenciais no formato `TEL-XXX`
-- Cada funcionalidade P0/P1 do PRD deve aparecer em pelo menos uma tela
-- Cada tela deve estar ligada a um ou mais requisitos do PRD
-- Liste todos os estados relevantes (vazio, erro, sucesso, carregando, sem permissão)
-- **Tela de Loja de Apps obrigatória** (ver regra 24): o inventário DEVE incluir uma tela (ex: `TEL-000 — Loja de Apps` ou numeração equivalente) listando todos os apps do catálogo definido em `docs/ARQUITETURA.md`, com indicação visual de quais estão ativos/inativos para o tenant e um controle (toggle/switch) para ativar/desativar cada um. Essa tela é tratada como P0 mesmo que o PRD não a mencione explicitamente por nome — ela é onde a arquitetura de apps vira produto. Se o projeto for uma exceção documentada (app único, sem loja — ver regra 24), registre no README de mockups por que essa tela foi omitida.
+Regras do inventário:
+- IDs sequenciais `TEL-XXX`; cada tela rastreável a um item do brief ou marcada como suposição
+- Cada capacidade citada no brief aparece em pelo menos uma tela
+- Liste os estados relevantes de cada tela (vazio, erro, sucesso, carregando, sem permissão)
+- **Tela de Loja de Apps obrigatória** (ver regra 24): inclua uma tela (ex: `TEL-000 — Loja de Apps`) listando os apps do produto com estado ativo/inativo por tenant e um toggle de ativação. Trate como P0 mesmo que o usuário não tenha mencionado — é onde a arquitetura modular vira produto, e é melhor ele ver isso agora do que descobrir no deploy. Se o projeto for app único documentado (exceção da regra 24), registre no README por que a tela foi omitida.
+- **Escopo enxuto na primeira rodada:** 5 a 10 telas. O objetivo é a pessoa ver o produto rápido, não receber 40 arquivos. Telas secundárias entram nas rodadas seguintes, depois que o esqueleto foi aprovado.
 
-Apresente o inventário ao usuário para validação. Só prossiga com aprovação.
+Não peça validação do inventário em texto antes de desenhar. Validar uma lista de nomes de tela é o mesmo erro do PRD em escala menor — desenhe e mostre.
 
 ---
 
-### Task 4 — Criar estrutura docs/mockups/
+### Task 4 — Criar a estrutura `docs/mockups/`
 
 ```bash
 mkdir -p docs/mockups
 ```
 
-Crie/resete `docs/mockups/README.md` com:
-- Propósito da pasta
-- Índice de telas com link para cada arquivo
-- Rastreabilidade PRD ↔ telas
-- Instruções de como abrir (`open docs/mockups/index.html`)
+`docs/mockups/README.md` contém: propósito da pasta, sistema(s) de referência (o que se copia / não se copia), baseline visual provisório, inventário de telas, suposições assumidas, e como abrir (`open docs/mockups/index.html`).
 
-Crie `docs/mockups/.gitignore` se necessário (normalmente não é necessário ignorar nada aqui — mockups são documentação versionável).
+**Antes de regenerar telas que já existem** (rodada 2 em diante), arquive a versão anterior em `docs/mockups/arquivo-v<N>-<apelido>/` **antes** de disparar qualquer agente em paralelo — evita corrida de nomes e preserva o histórico consultável (regra 1.7, item 4).
 
 ---
 
-### Task 5 — Gerar HTML de cada tela
+### Task 5 — Gerar o HTML de cada tela
 
-Para cada tela do inventário, crie um arquivo `docs/mockups/tel-XXX-nome.html`.
-
-**Estrutura obrigatória de cada arquivo:**
+Um arquivo por tela: `docs/mockups/tel-XXX-nome.html`.
 
 ```html
 <!DOCTYPE html>
@@ -1279,7 +1309,7 @@ Para cada tela do inventário, crie um arquivo `docs/mockups/tel-XXX-nome.html`.
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TEL-001 — Login | Nome do Projeto</title>
   <style>
-    /* Tokens do design system */
+    /* Baseline visual provisório — replicado em cada arquivo (autocontido) */
     :root {
       --color-primary: #...;
       --color-bg: #...;
@@ -1306,8 +1336,9 @@ Para cada tela do inventário, crie um arquivo `docs/mockups/tel-XXX-nome.html`.
   </main>
 
   <footer class="mockup-meta">
-    <p>PRD refs: RF-03, RF-04</p>
-    <p>Estados: vazio, erro, carregando</p>
+    <p>Veio de: brief item 2</p>
+    <p>Estados representados: vazio, erro, carregando</p>
+    <p><strong>Suposições:</strong> login por email/senha; sem login social</p>
   </footer>
 </body>
 </html>
@@ -1315,91 +1346,163 @@ Para cada tela do inventário, crie um arquivo `docs/mockups/tel-XXX-nome.html`.
 
 **Regras de implementação:**
 
-1. **Use apenas CSS puro.** Sem frameworks externos, sem builds, sem npm. O mockup deve abrir em qualquer navegador.
-2. **CSS inline em cada arquivo.** Cada tela deve ser 100% autocontida: todas as regras de estilo dentro de uma tag `<style>` no próprio HTML. **Não crie `styles.css` compartilhado**, `theme.css`, nem qualquer outro arquivo de CSS externo. Se você copiar uma única tela para outra pasta, ela deve continuar renderizando perfeitamente.
-3. **Nome de arquivo obrigatório:** `tel-XXX-nome-da-tela.html`, onde `XXX` é o ID da tela no inventário (ex: `tel-001-login.html`, `tel-002-dashboard.html`). Não use nomes genéricos como `login.html` ou `page1.html`.
-4. **Tokens via CSS variables.** Todas as cores, fontes e espaçamentos vêm do design system. Se o design system definir `tokens.json`, converta as variáveis para `:root` no próprio arquivo.
-5. **Represente estados.** Para cada tela, crie visualmente os estados listados no inventário. Se um estado for importante, considere criar uma seção extra na mesma tela mostrando "Estado: erro", "Estado: vazio" etc.
-6. **Dados realistas.** Use conteúdo de exemplo que pareça com o domínio real (nomes, valores, datas). Não use "lorem ipsum" genérico.
-7. **Interatividade mínima.** Links entre telas funcionam. Botões sem destino mostram um `alert` explicando o que aconteceria (ex: "Alert: enviaria formulário de login"). Não precisa de JavaScript complexo.
-8. **Responsivo básico.** Pelo menos mobile (375px) e desktop (1440px) devem ser legíveis.
-9. **Sem funcionalidade real.** O mockup é visual. Não conecta a APIs, não salva dados, não implementa auth real.
+1. **CSS puro, sem framework, sem build, sem npm.** Abre em qualquer navegador.
+2. **CSS inline em cada arquivo.** 100% autocontido: todas as regras dentro de um `<style>` no próprio HTML. **Não crie `styles.css` compartilhado** nem `theme.css`. Se você copiar uma tela sozinha para outra pasta, ela tem que continuar renderizando.
+3. **Nome de arquivo:** `tel-XXX-nome-da-tela.html` (ex: `tel-001-login.html`). Nunca `login.html` ou `page1.html` — perde a rastreabilidade com o inventário.
+4. **Tokens via CSS variables**, replicando o baseline da Task 2 no `:root`.
+5. **Represente os estados** listados no inventário. Se um estado importa, mostre-o — seção extra na mesma tela ("Estado: lista vazia", "Estado: erro") é aceitável e ajuda a aprovar.
+6. **Dados realistas do domínio.** Nomes, valores e datas que pareçam do negócio do usuário. Nada de "lorem ipsum" nem "Item 1 / Item 2" — ele não consegue julgar uma tela preenchida com placeholder, e é justamente o julgamento dele que estamos buscando.
+7. **Rodapé com suposições.** Toda tela declara o que você preencheu sem ele ter dito. Isso transforma revisão em correção pontual.
+8. **Interatividade mínima.** Links entre telas funcionam. Botão sem destino mostra um `alert` explicando o que aconteceria ("Alert: salvaria o cliente e voltaria para a lista"). Sem JS complexo.
+9. **Responsivo básico:** legível em 375px e em 1440px. Se o brief disse "mais no celular", desenhe mobile primeiro.
+10. **Sem funcionalidade real.** É visual: não conecta em API, não salva dado, não implementa auth.
+
+**`docs/mockups/index.html`** (hub de navegação) lista todas as telas com ID, nome, link e fluxo; mostra o mapa do fluxo principal; usa os mesmos tokens; e traz no topo a lista de suposições assumidas, para o usuário bater o olho antes de navegar.
 
 ---
 
-### Task 6 — Criar index.html (hub de navegação)
+### Task 6 — UX-Guardião ANTES de mostrar (gate 1.6e)
 
-O `docs/mockups/index.html` deve:
-- Listar todas as telas com ID, nome, link e fluxo
-- Ter um resumo de cobertura do PRD ("RF-03 → TEL-001, TEL-003")
-- Incluir instruções de como abrir os mockups
-- Usar os mesmos tokens visuais do design system
+Rode o Guardião sobre as telas geradas — subagente dedicado se disponível, senão uma passada separada sua, anunciada ("Agora atuando como UX-Guardião..."), esquecendo que foi você que desenhou.
 
----
+Ele reclama da checklist de `docs/regras/ux-referencia-e-guardiao.md`: cliques demais, botão sem destino, rota órfã, beco sem saída, estado vazio/erro/carregando não pensado, jargão técnico, incoerência com a referência declarada, navegação que exige memória, formulário longo sem etapas, mobile ignorado.
 
-### Task 7 — Validar cobertura e fidelidade
+- Registre a rodada em `docs/UX-REVIEW.md` (aditivo, nunca sobrescrito), com "Correções exigidas por item" e "Verificado, sem reclamação".
+- **Corrija antes de mostrar.** Veredicto ❌ não sobe para o usuário — corrija e rode de novo.
+- Só apresente com ✅ ou ⚠️ (ressalvas viram tasks e são declaradas ao usuário na Task 7).
 
-Esta é a task mais importante. Não pule.
-
-**Validação de cobertura do PRD:**
-
-Para cada requisito funcional P0/P1 do PRD, responda: "em qual tela isso aparece?". Se houver requisito sem tela, volte ao inventário e crie a tela correspondente.
-
-**Validação da Loja de Apps:**
-
-Confirme que existe uma tela de Loja de Apps (regra 24) listando todos os apps do catálogo documentado em `docs/ARQUITETURA.md`, com estado ativo/inativo visível e controle de ativação por app. Se o catálogo de apps mudou desde a última vez que essa tela foi gerada, atualize-a — ela não pode ficar desatualizada em relação a `docs/ARQUITETURA.md`.
-
-**Validação de fidelidade ao design system:**
-
-Faça uma revisão manual dos arquivos HTML:
-- Todas as cores usadas estão no design system?
-- Todas as fontes e tamanhos estão no design system?
-- Todos os espaçamentos seguem a escala?
-- Os componentes (botões, inputs, cards) respeitam as definições?
-
-**Validação de completude e conformidade das telas:**
-
-- Cada tela tem header com ID e navegação?
-- Cada tela tem todos os elementos listados no inventário?
-- Cada tela representa os estados listados?
-- Cada tela tem links funcionando para as próximas telas do fluxo?
-- Cada arquivo de tela segue o padrão `tel-XXX-nome-da-tela.html`?
-- Cada arquivo de tela tem CSS inline (`<style>` no `<head>`) e **nenhum** `<link rel="stylesheet">` externo?
-- Não há arquivos CSS compartilhados (`styles.css`, `theme.css`, etc.) na pasta `docs/mockups/`?
-
-**Registro da validação:**
-
-Crie um arquivo `docs/mockups/VALIDACAO.md` (ou seção no README) documentando:
-- Requisitos P0/P1 cobertos por cada tela
-- Requisitos não cobertos (se houver) e justificativa
-- Checklist de fidelidade ao design system
-
-Se a validação encontrar gaps, corrija antes de commitar.
+O objetivo é o usuário receber telas em que os defeitos óbvios já morreram, para gastar o tempo dele no que só ele sabe: se aquilo é o produto que ele quer.
 
 ---
 
-### Task 8 — Commitar
+### Task 7 — Abrir as telas e rodar o loop de aprovação
 
-Siga o padrão de commits desta skill. Commit único ou commits separados por etapa:
+**Esta é a task que dá nome ao fluxo. Não a resuma a "os arquivos estão em docs/mockups/".**
 
-```text
-docs: adiciona mockups navegáveis do app
+Abra os mockups para ele — o objetivo é a tela na frente da pessoa, não um caminho de arquivo no chat:
 
-Contexto: protótipo visual fiel ao PRD antes do desenvolvimento
-Mudanças: cria docs/mockups/ com 7 telas, index.html, README.md e VALIDACAO.md
-Impacto/Testes: mockups abertos manualmente no Chrome/Safari; todos os links entre telas funcionam
+```bash
+# macOS
+open docs/mockups/index.html
+# Linux
+xdg-open docs/mockups/index.html
+# WSL
+explorer.exe "$(wslpath -w docs/mockups/index.html)"
 ```
 
-Atualize `docs/MUDANCAS.md` e o índice do `CLAUDE.md`.
+Se o comando não puder rodar, diga o caminho completo e peça para ele abrir — e **espere**. O fluxo não avança sem ele ter visto.
+
+Apresente assim:
+
+```
+🖼️ 8 telas prontas para você VER — abri no seu navegador
+   (se não abriu: docs/mockups/index.html)
+
+  TEL-000  Loja de Apps      ← onde o cliente liga/desliga cada módulo
+  TEL-001  Login
+  TEL-002  Dashboard
+  ...
+
+Referência que segui: navegação tipo Linear (sidebar fixa, atalhos)
+
+Suposições que eu tomei — corrija qualquer uma:
+  1. Login por email/senha, sem login social
+  2. O dono da conta vê tudo; funcionário só os próprios clientes
+  3. Valores em BRL
+
+Ressalvas do UX-Guardião (já viraram tasks):
+  - Cadastro em 4 cliques; proponho um atalho no dashboard
+
+Me diga, tela por tela: **aprovada** ou **o que mudar**.
+Nada de PRD, banco de dados ou código antes da sua aprovação.
+```
+
+**O loop:**
+
+1. Ele responde por tela: aprovada / o que mudar. Registre cada status em `docs/mockups/APROVACAO.md` com data/hora BRT e a fala dele.
+2. Para as telas com pedido de alteração: arquive a versão anterior (Task 4), regenere **só as telas afetadas** (não o conjunto inteiro — regenerar tudo apaga escolhas que ele já aprovou), rode o Guardião nas telas mexidas e apresente de novo.
+3. Aprovação de tela não mexida **não é resetada** por uma rodada de mudanças em outra tela.
+4. Se ele pedir uma tela que não estava no inventário, adicione — o inventário é vivo nesta fase, é para isso que ela existe.
+5. A fundação libera quando **todas** as telas do inventário estiverem `aprovada` (ou aprovadas com ressalvas registradas como tasks).
+
+**Quando o loop não converge:** se a mesma tela voltar 3 vezes, pare de redesenhar no escuro. Duas saídas melhores: (a) faça **uma** pergunta específica sobre a decisão que está travando ("o cadastro é um formulário único ou em etapas?"); ou (b) entregue 2-3 **variantes** lado a lado (`tel-004-cadastro-var-a.html`, `-var-b.html`) e deixe ele apontar. Escolher entre opções visíveis é muito mais fácil que descrever o que se quer — e é o mesmo motivo pelo qual este fluxo existe.
+
+**O que nunca fazer nesta task:**
+- Inferir aprovação de um "ok" ambíguo, de um silêncio ou de uma mudança de assunto.
+- Começar a escrever PRD/UML "para adiantar" enquanto espera a resposta.
+- Pedir para ele aprovar lendo o README em vez de abrir as telas.
+
+---
+
+### Task 8 — Registrar a aprovação e promover o design system
+
+**`docs/mockups/APROVACAO.md`** (fonte da verdade do gate 1.6f):
+
+```markdown
+# Aprovação dos Mockups
+
+| Tela | Status | Data/hora BRT | O que o usuário disse |
+|------|--------|---------------|------------------------|
+| TEL-000 — Loja de Apps | ✅ aprovada | 03/09/2026 às 14h20 | "essa tá perfeita" |
+| TEL-001 — Login | ✅ aprovada com ressalva | 03/09/2026 às 14h20 | "aprovada, mas tira o 'criar conta'" → task criada |
+| TEL-002 — Dashboard | 🔄 alterar | 03/09/2026 às 14h22 | "quero os cards de faturamento em cima" |
+
+## Rodadas
+- Rodada 1 (03/09 14h05): 8 telas apresentadas, 6 aprovadas, 2 com alteração
+
+## Suposições confirmadas pelo usuário
+- Login por email/senha, sem social — confirmado em 03/09
+
+## Dispensas da Regra Zero (se houver)
+- (nenhuma)
+```
+
+**Promoção do design system:** com o visual aprovado nas telas, extraia o baseline para `docs/DESIGN.md` — agora sim como documento completo e fonte da verdade (cores, tipografia, espaçamento, componentes base com estados, layout, breakpoints). Ele nasce descrevendo um visual que já foi aceito, não propondo um que ainda vai ser discutido. Marque no README dos mockups que o baseline provisório foi promovido.
+
+**`docs/mockups/VALIDACAO.md`:**
+- cada capacidade do brief → em qual tela aparece
+- suposições assumidas × confirmadas pelo usuário
+- checklist de fidelidade ao baseline (cores, fontes, espaçamentos, componentes)
+- checklist técnico: cada arquivo segue `tel-XXX-*.html`, tem CSS inline, **nenhum** `<link rel="stylesheet">` externo, nenhum CSS compartilhado na pasta, links entre telas funcionando, estados representados
+- Loja de Apps presente (ou exceção documentada)
+
+Quando o PRD existir (próximo passo), volte aqui e acrescente a checagem cruzada nos dois sentidos: todo requisito P0/P1 aparece em alguma tela, e toda tela é rastreável a um requisito.
+
+---
+
+### Task 9 — Commitar e liberar a fundação
+
+```text
+docs: adiciona mockups navegáveis aprovados pelo usuário
+
+Contexto: mockup-first (Regra Zero) — telas visualizadas e aprovadas antes de PRD/UML
+Mudanças: cria docs/mockups/ com 8 telas, index.html, README.md, APROVACAO.md e VALIDACAO.md; promove baseline visual para docs/DESIGN.md
+Impacto/Testes: telas abertas pelo usuário no navegador; 8/8 aprovadas (2 com ressalvas viradas em tasks); UX-Guardião ✅ em docs/UX-REVIEW.md
+```
+
+Registre no `.empire/state.json`: `mockups_approved: true`, `mockups_approved_at`, `mockups_round` e `mockups_screens` (quantas telas aprovadas). Atualize `docs/MUDANCAS.md` e o índice do `CLAUDE.md`.
+
+**Só agora a fundação está liberada.** Diga isso explicitamente ao usuário e siga a ordem:
+
+```
+✅ Telas aprovadas — agora os documentos, descrevendo o que você já viu:
+
+1. docs/UX-MAP.md      transcreve rotas, navegação e cliques das telas aprovadas
+2. docs/PRD.md         requisitos do que está nas telas → UX-Guardião → sua aprovação
+3. docs/ROADMAP.md     fases e tarefas
+4. docs/ARQUITETURA.md estrutura técnica, multi-tenant, catálogo de apps
+5. docs/UML.md + .html entidades e fluxos críticos
+6. depois: código
+```
+
+Cada um desses documentos agora tem uma referência visual concreta para descrever — é por isso que eles saem certos na primeira rodada.
 
 ---
 
 ### Integração com o CLAUDE.md e AGENTS.md
 
-Sempre que este fluxo for executado, atualize:
-
-- `CLAUDE.md` → adicione `docs/mockups/` na tabela de índice de documentos (se ainda não estiver)
-- `AGENTS.md` → se outro agente (Lovable, Cursor) for trabalhar no projeto, ele deve saber que os mockups existem e são a referência visual do PRD
+- `CLAUDE.md` → `docs/mockups/` no índice de documentos; regra `docs/regras/mockup-first.md` no índice de regras
+- `AGENTS.md` → outro agente (Lovable, Cursor, Codex) precisa saber que as telas aprovadas em `docs/mockups/` são a referência visual do produto e que tela nova nasce como mockup aprovado, não como código
 
 ---
 
@@ -1407,16 +1510,24 @@ Sempre que este fluxo for executado, atualize:
 
 | Proibido | Por que | O que fazer em vez disso |
 |----------|---------|--------------------------|
-| Criar mockup sem PRD aprovado | O mockup não reflete o produto real | Criar o PRD primeiro |
-| Criar mockup sem design system | Design inconsistente, genérico | Exigir design system completo |
-| Colocar várias telas em um único arquivo | Difícil navegar e revisar | Um arquivo por tela |
-| Usar nomes genéricos como `login.html` | Perde rastreabilidade com o inventário | Usar `tel-XXX-nome-da-tela.html` |
-| Criar `styles.css` compartilhado | Quebra a regra de autocontido; copiar uma tela perde o estilo | Colocar CSS inline em cada arquivo HTML |
-| Usar cores/fontes fora do design system | Quebra fidelidade | Mapear tudo para tokens |
-| Deixar estados importantes de fora | O usuário não vê casos de erro/vazio | Representar todos os estados do inventário |
-| Mockup estático sem links | Não simula fluxo real | Sempre linkar próximas telas |
-| Ignorar requisitos P0/P1 "porque é só mockup" | Mockup pela metade | Cobrir todos os requisitos P0/P1 |
-| Gerar telas sem a Loja de Apps (regra 24) | Esconde a arquitetura de ativação por tenant, que é P0 mesmo sem estar no PRD por nome | Sempre incluir a tela de Loja de Apps no inventário, salvo exceção documentada |
+| Exigir PRD/UML/ARQUITETURA aprovados para começar a desenhar | Inverte a Regra Zero: o usuário volta a ter que aprovar lendo | Colher o brief mínimo (Task 1) e desenhar |
+| Exigir design system escrito antes das telas | Ele não sabe julgar hex numa lista; sabe julgar a tela | Propor o baseline inline e promover depois de aprovado |
+| Escrever "um rascunho do PRD" enquanto espera aprovação | O rascunho vira âncora e o mockup passa a servir o documento | Esperar. O tempo economizado aqui é falso |
+| Inferir aprovação de "ok" ambíguo ou de silêncio | Documento e código nascem sobre uma aprovação que não houve | Pedir aprovação tela por tela e citar a fala em `APROVACAO.md` |
+| Entregar só o caminho do arquivo e seguir adiante | O gate é a pessoa VER, não o arquivo existir | Abrir no navegador e esperar |
+| Fazer 6 perguntas em 6 mensagens | Ele desiste antes da primeira tela | Mandar as 6 juntas e aceitar resposta parcial |
+| Preencher lacuna do brief em silêncio | Ele não sabe o que revisar | Declarar a suposição no rodapé da tela e na apresentação |
+| Regenerar o conjunto todo por causa de uma tela | Apaga escolhas já aprovadas | Arquivar, regenerar só as afetadas |
+| Mostrar as telas antes do UX-Guardião | Gasta o tempo dele com defeito que um agente pegava de graça | Rodar o Guardião e corrigir antes (Task 6) |
+| Tela com placeholder ("aqui vai a lista") | Não se aprova o que não está desenhado | Dados realistas do domínio |
+| Colocar várias telas num único arquivo | Difícil navegar, revisar e versionar | Um arquivo por tela |
+| Nome genérico como `login.html` | Perde rastreabilidade com o inventário | `tel-XXX-nome-da-tela.html` |
+| Criar `styles.css` compartilhado | Quebra o autocontido; copiar uma tela perde o estilo | CSS inline em cada arquivo |
+| Carregar fonte ou CSS de CDN | Mockup tem que abrir offline em `file://` | Fonte do sistema ou local |
+| Deixar estados importantes de fora | Ele não vê os casos de erro/vazio, que é onde produto morre | Representar todos os estados do inventário |
+| Mockup estático sem links | Fluxo não se aprova imaginando, se aprova clicando | Sempre linkar as próximas telas |
+| Gerar telas sem a Loja de Apps (regra 24) | Esconde a arquitetura de ativação por tenant, que é P0 | Sempre incluir, salvo exceção documentada |
+| 40 telas na primeira rodada | Ele não revisa; o fluxo trava | 5-10 telas do esqueleto, o resto nas rodadas seguintes |
 
 ---
 
@@ -1523,6 +1634,7 @@ Sempre sobrescreva este arquivo com o estado atual. Use este template:
 
 ## Bloqueios / gates
 
+- [ ] Gate Mockup-first (telas aprovadas pelo usuário): <status>
 - [ ] Gate de segurança: <status>
 - [ ] Gate UML: <status>
 - [ ] Gate Níveis de Acesso: <status>
@@ -2167,6 +2279,9 @@ Skill("<nome-da-skill>", args="<contexto do projeto>")
 
 | Arquivo / URL | Conteúdo |
 |---------------|----------|
+| `references/regras/` | Regras inegociaveis instaladas como `docs/regras/` nos projetos |
+| `references/regras/mockup-first.md` | Regra Zero: telas aprovadas antes de qualquer documento (gate 1.6f) |
+| `references/regras/ux-referencia-e-guardiao.md` | Sistema de referencia + UX-Guardiao (gate 1.6e) |
 | `references/modelo-claude.md` | Template padrao do CLAUDE.md a instalar nos projetos |
 | `references/modelo-agents.md` | Template padrao do AGENTS.md (Lovable, Cursor, Windsurf, Codex) |
 | `references/modelo-uml.html` | Template HTML visual para UML (abas navegaveis, tema dark, Mermaid.js) |
