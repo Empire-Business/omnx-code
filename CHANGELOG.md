@@ -4,6 +4,23 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.24.1 — 2026-09-03
+
+### A avaliadora leiga ganha nome: Dona Maria
+
+O gate 1.6g (v1.24) definia uma persona leiga fixa, mas anônima — "o Avaliador Leigo". A própria regra já explicava que manter a **mesma** persona entre rodadas é o que torna o resultado comparável; um avaliador abstrato muda de exigência a cada passada e vira opinião solta. Um nome resolve isso de graça, e tem um segundo efeito: é muito mais difícil ignorar o travamento de uma pessoa com nome do que uma linha num relatório de usabilidade.
+
+- A persona passa a se chamar **Dona Maria** em toda a skill: gate 1.6g, Task 6b do fluxo de mockups, `references/regras/avaliador-leigo.md`, `modelo-claude.md` e `modelo-agents.md`. O texto passa a tratá-la consistentemente no feminino e instrui a chamá-la pelo nome ao falar com o dono do produto ("a Dona Maria travou na tela de conexão").
+- O caminho do arquivo continua `docs/regras/avaliador-leigo.md` — o nome do arquivo descreve a função, não a persona, e mantê-lo evita quebrar os links de projetos já instalados com a v1.24.0.
+
+### Correções
+
+- **🔴 Frontmatter do `SKILL.md` estava com YAML inválido desde a v1.24.0, derrubando a descrição inteira da skill.** Ao inserir a linha do gate 1.6g dentro do bloco `description: |`, a linha seguinte (`MOCKUP-FIRST (Regra Zero...`) perdeu a indentação de 2 espaços. Num block scalar de YAML, uma linha sem indentação encerra o bloco — e o parser então tropeçava no primeiro `:` do texto solto (`...por isso: só muda a ordem`). Resultado: o `description` inteiro deixava de ser lido e a skill aparecia no índice apenas como "OMNX Code", **sem nenhum dos gatilhos de ativação** (mockup, protótipo, telas do app, omnx, handoff, retomar, multi-tenancy...). Na prática a skill parava de se candidatar sozinha e só rodava se chamada pelo nome. Indentação restaurada e validação de YAML incluída na verificação antes do commit.
+- **`checklist-de-entrega.md` não tinha nenhum item do gate 1.6g** (o gate entrou na v1.24 sem chegar ao checklist). Adicionados dois: o registro em `docs/TESTE-DE-LEIGO.md` sem 🔴 em aberto nem veredicto "não conseguiria usar sozinha", e a rodada nova obrigatória sempre que texto de tela, rótulo de botão ou mensagem de erro mudar.
+- **Versão no frontmatter do `SKILL.md` estava em `1.23`** enquanto a tabela de versão, o `CHANGELOG.md` e a tag diziam `1.24`. Sem efeito no gate de versão (Passo 1.5), que lê a versão do `CHANGELOG.md` e não do frontmatter — era inconsistência de metadado, não bloqueio. Tudo alinhado agora em `1.24.1`.
+
+---
+
 ## v1.24 — 2026-09-03
 
 ### Adicionado
