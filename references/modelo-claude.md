@@ -20,6 +20,7 @@
 | 🛂 Níveis de acesso | Permissões em catálogo global + **perfis que cada tenant monta** (nunca papéis fixos nas policies); `has_permission()` como única checagem; 5 travas anti-lockout; `docs/NIVEIS-DE-ACESSO.md` completo — bloqueia commit de auth e deploy | `docs/regras/niveis-de-acesso.md` |
 | 🎫 Sistema de tickets de erro | Botão de reportar + captura automática (print, log, rota) + fila por status — bloqueia deploy | `docs/regras/sistema-de-tickets.md` |
 | 🧭 UX: referência & Guardião | Referência real escolhida antes de desenhar; UX-Guardião revisa as telas antes de você vê-las; `docs/UX-MAP.md` transcreve as telas aprovadas — bloqueia aprovação de PRD/UML | `docs/regras/ux-referencia-e-guardiao.md` |
+| [avaliador-leigo.md](docs/regras/avaliador-leigo.md) | Persona leiga fixa lê as telas depois do UX-Guardião e antes do dono do produto. Qualquer travamento — ou o veredicto "não usaria sozinha" — bloqueia a apresentação. Registro em `docs/TESTE-DE-LEIGO.md`. |
 | 🔑 Acesso ao Supabase | Nunca `service_role_key` no client; tokens temporários (7 dias) via `supabase login` | `docs/regras/acesso-supabase.md` |
 | 🗃️ Migrations | Toda mudança de banco via migration versionada — SQL direto proibido | `docs/regras/migrations.md` |
 | 🚫 Git | `.env` e credenciais sempre no `.gitignore`, nunca commitados | `docs/regras/git.md` |

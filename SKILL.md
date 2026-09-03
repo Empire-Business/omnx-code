@@ -18,7 +18,8 @@ description: |
   A skill /security-auditor é acionada automaticamente na fundação do app para garantir
   que o planejamento inicial nasça seguro; auditorias periódicas e deploy são opt-in
   (o usuário decide quando CHAMAR a auditoria).
-  MOCKUP-FIRST (Regra Zero, gate 1.6f, fail-closed): em todo pedido de produto —
+  AVALIADOR LEIGO (gate 1.6g, fail-closed): antes de o dono do produto ver as telas, uma persona leiga fixa (nao tecnica, trava na primeira palavra desconhecida) tenta usar e registra cada travamento com a frase literal em docs/TESTE-DE-LEIGO.md; qualquer travamento bloqueia a apresentacao.
+MOCKUP-FIRST (Regra Zero, gate 1.6f, fail-closed): em todo pedido de produto —
   sistema novo ou tela nova em projeto existente — o PRIMEIRO entregável é sempre
   o mockup navegável das telas em docs/mockups/, aberto no navegador e aprovado
   pelo dono do produto. A pessoa VISUALIZA e aprova (ou pede alteração) ANTES de
@@ -128,7 +129,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.23** |
+| Versão da skill | **1.24** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -761,6 +762,31 @@ Este gate é a forma executável da **Regra Zero** (topo desta skill). O princí
 
 > Este gate é independente dos gates 1.6, 1.6b, 1.6c, 1.6d e 1.6e — mas é o **primeiro na linha do tempo**: todos os outros passam a operar sobre telas que o dono do produto já viu e aceitou. A especificação completa vive em `docs/regras/mockup-first.md`.
 
+**1.6g. Gate do Avaliador Leigo — a pessoa que não entende testa antes do dono do produto (fail-closed, obrigatório)**
+
+O UX-Guardião (regra 1.6e) é um especialista, e é exatamente por isso que existe uma classe inteira de problema que ele nunca vai achar: **ele já sabe demais**. Um especialista lê "conectar seu repositório" e entende. Alguém que nunca programou lê a mesma frase e **para de ler ali** — não pede ajuda, não clica em nada, não reclama. Fecha o produto e não volta, e ninguém fica sabendo o porquê.
+
+Esse abandono não aparece em checklist de UX, não aparece em teste de quem construiu o produto (porque quem construiu não consegue mais desler o que sabe), e não aparece nem no UX-Guardião. Aparece só quando alguém de fora lê com os olhos de quem não sabe. O Avaliador Leigo existe para produzir esse travamento **antes** dele acontecer com um cliente real, onde ele custa a conta inteira.
+
+**Como roda:** um subagente com uma **persona leiga fixa** (dona de negócio 50+, não técnica, usa só WhatsApp/Instagram/banco/planilha, nunca programou, trava na primeira palavra desconhecida, tem medo de clicar no que não entende, e quando trava desiste ou chama outra pessoa em vez de perguntar). Ele lê os HTMLs dos mockups e relata cada travamento com a **frase literal** que está na tela, o que entendeu, o que faria, e a gravidade. Manter a mesma persona entre rodadas é o que torna o resultado comparável.
+
+**Ordem inegociável:** UX-Guardião **primeiro**, Avaliador Leigo **depois**, dono do produto **por último**. O Guardião limpa o defeito estrutural; o Leigo testa se o que sobrou é compreensível. Rodar o Leigo antes desperdiça a passada dele reclamando de coisa que ia mudar de qualquer jeito.
+
+**Quando roda:** antes de apresentar mockups novos ao dono do produto (sempre), e depois de qualquer mudança de texto de tela, rótulo de botão ou mensagem de erro — é exatamente onde ele pega coisa. Não roda para mudança só visual (cor, espaçamento, sombra), bug, refactor, migration ou script sem UI.
+
+**O gate (fail-closed):**
+1. Registre a rodada em `docs/TESTE-DE-LEIGO.md`, **aditivo** — rodadas novas se acumulam, nada é apagado.
+2. Qualquer travamento 🔴 ("travei e não consigo continuar sozinha") → **não apresente**. Corrija o texto e rode de novo.
+3. O veredicto final — "Eu conseguiria usar isso sozinha? Sim/Não, porque..." — vale **mais que a contagem**: um "não conseguiria" bloqueia mesmo sem nenhum 🔴.
+4. Só 🟡 e 🟢 → pode apresentar, **declarando as ressalvas** ao dono do produto.
+5. O usuário pode dispensar uma objeção específica ("esse termo fica, meu público é técnico"), mas **uma a uma e com registro** no próprio `TESTE-DE-LEIGO.md`, nunca em bloco.
+
+**Aproveite o que ele elogia, não só o que ele reclama.** Quando a persona diz que uma tela específica ficou boa, ela está apontando o padrão que o resto do produto deveria seguir. Identifique a tela que passou e use o vocabulário e o tom dela para reescrever as que travaram — isso costuma resolver metade dos achados de uma vez.
+
+**Anti-teatro.** Três formas de fingir que este gate rodou: (a) **persona que sabe demais** — se o avaliador "entendeu pelo contexto" o que é um repositório, ele não é leigo, é você fingindo ser leigo; leigo trava na palavra, não infere; (b) **reclamação genérica** — "a linguagem poderia ser mais simples" não é achado, achado é *"li 'cole isto na sua IA' e não sei o que é 'minha IA' — eu tenho uma IA?"*, com a frase literal; (c) **só reclamação** — um relatório sem nenhum "isso aqui eu entendi" provavelmente leu procurando defeito, não leu de verdade. O sinal de que rodou: pelo menos um achado que **surpreendeu quem escreveu a tela**.
+
+> Este gate é independente dos gates 1.6, 1.6b, 1.6c, 1.6d, 1.6e e 1.6f. Ele roda **entre** o UX-Guardião e a apresentação ao dono do produto. A especificação completa vive em `docs/regras/avaliador-leigo.md`.
+
 **1.7. Confiabilidade de edições de documentos longos por subagentes (lição de campo, 22/08)**
 Quando delegar a um subagente a edição de um documento longo (>500 linhas — PRD, ARQUITETURA, UML, roadmap):
 1. O prompt DEVE instruir: leitura integral antes de editar, patch cirúrgico aditivo (nunca reescrita total), e retorno OBRIGATORIAMENTE não-vazio com `git diff --stat <arquivo>` incluído.
@@ -1202,6 +1228,7 @@ Task 3: Inventariar as telas (a partir do brief, não de um PRD)
 Task 4: Criar a estrutura docs/mockups/
 Task 5: Gerar o HTML de cada tela + index.html
 Task 6: Rodada do UX-Guardião e correção ANTES de mostrar
+Task 6b: Rodada do Avaliador Leigo e correção ANTES de mostrar (gate 1.6g)
 Task 7: Abrir as telas para o usuário e rodar o loop visualizar → aprovar/alterar
 Task 8: Registrar a aprovação e promover o design system para docs/DESIGN.md
 Task 9: Commitar e só então liberar a fundação (PRD, UML, UX-MAP)
@@ -1372,6 +1399,21 @@ Ele reclama da checklist de `docs/regras/ux-referencia-e-guardiao.md`: cliques d
 - Só apresente com ✅ ou ⚠️ (ressalvas viram tasks e são declaradas ao usuário na Task 7).
 
 O objetivo é o usuário receber telas em que os defeitos óbvios já morreram, para gastar o tempo dele no que só ele sabe: se aquilo é o produto que ele quer.
+
+---
+
+### Task 6b — Avaliador Leigo ANTES de mostrar (gate 1.6g)
+
+Depois do Guardião e antes do usuário, rode a **persona leiga fixa** sobre as mesmas telas — subagente dedicado, com a persona descrita em `docs/regras/avaliador-leigo.md`. Ela não avalia UX: ela **tenta usar e trava**.
+
+O Guardião limpou o que era estrutural. Esta passada responde outra pergunta: **o que sobrou dá para entender por quem não é da área?** Uma tela pode ter navegação impecável, zero rota órfã, todos os estados previstos — e ainda assim a pessoa parar na terceira palavra e fechar o produto.
+
+- Registre em `docs/TESTE-DE-LEIGO.md` (aditivo), com a **frase literal** de cada travamento.
+- **Qualquer 🔴 ou um "não conseguiria usar sozinha" → corrija e rode de novo.** Não sobe.
+- Só apresente com 🟡/🟢, declarando as ressalvas na Task 7.
+- Use as telas que ela **elogiou** como referência de vocabulário para reescrever as que travaram.
+
+Isso não é redundante com o Guardião: os dois acham coisas diferentes, e na prática o Leigo é quem pega o que faria o produto morrer na mão do cliente final.
 
 ---
 
@@ -2282,6 +2324,7 @@ Skill("<nome-da-skill>", args="<contexto do projeto>")
 | `references/regras/` | Regras inegociaveis instaladas como `docs/regras/` nos projetos |
 | `references/regras/mockup-first.md` | Regra Zero: telas aprovadas antes de qualquer documento (gate 1.6f) |
 | `references/regras/ux-referencia-e-guardiao.md` | Sistema de referencia + UX-Guardiao (gate 1.6e) |
+| `references/regras/avaliador-leigo.md` | Persona leiga que testa as telas antes do dono do produto (gate 1.6g) |
 | `references/modelo-claude.md` | Template padrao do CLAUDE.md a instalar nos projetos |
 | `references/modelo-agents.md` | Template padrao do AGENTS.md (Lovable, Cursor, Windsurf, Codex) |
 | `references/modelo-uml.html` | Template HTML visual para UML (abas navegaveis, tema dark, Mermaid.js) |
