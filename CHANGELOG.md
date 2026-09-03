@@ -4,6 +4,30 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.24 — 2026-09-03
+
+### Adicionado
+- **Gate 1.6g — Avaliador Leigo (fail-closed).** Antes de o dono do produto ver as telas, e depois do
+  UX-Guardião, uma persona leiga fixa (dona de negócio 50+, não técnica, trava na primeira palavra
+  desconhecida, tem medo de clicar) tenta usar os mockups e registra cada travamento em
+  `docs/TESTE-DE-LEIGO.md` com a **frase literal** da tela. Qualquer travamento 🔴 — ou o veredicto
+  "não conseguiria usar sozinha" — bloqueia a apresentação.
+- `references/regras/avaliador-leigo.md`, instalado como `docs/regras/avaliador-leigo.md` nos projetos:
+  persona, quando roda, formato do registro, o gate e três formas de fingir que ele rodou.
+- **Task 6b** no Fluxo de Mockups, entre o UX-Guardião (Task 6) e a apresentação ao usuário (Task 7).
+- Índice da regra no `references/modelo-claude.md` e no `references/modelo-agents.md`.
+
+### Por que
+O UX-Guardião é especialista, e por isso não acha uma classe inteira de problema: ele já sabe demais.
+Lê "conectar seu repositório" e entende. Quem nunca programou lê a mesma frase e para de ler ali —
+não pede ajuda, não reclama, fecha o produto e não volta. Esse abandono não aparece em checklist de
+UX nem em teste de quem construiu, porque quem construiu não consegue mais desler o que sabe.
+
+Na primeira execução, num app de planejamento para não-técnicos, a persona travou em 8 pontos que
+tinham passado pelo UX-Guardião — incluindo uma frase escrita para tranquilizar que estava
+assustando ("se precisou explicar que não vai estragar, é porque tem risco de estragar") e o passo
+final do produto, que largava a usuária justamente no trabalho que ele prometia poupar.
+
 ## v1.23 — 2026-09-03
 
 ### Regra Zero: MOCKUP-FIRST — a pessoa VISUALIZA as telas antes de qualquer documento (gate 1.6f)
