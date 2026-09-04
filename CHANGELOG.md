@@ -4,6 +4,32 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.25.0 — 2026-09-04
+
+### Revisão de mockups com convergência eficiente
+
+Uma auditoria rigorosa estava podendo virar um ciclo longo de um novo achado
+por rodada, especialmente em lotes grandes e depois de mudanças localizadas de
+texto. Esta versão mantém todos os gates fail-closed, mas troca o retrabalho por
+um processo determinístico.
+
+- Adiciona uma pré-auditoria consolidada antes dos avaliadores formais, cobrindo
+  rotas, ações, estados, responsividade, acessibilidade, memória, linguagem e a
+  separação entre rótulo visível e valor interno dos controles.
+- Define lotes preferenciais de 3 a 4 telas para revisão e aprovação; fluxos
+  indivisíveis podem justificar um lote maior.
+- Exige que cada rodada formal devolva a lista completa de achados reproduzíveis
+  do candidato e que as correções sejam feitas em bloco.
+- Depois de um PASS, reabre apenas telas alteradas e dependências compartilhadas
+  afetadas. Item encerrado só reabre com passos, esperado e observado que provem
+  a regressão; preferência estética nova é sugestão não bloqueante.
+- Se o mesmo mecanismo compartilhado gerar novidades em duas rodadas seguidas,
+  exige análise de causa raiz e uma correção única antes do próximo reteste.
+- Sincroniza `SKILL.md`, regras de UX/avaliadora/mockup-first, template de
+  `AGENTS.md`, README e um cenário novo em `evals/evals.json`.
+- Normaliza o frontmatter para o schema oficial de skills: metadados de versão
+  ficam dentro de `metadata` e a descrição volta ao limite aceito pelo validador.
+
 ## v1.24.1 — 2026-09-03
 
 ### A avaliadora leiga ganha nome: Dona Maria

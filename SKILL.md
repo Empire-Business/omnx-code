@@ -1,70 +1,10 @@
 ---
 name: omnx-code
-version: "1.24.1"
-min_security_auditor: "1.11"
-contract_version: 1
-description: |
-  Framework "vibe coding" completo para apps React + TypeScript + Supabase + Vercel.
-  Instala e mantém o CLAUDE.md do projeto seguindo o padrão OMNX, instala e atualiza
-  automaticamente a skill /security-auditor para compatibilidade, e executa qualquer
-  trabalho de desenvolvimento guiado pelo CLAUDE.md — com tasks 100% do tempo.
-  Sempre aplica os princípios de segurança do OMNX (RLS, isolamento de tenant,
-  não exposição de secrets, headers seguros, etc.) em todas as fases.
-  Todo sistema nasce com PERFIS DE ACESSO montados pelo próprio tenant — um
-  catálogo global de permissões e perfis que o cliente edita numa tela, nunca
-  papéis fixos gravados nas policies (que transformam cada ajuste de permissão
-  em migration). O perfil de dono concede tudo implicitamente e é imutável, o
-  que torna impossível um cliente se trancar para fora da própria conta.
-  A skill /security-auditor é acionada automaticamente na fundação do app para garantir
-  que o planejamento inicial nasça seguro; auditorias periódicas e deploy são opt-in
-  (o usuário decide quando CHAMAR a auditoria).
-  DONA MARIA, A AVALIADORA LEIGA (gate 1.6g, fail-closed): antes de o dono do produto ver as telas, uma persona fixa com nome — dona de negocio 50+, nao tecnica, que trava na primeira palavra desconhecida — tenta usar e registra cada travamento com a frase literal em docs/TESTE-DE-LEIGO.md; qualquer travamento bloqueia a apresentacao.
-  MOCKUP-FIRST (Regra Zero, gate 1.6f, fail-closed): em todo pedido de produto —
-  sistema novo ou tela nova em projeto existente — o PRIMEIRO entregável é sempre
-  o mockup navegável das telas em docs/mockups/, aberto no navegador e aprovado
-  pelo dono do produto. A pessoa VISUALIZA e aprova (ou pede alteração) ANTES de
-  existir PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou qualquer linha de código —
-  esses documentos passam a ser escritos a partir das telas aprovadas, nunca o
-  contrário. Nenhum gate é afrouxado por isso: só muda a ordem.
-  Nenhum sistema novo é desenhado sem um sistema de referência real escolhido pelo
-  usuário; depois das telas aprovadas, a experiência é transcrita por completo em
-  docs/UX-MAP.md (rotas, navegação, botões, fluxos com contagem de cliques —
-  fácil de usar SEMPRE).
-  E nenhuma tela chega ao usuário antes de passar pelo UX-Guardião: um agente
-  adversarial cuja única função é reclamar da experiência do usuário, com
-  veredicto registrado em docs/UX-REVIEW.md (gate 1.6e, fail-closed).
-  Todo sistema gerado nasce modular por padrão: cada funcionalidade vira um app
-  independente listado num catálogo, com uma Loja de Apps interna onde o tenant
-  ativa/desativa cada um — nunca um monólito de funções sempre ligadas.
-  Sempre que possível, opera de forma enxuta para economizar tokens: resume contexto,
-  evita releituras desnecessárias e mantém docs de handoff em docs/handoffs/ para que
-  o usuário possa dar CLEAR no contexto e retomar depois.
-
-  Use SEMPRE que o usuário pedir para começar um projeto novo, codar qualquer feature,
-  estruturar documentação, auditar segurança, criar mockups, prototipar telas,
-  wireframes, ou sempre que mencionar "omnx", "omnx-code", "omnx code",
-  "mockup", "protótipo", "telas do app" ou pedir para "ativar o framework".
-  Também use quando o usuário pedir para "continuar", "retomar", "handoff",
-  "limpar contexto", "nova sessão", "resumir o que estava fazendo" ou qualquer variação
-  que indique retomada de trabalho — a skill deve ler docs/handoffs/latest.md e
-  retomar a partir dele.
-  Também use quando o usuário pedir para "reorganiza o CLAUDE.md", "migra pro novo
-  formato", "deixa o CLAUDE.md enxuto", "atualiza pro padrão de índice", "meu CLAUDE.md
-  está gigante", ou qualquer variação que indique migrar um CLAUDE.md/AGENTS.md antigo
-  (com regras escritas por extenso) para o formato índice + docs/regras/ — essa migração
-  é sempre feita com plano mostrado e confirmação explícita antes de mexer em qualquer
-  arquivo (nunca automática nem silenciosa em projeto já configurado).
-  Em projetos novos, esta skill é o primeiro passo obrigatório antes de qualquer código.
-  Em pedidos de mockup, esta skill NÃO exige PRD, UML nem design system prontos:
-  ela colhe um brief mínimo, gera as telas com um baseline visual provisório e
-  entrega para o usuário ver. O design system só é extraído para docs/DESIGN.md
-  depois que o visual foi aprovado nas telas.
-  Quando o pedido envolver multi-tenancy, sub-contas, agência, tenant,
-  workspace isolation, BYOK, isolamento de credenciais, roteamento de webhooks
-  por tenant, ou offboarding LGPD de tenant, esta skill é a porta de entrada e
-  DEVE ativar a skill especializada `omnx-multi-tenancy` para definir o playbook
-  e as fases de trabalho.
-  Roteamento de triggers: em pedido PURO de auditoria de segurança, esta skill DELEGA à `/security-auditor` (não se candidata ao mesmo trigger); em "atualiza a skill" / "verifique atualizações", esta skill é a DONA e atualiza as duas (omnx-code + security-auditor).
+metadata:
+  version: "1.25.0"
+  min_security_auditor: "1.11"
+  contract_version: 1
+description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supabase e Vercel com tasks, segurança, multi-tenant, perfis de acesso, apps modulares, documentação e handoffs. Use em qualquer trabalho de desenvolvimento, setup, feature, mockup, protótipo, tela, documentação, retomada/handoff, migração de CLAUDE.md/AGENTS.md, atualização da própria skill ou quando o usuário mencionar OMNX/omnx-code. Aplica mockup-first, UX-Guardião e Dona Maria antes de apresentar UI; usa pré-auditoria consolidada, lotes de 3-4 telas, correções em bloco e reteste somente do escopo afetado. Em pedido puro de auditoria de segurança, delegue à security-auditor. Em multi-tenancy, subcontas, BYOK ou isolamento de credenciais/webhooks, acione também a skill especializada omnx-multi-tenancy quando disponível.
 ---
 
 # OMNX Code
@@ -129,7 +69,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.24.1** |
+| Versão da skill | **1.25.0** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -733,7 +673,7 @@ Duas peças, cada uma no ponto do tempo em que ela paga.
 
 **Gate:** sem `docs/UX-MAP.md` + veredicto ✅ (ou ⚠️ com ressalvas virando tasks, ou objeções dispensadas uma a uma pelo usuário e registradas no review), PRD e UML **não são aprovados** e nenhum código nasce — recuse e rode o Guardião de novo. A especificação completa (checklist de reclamações, formato do UX-MAP e do UX-REVIEW, válvula de escape e anti-teatro) vive em `docs/regras/ux-referencia-e-guardiao.md` — leia antes de planejar qualquer sistema novo, não invente a própria versão simplificada.
 
-> **Formato de rodadas que converge rápido (validado em campo):** cada rodada do Guardião deve incluir, além da tabela de reclamações ID/seção/descrição/gravidade, uma seção "**Correções exigidas por item**" dizendo EXATAMENTE o que mudar para virar ✅, e uma seção "Verificado, sem reclamação" (para não inventar problema). Com esse formato, um conjunto médio de telas converge em 2–3 rodadas. Rodadas seguintes são ADITIVAS ao review (nada apagado), e o review registra também objeções dispensadas pelo usuário uma a uma com justificativa.
+> **Protocolo de convergência eficiente:** antes da primeira rodada formal, faça uma única pré-auditoria consolidada cobrindo rotas, ações, estados, responsividade, acessibilidade, memória de estado e linguagem comum. Corrija todos os achados dessa passada em bloco e congele o candidato. O Guardião então devolve a lista completa de defeitos reproduzíveis daquela versão, com ID, gravidade, passos, esperado, observado e correção exigida — nunca um achado isolado por rodada. Corrija o lote inteiro e reteste. Depois de um PASS, mudanças reabrem somente as telas alteradas e as dependências compartilhadas alcançadas por elas; item encerrado só reabre com uma regressão reproduzível. Preferência estética nova vira sugestão não bloqueante. Rodadas continuam aditivas no review e objeções dispensadas pelo usuário continuam registradas uma a uma.
 > Este gate é independente dos gates 1.6, 1.6b, 1.6c e 1.6d: um projeto pode ter segurança, níveis de acesso, UML e sistema de tickets em dia e ainda estar bloqueado na fundação por falta de referência de UX ou por rejeição do UX-Guardião. Ele trava a **aprovação da fundação** (telas, PRD, UML), não commits simples em branch de feature — mas nenhuma tela nova de produto vai ao ar sem atualizar o `UX-MAP.md` e, se o fluxo mudar, rodar o Guardião de novo.
 
 **1.6f. Gate de Mockup-First — nada de documento antes da tela aprovada (fail-closed, obrigatório)**
@@ -1227,6 +1167,7 @@ Task 2: Propor o baseline visual provisório
 Task 3: Inventariar as telas (a partir do brief, não de um PRD)
 Task 4: Criar a estrutura docs/mockups/
 Task 5: Gerar o HTML de cada tela + index.html
+Task 5b: Fazer pré-auditoria consolidada e congelar o candidato
 Task 6: Rodada do UX-Guardião e correção ANTES de mostrar
 Task 6b: Rodada da Dona Maria (avaliadora leiga) e correção ANTES de mostrar (gate 1.6g)
 Task 7: Abrir as telas para o usuário e rodar o loop visualizar → aprovar/alterar
@@ -1306,7 +1247,7 @@ Regras do inventário:
 - Cada capacidade citada no brief aparece em pelo menos uma tela
 - Liste os estados relevantes de cada tela (vazio, erro, sucesso, carregando, sem permissão)
 - **Tela de Loja de Apps obrigatória** (ver regra 24): inclua uma tela (ex: `TEL-000 — Loja de Apps`) listando os apps do produto com estado ativo/inativo por tenant e um toggle de ativação. Trate como P0 mesmo que o usuário não tenha mencionado — é onde a arquitetura modular vira produto, e é melhor ele ver isso agora do que descobrir no deploy. Se o projeto for app único documentado (exceção da regra 24), registre no README por que a tela foi omitida.
-- **Escopo enxuto na primeira rodada:** 5 a 10 telas. O objetivo é a pessoa ver o produto rápido, não receber 40 arquivos. Telas secundárias entram nas rodadas seguintes, depois que o esqueleto foi aprovado.
+- **Escopo enxuto na primeira versão:** 5 a 10 telas. Para revisão e aprovação, divida preferencialmente em lotes coesos de **3 a 4 telas**; só exceda quando separar quebraria um único fluxo. O objetivo é a pessoa ver o produto rápido, não receber 40 arquivos. Telas secundárias entram nas rodadas seguintes, depois que o esqueleto foi aprovado.
 
 Não peça validação do inventário em texto antes de desenhar. Validar uma lista de nomes de tela é o mesmo erro do PRD em escala menor — desenhe e mostre.
 
@@ -1388,14 +1329,33 @@ Um arquivo por tela: `docs/mockups/tel-XXX-nome.html`.
 
 ---
 
+### Task 5b — Pré-auditoria consolidada antes dos avaliadores
+
+Antes de gastar uma rodada formal do UX-Guardião, faça **uma passada completa da própria IA** sobre o lote e corrija tudo de uma vez. Esta passada não substitui nenhum gate; ela evita usar os avaliadores como depuradores incrementais.
+
+Use uma única matriz de verificação para o lote:
+
+- todos os arquivos, links, botões, controles e estados do inventário;
+- fluxos críticos de ida e volta, persistência e coerência entre telas;
+- vazio, erro, carregando, sucesso e sem permissão;
+- teclado, foco, nomes acessíveis e alvos de toque;
+- desktop e mobile, incluindo sobreposição de texto — não apenas largura da página;
+- linguagem da pessoa usuária; termos técnicos ficam explicados ou separados numa área para especialista;
+- valores internos de controles e IDs permanecem canônicos mesmo quando o rótulo visível muda.
+
+Corrija o conjunto encontrado em **um lote**, execute novamente a mesma matriz e só então marque o candidato como congelado para a Task 6. Registre no `VALIDACAO.md` a versão/data, as telas do lote e os testes executados. Não mande um candidato sabidamente incompleto para o Guardião.
+
+---
+
 ### Task 6 — UX-Guardião ANTES de mostrar (gate 1.6e)
 
 Rode o Guardião sobre as telas geradas — subagente dedicado se disponível, senão uma passada separada sua, anunciada ("Agora atuando como UX-Guardião..."), esquecendo que foi você que desenhou.
 
 Ele reclama da checklist de `docs/regras/ux-referencia-e-guardiao.md`: cliques demais, botão sem destino, rota órfã, beco sem saída, estado vazio/erro/carregando não pensado, jargão técnico, incoerência com a referência declarada, navegação que exige memória, formulário longo sem etapas, mobile ignorado.
 
-- Registre a rodada em `docs/UX-REVIEW.md` (aditivo, nunca sobrescrito), com "Correções exigidas por item" e "Verificado, sem reclamação".
-- **Corrija antes de mostrar.** Veredicto ❌ não sobe para o usuário — corrija e rode de novo.
+- Registre a rodada em `docs/UX-REVIEW.md` (aditivo, nunca sobrescrito), com "Correções exigidas por item" e "Verificado, sem reclamação". A rodada formal deve devolver a **lista completa** de achados reproduzíveis do candidato, não parar no primeiro defeito.
+- **Corrija antes de mostrar e sempre em bloco.** Veredicto ❌ não sobe para o usuário — corrija todos os itens, rode a matriz da Task 5b e só então peça o reteste.
+- Depois de um PASS, mudança localizada reabre somente as telas alteradas e dependências compartilhadas afetadas. Um item já encerrado só pode ser reaberto se o relatório trouxer passos, resultado esperado e resultado observado que provem a regressão.
 - Só apresente com ✅ ou ⚠️ (ressalvas viram tasks e são declaradas ao usuário na Task 7).
 
 O objetivo é o usuário receber telas em que os defeitos óbvios já morreram, para gastar o tempo dele no que só ele sabe: se aquilo é o produto que ele quer.
@@ -1409,7 +1369,7 @@ Depois do Guardião e antes do usuário, rode a **Dona Maria** sobre as mesmas t
 O Guardião limpou o que era estrutural. Esta passada responde outra pergunta: **o que sobrou dá para entender por quem não é da área?** Uma tela pode ter navegação impecável, zero rota órfã, todos os estados previstos — e ainda assim a pessoa parar na terceira palavra e fechar o produto.
 
 - Registre em `docs/TESTE-DE-LEIGO.md` (aditivo), com a **frase literal** de cada travamento.
-- **Qualquer 🔴 ou um "não conseguiria usar sozinha" → corrija e rode de novo.** Não sobe.
+- **Qualquer 🔴 ou um "não conseguiria usar sozinha" → corrija todos os achados de linguagem em bloco.** Antes de chamar a Dona Maria de novo, rode o Guardião apenas nas telas cujo texto mudou e nas dependências compartilhadas alcançadas; depois reteste com a Dona Maria esse mesmo escopo.
 - Só apresente com 🟡/🟢, declarando as ressalvas na Task 7.
 - Use as telas que ela **elogiou** como referência de vocabulário para reescrever as que travaram.
 
@@ -1561,6 +1521,9 @@ Cada um desses documentos agora tem uma referência visual concreta para descrev
 | Preencher lacuna do brief em silêncio | Ele não sabe o que revisar | Declarar a suposição no rodapé da tela e na apresentação |
 | Regenerar o conjunto todo por causa de uma tela | Apaga escolhas já aprovadas | Arquivar, regenerar só as afetadas |
 | Mostrar as telas antes do UX-Guardião | Gasta o tempo dele com defeito que um agente pegava de graça | Rodar o Guardião e corrigir antes (Task 6) |
+| Usar o Guardião como depurador, um defeito por rodada | Gera ciclos longos e faz o escopo oscilar | Rodar a matriz da Task 5b, exigir lista completa e corrigir em bloco |
+| Reabrir item aprovado por preferência nova | Faz a revisão nunca terminar | Só reabrir com regressão reproduzível; preferência nova é sugestão |
+| Revalidar todas as telas após ajuste local | Gasta tempo sem aumentar a confiança | Retestar tela alterada + dependências compartilhadas afetadas |
 | Tela com placeholder ("aqui vai a lista") | Não se aprova o que não está desenhado | Dados realistas do domínio |
 | Colocar várias telas num único arquivo | Difícil navegar, revisar e versionar | Um arquivo por tela |
 | Nome genérico como `login.html` | Perde rastreabilidade com o inventário | `tel-XXX-nome-da-tela.html` |
@@ -1569,7 +1532,7 @@ Cada um desses documentos agora tem uma referência visual concreta para descrev
 | Deixar estados importantes de fora | Ele não vê os casos de erro/vazio, que é onde produto morre | Representar todos os estados do inventário |
 | Mockup estático sem links | Fluxo não se aprova imaginando, se aprova clicando | Sempre linkar as próximas telas |
 | Gerar telas sem a Loja de Apps (regra 24) | Esconde a arquitetura de ativação por tenant, que é P0 | Sempre incluir, salvo exceção documentada |
-| 40 telas na primeira rodada | Ele não revisa; o fluxo trava | 5-10 telas do esqueleto, o resto nas rodadas seguintes |
+| Mais de 4 telas sem necessidade no mesmo lote de aprovação | Ele não revisa com atenção; o fluxo trava | Preferir lotes coesos de 3-4 telas; exceder só para manter um fluxo indivisível |
 
 ---
 

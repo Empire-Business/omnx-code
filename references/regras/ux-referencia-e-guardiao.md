@@ -112,13 +112,41 @@ bom". Ele existe para responder, com mau humor profissional: *"onde um usuário
 real vai se perder, clicar errado ou desistir?"*. Quem escreveu o documento
 está apaixonado pela própria solução — o Guardião é o contrapeso.
 
+### Protocolo de convergência eficiente
+
+O gate continua fail-closed, mas revisão rigorosa não pode virar um ciclo de
+um defeito novo por rodada. Antes da primeira chamada formal do Guardião, a IA
+responsável faz uma **pré-auditoria consolidada**, corrige todos os achados em
+bloco e entrega um candidato congelado. A matriz cobre ao mesmo tempo rotas,
+ações, estados, responsividade, acessibilidade, memória entre telas e linguagem
+comum. Em controles, diferencia sempre valor interno estável de rótulo visível.
+
+- Revise preferencialmente em lotes coesos de **3 a 4 telas**. Só exceda se
+  separar quebraria um fluxo indivisível.
+- A rodada formal devolve a **lista completa** de achados do candidato, com ID,
+  gravidade, passos de reprodução, esperado, observado e correção exigida. Não
+  interrompe no primeiro erro.
+- A correção é feita em bloco; depois a mesma matriz é executada uma vez antes
+  do reteste formal.
+- Depois de um PASS, mudança localizada reabre apenas as telas alteradas e as
+  dependências compartilhadas efetivamente afetadas. Não reabre o lote inteiro.
+- Um item encerrado só reabre com regressão reproduzível. Preferência estética
+  nova, sem quebra observável de critério, entra como sugestão não bloqueante.
+- Se duas rodadas consecutivas revelarem defeitos novos no mesmo mecanismo
+  compartilhado, pare os retoques pontuais e faça uma análise de causa raiz
+  desse mecanismo, seguida de uma correção única e um reteste do seu alcance.
+
+Esse protocolo reduz retrabalho; não autoriza pular o Guardião, a Dona Maria
+ou a aprovação explícita do dono do produto.
+
 ### Como executar o Guardião
 
 - **Com subagentes disponíveis:** dispare um subagente dedicado, passando o
   material em revisão (os HTMLs das telas, na primeira passada; o documento,
   nas seguintes) + a referência declarada + esta checklist. A instrução dele é
   ser adversarial: presumir o usuário mais apressado, mais leigo e mais
-  distraído possível.
+  distraído possível, devolver todos os achados reproduzíveis daquela versão e
+  não reabrir item encerrado sem evidência de regressão.
 - **Sem subagentes:** a própria IA faz uma **passada separada**, anunciando
   explicitamente ("Agora atuando como UX-Guardião...") e trocando de chapéu:
   esquecer a solução que acabou de escrever e atacá-la.
@@ -180,7 +208,8 @@ rodada, com data/hora BRT), contendo:
 ### Quando o Guardião roda de novo
 
 - **Antes de cada apresentação de mockups ao usuário** — inclusive nas rodadas
-  de alteração, rodando nas telas que foram mexidas
+  de alteração, rodando nas telas que foram mexidas e nas dependências
+  compartilhadas afetadas, não no conjunto inteiro por padrão
 - Na primeira aprovação de PRD e UML (agora contra as telas aprovadas)
 - Sempre que o PRD mudar de forma relevante (requisito novo, fluxo alterado)
 - Sempre que o `UX-MAP.md` mudar (rota nova, navegação alterada)

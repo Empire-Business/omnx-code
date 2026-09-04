@@ -72,6 +72,10 @@ Aprovação é uma **frase do usuário**, nunca uma inferência da IA. "Ok",
   com data/hora BRT.
 - Se ele aprovou com ressalvas ("aprovado, mas troca o rótulo desse botão"),
   as ressalvas viram tasks e ficam registradas junto — não somem na conversa.
+- Quando houver muitas telas, a apresentação e a aprovação são divididas
+  preferencialmente em lotes coesos de **3 a 4 telas**. Aprovação de um lote
+  não é invalidada por mudança posterior fora dele; só reabre a tela alterada
+  e as dependências compartilhadas realmente afetadas.
 
 ## Projeto que já tem PRD/UML aprovados
 

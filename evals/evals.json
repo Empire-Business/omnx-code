@@ -23,6 +23,20 @@
         "O resumo inclui o que estava sendo feito, a fase atual e o próximo passo recomendado",
         "A skill cria tasks para continuar o trabalho no RF-01 login"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Você recebeu 10 mockups novos. O UX-Guardião já aprovou uma versão, mas uma correção de texto alterou apenas TEL-004 e um componente de navegação compartilhado por TEL-004 e TEL-005. Explique e execute o fluxo de revisão eficiente da omnx-code sem pular gates.",
+      "expected_output": "A skill faz pré-auditoria consolidada, trabalha em lotes pequenos, corrige achados em bloco e reabre somente TEL-004, TEL-005 e o componente compartilhado afetado; depois roda UX-Guardião e Dona Maria nessa ordem. Não reinicia a auditoria das 10 telas nem reabre achados encerrados sem regressão reproduzível.",
+      "files": [],
+      "expectations": [
+        "Faz uma pré-auditoria consolidada antes dos avaliadores formais",
+        "Prefere lotes coesos de 3 a 4 telas",
+        "Mantém a ordem UX-Guardião antes de Dona Maria",
+        "Retesta apenas as telas alteradas e dependências compartilhadas afetadas",
+        "Exige evidência reproduzível para reabrir item já encerrado",
+        "Agrupa os achados e as correções em vez de criar uma rodada por defeito"
+      ]
     }
   ]
 }

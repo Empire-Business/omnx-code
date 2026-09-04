@@ -48,6 +48,10 @@ Ordem: **UX-Guardião primeiro, Dona Maria depois**. O Guardião limpa os defeit
 a Dona Maria testa se o que sobrou é compreensível. Rodá-la antes desperdiça a passada dela
 reclamando de coisas que iam mudar de qualquer jeito.
 
+Antes do Guardião formal, a IA responsável já deve ter feito a pré-auditoria
+consolidada de linguagem comum prevista no fluxo de mockups. Isso preserva a
+ordem dos gates e evita usar a Dona Maria como corretora de um termo por vez.
+
 ## O que ele produz
 
 Registro em `docs/TESTE-DE-LEIGO.md`, **aditivo** (rodadas novas se acumulam, nada é apagado).
@@ -74,6 +78,18 @@ E no fim, obrigatoriamente:
 
 O usuário pode dispensar uma objeção específica ("esse termo fica, meu público é técnico"), mas
 **uma a uma e com registro**, nunca em bloco.
+
+### Reteste sem repetir trabalho
+
+- A Dona Maria devolve todos os travamentos encontrados no lote, não apenas o
+  primeiro.
+- As correções de linguagem são agrupadas numa única alteração.
+- Como texto visível também pode afetar layout, acessibilidade ou valor de
+  controle, o UX-Guardião retesta primeiro **somente as telas alteradas e as
+  dependências compartilhadas afetadas**; em seguida a Dona Maria retesta esse
+  mesmo escopo.
+- Tela já aprovada e não alcançada pela mudança permanece encerrada. Achado
+  anterior só reabre com a frase atual e uma regressão observável.
 
 ## Anti-teatro
 

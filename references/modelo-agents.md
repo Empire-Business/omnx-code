@@ -83,6 +83,7 @@
 
 - Nenhum sistema novo é desenhado "do zero": antes de desenhar as telas, o usuário escolhe pelo menos um sistema de referência real (produto existente cuja experiência o projeto segue) — a IA pode propor candidatos, mas nunca escolhe sozinha, e "sem referência" não é aceito
 - **Gate obrigatório (fail-closed):** nenhum conjunto de mockups é apresentado ao usuário sem passar antes pelo UX-Guardião — um agente adversarial cuja única função é reclamar da experiência do usuário, com checklist de reclamações obrigatórias (cliques demais, botão sem destino, rota órfã, estado vazio não pensado, jargão técnico, inconsistência com a referência) e veredicto registrado em `docs/UX-REVIEW.md` (✅ / ⚠️ / ❌). Veredicto ❌ não sobe para o usuário: corrige e roda de novo
+- **Convergência eficiente:** antes dos avaliadores formais, faça uma pré-auditoria consolidada; revise preferencialmente em lotes de 3-4 telas; devolva e corrija achados em bloco; depois de PASS, reteste apenas telas alteradas + dependências compartilhadas afetadas. Item encerrado só reabre com regressão reproduzível
 - **Gate da Dona Maria** (`docs/regras/avaliador-leigo.md`): depois do Guardião e antes do dono do produto, a Dona Maria — persona leiga fixa, dona de negócio 50+, não técnica, que trava na primeira palavra desconhecida — lê as telas e registra cada travamento em `docs/TESTE-DE-LEIGO.md` com a frase literal. Ela tem nome porque precisa ser sempre a mesma pessoa: é o que torna uma rodada comparável com a seguinte. Travamento 🔴 ou o veredicto "não usaria sozinha" bloqueia a apresentação; objeção só é dispensada uma a uma, com registro.
 - Depois das telas aprovadas, a IA cria `docs/UX-MAP.md` **transcrevendo** os HTMLs aprovados: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário sem jargão técnico). Rota no mapa sem HTML é bug do mapa; link em HTML sem rota no mapa é buraco no mapa
 - Nenhum PRD ou UML é aprovado sem o Guardião revalidando contra as telas aprovadas e o UX-MAP; ❌ bloqueia até correção e nova rodada; ⚠️ exige ressalvas registradas como tasks; o usuário só dispensa objeções uma a uma, com registro no review
@@ -148,4 +149,4 @@ Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tor
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.18
+> Versão do template: omnx-code v1.25.0
