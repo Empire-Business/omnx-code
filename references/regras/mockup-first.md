@@ -61,6 +61,22 @@ o usuário ainda não viu e aprovou**.
    aquelas telas são atualizados **no mesmo commit** — tela e documento nunca
    divergem.
 
+## Uma única árvore de mockups
+
+Todo projeto usa somente `docs/mockups/`; versões nunca criam pastas irmãs.
+
+- Raiz de `docs/mockups/`: somente telas oficiais e aprovadas, com o
+  `index.html` que o usuário abre para ver o que vale.
+- `docs/mockups/em-aprovacao/<lote>/`: telas candidatas ainda sem aprovação.
+- `docs/mockups/historico/<versao>-<apelido>/`: versões substituídas, rejeitadas
+  ou exploratórias, sempre marcadas “NÃO IMPLEMENTAR”.
+
+São proibidos nomes como `docs/mockups-v2/`, `docs/mockups-final/` e
+`docs/novo-mockup/`. Se um projeto antigo já os tiver, consolide-os em
+`historico/`, preserve os arquivos, corrija referências e mantenha um índice
+que deixe inequívoco o que é oficial, o que aguarda aprovação e o que é apenas
+histórico. Nenhuma versão é apagada sem pedido explícito do usuário.
+
 ## O que conta como aprovação
 
 Aprovação é uma **frase do usuário**, nunca uma inferência da IA. "Ok",

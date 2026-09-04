@@ -78,6 +78,7 @@
 - Tela nova ou mudança visível em tela aprovada: desenha, mostra, aprova, e só então atualiza PRD/UML/código, no mesmo commit
 - Não se aplica a bug, refactor, migration, ajuste de estilo, script sem UI — aí é o fluxo normal
 - Válvula de escape: o usuário pode pedir explicitamente o documento antes das telas; a dispensa fica registrada em `docs/mockups/APROVACAO.md`. No silêncio, telas primeiro
+- Use uma única árvore: oficiais aprovados na raiz de `docs/mockups/`, candidatos em `docs/mockups/em-aprovacao/<lote>/` e versões substituídas em `docs/mockups/historico/<versao>-<apelido>/`. Nunca crie `docs/mockups-v2`, `docs/mockups-final` ou pasta paralela equivalente
 
 ## Regra de UX na fundação (inegociável) (detalhe: `docs/regras/ux-referencia-e-guardiao.md`)
 
@@ -149,4 +150,4 @@ Se o usuário pedir algo que viole as regras acima (usar `service_role_key`, tor
 
 > Sincronizado com `CLAUDE.md` pela skill omnx-code.
 > Para documentação completa do projeto, leia o `CLAUDE.md` e os arquivos em `docs/`.
-> Versão do template: omnx-code v1.25.0
+> Versão do template: omnx-code v1.26.0

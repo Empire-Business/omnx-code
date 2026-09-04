@@ -44,7 +44,7 @@ A IA deve saber que os arquivos abaixo existem e consultá-los quando a tarefa t
 | Arquivo                      | Descrição                                                | Atualizado em |
 |------------------------------|----------------------------------------------------------|---------------|
 | `docs/regras/`               | Todas as regras inegociáveis do projeto, uma por arquivo (ver índice acima) | — |
-| `docs/mockups/`              | **Telas aprovadas — o primeiro entregável do produto.** Um HTML autocontido por tela + `index.html` navegável; `APROVACAO.md` é a fonte da verdade do gate mockup-first | — |
+| `docs/mockups/`              | **Árvore única de telas.** Raiz = oficiais aprovadas; `em-aprovacao/<lote>/` = candidatas; `historico/<versao>/` = substituídas. Nunca criar `mockups-v2` ou árvore paralela. `APROVACAO.md` é a fonte da verdade do gate | — |
 | `docs/PRD.md`                | Requisitos completos do produto, descrevendo as telas aprovadas | —             |
 | `docs/ARQUITETURA.md`        | Estrutura, decisões técnicas, fluxo de dados, e seções de Multi-Tenant e Apps | —             |
 | `docs/UML.md` + `docs/UML.html` | Diagramas de classes/entidades e sequência (Mermaid + versão visual) — **bloqueia código novo/commit se ausente/desatualizado** | — |

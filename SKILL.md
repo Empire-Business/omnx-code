@@ -1,10 +1,10 @@
 ---
 name: omnx-code
 metadata:
-  version: "1.25.0"
+  version: "1.26.0"
   min_security_auditor: "1.11"
   contract_version: 1
-description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supabase e Vercel com tasks, segurança, multi-tenant, perfis de acesso, apps modulares, documentação e handoffs. Use em qualquer trabalho de desenvolvimento, setup, feature, mockup, protótipo, tela, documentação, retomada/handoff, migração de CLAUDE.md/AGENTS.md, atualização da própria skill ou quando o usuário mencionar OMNX/omnx-code. Aplica mockup-first, UX-Guardião e Dona Maria antes de apresentar UI; usa pré-auditoria consolidada, lotes de 3-4 telas, correções em bloco e reteste somente do escopo afetado. Em pedido puro de auditoria de segurança, delegue à security-auditor. Em multi-tenancy, subcontas, BYOK ou isolamento de credenciais/webhooks, acione também a skill especializada omnx-multi-tenancy quando disponível.
+description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supabase e Vercel com tasks, segurança, multi-tenant, perfis de acesso, apps modulares, documentação e handoffs. Use em qualquer trabalho de desenvolvimento, setup, feature, mockup, protótipo, tela, documentação, retomada/handoff, migração de CLAUDE.md/AGENTS.md, atualização da própria skill ou quando o usuário mencionar OMNX/omnx-code. Aplica mockup-first, UX-Guardião e Dona Maria antes de apresentar UI; mantém uma única árvore de mockups com oficial, em aprovação e histórico; usa pré-auditoria consolidada, lotes de 3-4 telas, correções em bloco e reteste somente do escopo afetado. Em pedido puro de auditoria de segurança, delegue à security-auditor. Em multi-tenancy, subcontas, BYOK ou isolamento de credenciais/webhooks, acione também a skill especializada omnx-multi-tenancy quando disponível.
 ---
 
 # OMNX Code
@@ -69,7 +69,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.25.0** |
+| Versão da skill | **1.26.0** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -732,7 +732,7 @@ Quando delegar a um subagente a edição de um documento longo (>500 linhas — 
 1. O prompt DEVE instruir: leitura integral antes de editar, patch cirúrgico aditivo (nunca reescrita total), e retorno OBRIGATORIAMENTE não-vazio com `git diff --stat <arquivo>` incluído.
 2. Ao receber o resultado, verifique o diff real: resposta vazia ou diff vazio = falha silenciosa. **Reenvie a tarefa uma vez** com nota explícita de que a tentativa anterior não editou nada; se falhar de novo, faça a edição você mesmo.
 3. Documentos gêmeos que devem mudar juntos (UML.md ↔ UML.html; UX-MAP ↔ NDA) recebem instrução explícita de sincronia + verificação de contagem (ex.: mesmos blocos Mermaid nos dois lados).
-4. Antes de regenerar um conjunto de arquivos versionados (mockups, telas), **arquive o anterior** em subpasta (`arquivo-v<X>-<apelido>/`) ANTES de disparar agentes em paralelo — evita corrida de nomes e preserva o histórico consultável.
+4. Antes de regenerar um conjunto de arquivos versionados (mockups, telas), preserve o anterior dentro de `docs/mockups/historico/<versao>-<apelido>/` ANTES de disparar agentes em paralelo — evita corrida de nomes e preserva o histórico consultável. Nunca crie `docs/mockups-v2`, `docs/mockups-final` ou outra árvore paralela.
 
 **2. Ler CLAUDE.md antes de começar**
 O `CLAUDE.md` é o ponto de entrada de todo projeto. Leia-o antes de qualquer decisão técnica. Não assuma nada que não esteja documentado lá.
@@ -1139,7 +1139,7 @@ Não ative para bug, refactor, migration, ajuste em tela já aprovada, script se
 2. **O usuário aprova vendo, não lendo.** O entregável desta fase é uma pasta que abre no navegador. Se ele não abriu, o fluxo não terminou.
 3. **Fiel ao brief, honesto sobre o resto.** Toda capacidade que o usuário mencionou aparece em alguma tela. Tudo que você preencheu por conta própria vai declarado como **suposição** no rodapé da tela — é assim que ele corrige em vez de ter que perguntar.
 4. **Design system provisório inline, promovido depois.** Você propõe o baseline visual (cores, tipografia, espaçamento) já embutido nas telas; ele aprova olhando. Só depois da aprovação isso é extraído para `docs/DESIGN.md` como fonte da verdade. Nunca peça um design system escrito como pré-condição para desenhar.
-5. **Uma tela por arquivo.** Cada tela é um HTML separado em `docs/mockups/`.
+5. **Uma tela por arquivo.** Cada tela é um HTML separado na área correspondente da árvore única `docs/mockups/`.
 6. **Navegável.** Existe um `index.html` central e cada tela linka as próximas do fluxo. Fluxo se aprova clicando, não imaginando.
 7. **Autocontido.** Abre em `file://` sem servidor, build ou dependência externa. CSS inline em cada arquivo.
 8. **Guardião antes do usuário.** As telas passam pelo UX-Guardião e as reclamações são corrigidas antes de ele ver (gate 1.6e).
@@ -1256,18 +1256,43 @@ Não peça validação do inventário em texto antes de desenhar. Validar uma li
 ### Task 4 — Criar a estrutura `docs/mockups/`
 
 ```bash
-mkdir -p docs/mockups
+mkdir -p docs/mockups/em-aprovacao docs/mockups/historico
 ```
 
-`docs/mockups/README.md` contém: propósito da pasta, sistema(s) de referência (o que se copia / não se copia), baseline visual provisório, inventário de telas, suposições assumidas, e como abrir (`open docs/mockups/index.html`).
+`docs/mockups/` é a **única árvore permitida**. Sua organização é estável:
 
-**Antes de regenerar telas que já existem** (rodada 2 em diante), arquive a versão anterior em `docs/mockups/arquivo-v<N>-<apelido>/` **antes** de disparar qualquer agente em paralelo — evita corrida de nomes e preserva o histórico consultável (regra 1.7, item 4).
+- `docs/mockups/index.html`, `tel-*.html`, `README.md`, `APROVACAO.md` e
+  `VALIDACAO.md`: somente a versão **oficial e aprovada**;
+- `docs/mockups/em-aprovacao/<lote>/`: propostas que ainda aguardam os gates
+  e a fala explícita do dono;
+- `docs/mockups/historico/<versao>-<apelido>/`: versões substituídas, rejeitadas
+  ou exploratórias, preservadas para consulta e marcadas “NÃO IMPLEMENTAR”.
+
+É proibido criar árvores irmãs como `docs/mockups-v2/`, `docs/mockups-v5/`,
+`docs/mockups-final/` ou `docs/novo-mockup/`. Antes de gerar um lote, procure
+essas árvores antigas; se existirem, mova-as para `historico/`, corrija as
+referências e preserve os arquivos. Não apague histórico sem pedido explícito.
+
+`docs/mockups/README.md` é o mapa humano: mostra primeiro o que é oficial,
+depois o que está em aprovação e, por último, um link para o histórico. O
+`index.html` oficial nunca mistura telas não aprovadas como se já valessem.
+Cada lote em aprovação e o histórico têm seu próprio índice ou README claro.
+
+O README do lote contém: propósito, sistema(s) de referência (o que se copia /
+não se copia), baseline visual provisório, inventário, suposições e como abrir.
+
+**Antes de regenerar telas que já existem** (rodada 2 em diante), mova a versão
+anterior para `docs/mockups/historico/<versao>-<apelido>/` antes de disparar
+qualquer agente em paralelo. Atualize todos os links e valide que não sobrou
+nenhuma referência aos caminhos antigos.
 
 ---
 
 ### Task 5 — Gerar o HTML de cada tela
 
-Um arquivo por tela: `docs/mockups/tel-XXX-nome.html`.
+Um arquivo por tela. Enquanto aguarda aprovação:
+`docs/mockups/em-aprovacao/<lote>/tel-XXX-nome.html`. Depois da aprovação
+explícita, promova apenas a versão aceita para `docs/mockups/tel-XXX-nome.html`.
 
 ```html
 <!DOCTYPE html>

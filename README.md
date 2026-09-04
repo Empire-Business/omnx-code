@@ -57,7 +57,7 @@ git verify-tag <TAG> && git checkout <TAG>
 
 ## Versão
 
-`v1.25.0` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.26.0` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 

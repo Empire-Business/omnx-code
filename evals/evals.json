@@ -37,6 +37,21 @@
         "Exige evidência reproduzível para reabrir item já encerrado",
         "Agrupa os achados e as correções em vez de criar uma rodada por defeito"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "O projeto contém docs/mockups/, docs/mockups-v3/, docs/mockups-v4/ e docs/mockups-final/. O usuário diz que não consegue saber qual versão vale. Organize os mockups conforme a omnx-code sem perder o histórico.",
+      "expected_output": "A skill mantém uma única árvore docs/mockups/: raiz apenas para telas oficiais aprovadas, em-aprovacao/<lote>/ para candidatos e historico/<versao>/ para versões antigas. Move sem apagar, corrige referências, cria um índice claro e valida links locais. Não inventa aprovação para nenhuma tela.",
+      "files": [],
+      "expectations": [
+        "Não apaga versões antigas sem pedido explícito",
+        "Não deixa árvores paralelas docs/mockups-v* ou mockups-final",
+        "Mantém somente telas aprovadas na raiz oficial",
+        "Separa candidatos em docs/mockups/em-aprovacao/<lote>/",
+        "Move versões antigas para docs/mockups/historico/<versao>/ e marca como não implementar",
+        "Atualiza referências e valida links após os movimentos",
+        "Não registra aprovação sem fala explícita do usuário"
+      ]
     }
   ]
 }

@@ -75,11 +75,12 @@ Os mockups não morrem depois da fundação: eles são a referência visual do p
 ### Entregáveis da pasta
 
 - `docs/mockups/README.md` — sistema(s) de referência, baseline visual, inventário de telas e suposições assumidas
-- `docs/mockups/index.html` — hub navegável com todas as telas
-- `docs/mockups/tel-XXX-nome.html` — um arquivo HTML por tela
+- `docs/mockups/index.html` — hub navegável somente das telas oficiais e aprovadas
+- `docs/mockups/tel-XXX-nome.html` — um arquivo HTML por tela oficial e aprovada
+- `docs/mockups/em-aprovacao/<lote>/` — candidatos ainda não aprovados
+- `docs/mockups/historico/<versao>-<apelido>/` — versões substituídas ou rejeitadas; não implementar
 - `docs/mockups/APROVACAO.md` — status por tela, rodadas, falas do usuário, dispensas (fonte da verdade do gate 1.6f)
 - `docs/mockups/VALIDACAO.md` — cobertura do brief e, depois do PRD existir, a checagem cruzada telas ↔ requisitos P0/P1
-- `docs/mockups/arquivo-v<N>-<apelido>/` — versões anteriores arquivadas antes de regenerar
 
 ### Regras dos mockups
 
@@ -91,6 +92,7 @@ Os mockups não morrem depois da fundação: eles são a referência visual do p
 - Links entre telas funcionam; botão sem destino mostra `alert` explicando a ação
 - Toda capacidade citada pelo usuário aparece em pelo menos uma tela; depois do PRD, todo requisito P0/P1 também
 - **Tela de Loja de Apps é obrigatória** — lista o catálogo de apps com estado ativo/inativo por tenant e controle de ativação (ver `docs/regras/apps-loja-de-apps.md`). Só pode ser omitida em projeto explicitamente definido como app único
-- Antes de regenerar telas existentes, arquive a versão anterior em `docs/mockups/arquivo-v<N>-<apelido>/`
+- Mantenha uma única árvore: nunca crie `docs/mockups-v2`, `docs/mockups-final` ou equivalente
+- Antes de regenerar telas existentes, preserve a versão anterior em `docs/mockups/historico/<versao>-<apelido>/`
 
 > Detalhes completos do fluxo estão em `docs/regras/mockup-first.md` e na seção "Fluxo de Mockups" do `SKILL.md` da `omnx-code`.

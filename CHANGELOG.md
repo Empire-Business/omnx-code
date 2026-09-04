@@ -4,6 +4,22 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.26.0 — 2026-09-04
+
+### Árvore única e legível de mockups
+
+- Define `docs/mockups/` como a única árvore permitida: raiz somente para telas
+  oficiais aprovadas, `em-aprovacao/<lote>/` para candidatos e
+  `historico/<versao>-<apelido>/` para material substituído ou rejeitado.
+- Proíbe novas árvores paralelas como `docs/mockups-v2`, `mockups-final` e
+  equivalentes, que tornavam impossível identificar o que valia.
+- Exige consolidação preservadora em projetos antigos: mover, corrigir
+  referências, validar links e nunca apagar versões sem pedido explícito.
+- Faz o índice oficial mostrar somente o que vale, com links separados para o
+  que aguarda decisão e para o histórico marcado “NÃO IMPLEMENTAR”.
+- Sincroniza a regra no fluxo principal, regra mockup-first, manutenção dos
+  documentos e templates de `CLAUDE.md`/`AGENTS.md`.
+
 ## v1.25.0 — 2026-09-04
 
 ### Revisão de mockups com convergência eficiente
