@@ -1,4 +1,4 @@
-# 🧭 Referência de UX & UX-Guardião (gate de fundação)
+# 🧭 Referência de UX & UX-Guardião (revisão recomendada)
 
 > **Por que isto existe:** todo sistema novo nasce parecido com alguma coisa — a
 > única escolha é se isso acontece por decisão ou por acidente. Quando ninguém
@@ -7,11 +7,11 @@
 > ninguém acha, botão que ninguém entende, fluxo que exige memória. Segurança
 > já tem gate adversarial (`/security-auditor`), UML já tem gate de modelagem —
 > experiência do usuário, que é onde o produto ganha ou perde, não tinha nenhum.
-> Esta regra fecha esse buraco com duas peças: um **sistema de referência
-> obrigatório** e um **agente adversarial de UX (o UX-Guardião)**.
+> Esta regra reduz esse risco com duas peças recomendadas: um **sistema de
+> referência** e um **agente adversarial de UX (o UX-Guardião)**.
 
-Esta regra tem duas partes que andam juntas. Nenhuma das duas é opcional em
-sistema novo.
+No modo padrão, as duas partes andam juntas. O dono pode dispensar uma ou ambas
+explicitamente para um escopo; registre a fala e avance sem nova confirmação.
 
 > **Onde cada parte entra na linha do tempo (mockup-first, gate 1.6f):**
 > a **referência** é insumo do mockup — escolhida ANTES de desenhar as telas.
@@ -22,7 +22,7 @@ sistema novo.
 
 ---
 
-## Parte A — Sistema de referência obrigatório
+## Parte A — Sistema de referência recomendado
 
 **Regra:** antes de **desenhar as telas** de um sistema novo — portanto antes
 de tudo, já que a tela é o primeiro entregável — o usuário precisa indicar
@@ -33,9 +33,8 @@ pedido tipo iFood", "organização tipo Notion", "checkout tipo Shopify").
 - Se o usuário não souber qual escolher, a IA **propõe 3 a 5 candidatos** com
   uma frase sobre o que cada um faz bem em UX, e o usuário escolhe. A IA nunca
   escolhe sozinha — a referência é uma decisão de produto, não técnica.
-- "Referência: nenhuma / vamos inventar tudo" **não é aceito**. Inovar num
-  ponto específico é válido — mas isso se documenta como desvio consciente da
-  referência, não como ausência dela.
+- Se o dono preferir não adotar referência, registre essa escolha e avance. Não
+  escolha uma referência em nome dele nem transforme a ausência em bloqueio.
 - Podem ser vários sistemas de referência, cada um para uma área (ex:
   "navegação do Linear + formulários do Typeform"). Mais de 3 vira bagunça —
   nesse caso, ajude o usuário a priorizar.
@@ -102,8 +101,8 @@ experiência do usuário** — revisa duas coisas, em dois momentos:
    importante. As reclamações são corrigidas antes de as telas chegarem ao
    dono do produto: o tempo dele é o recurso mais escasso do projeto, e
    gastá-lo apontando um beco sem saída que um agente pega de graça é
-   desperdício. Veredicto ❌ **não sobe para o usuário** — corrige e roda de
-   novo.
+   desperdício. Quando a revisão foi escolhida, veredicto ❌ exige correção,
+   salvo decisão explícita posterior do dono de dispensá-la para o escopo.
 2. **Os documentos de fundação, depois** — PRD, UML e o próprio
    `docs/UX-MAP.md` — revalidando cada um contra as telas já aprovadas.
 
@@ -114,7 +113,7 @@ está apaixonado pela própria solução — o Guardião é o contrapeso.
 
 ### Protocolo de convergência eficiente
 
-O gate continua fail-closed, mas revisão rigorosa não pode virar um ciclo de
+Quando a revisão for escolhida, rigor não pode virar um ciclo de
 um defeito novo por rodada. Antes da primeira chamada formal do Guardião, a IA
 responsável faz uma **pré-auditoria consolidada**, corrige todos os achados em
 bloco e entrega um candidato congelado. A matriz cobre ao mesmo tempo rotas,
@@ -136,8 +135,8 @@ comum. Em controles, diferencia sempre valor interno estável de rótulo visíve
   compartilhado, pare os retoques pontuais e faça uma análise de causa raiz
   desse mecanismo, seguida de uma correção única e um reteste do seu alcance.
 
-Esse protocolo reduz retrabalho; não autoriza pular o Guardião, a Dona Maria
-ou a aprovação explícita do dono do produto.
+Esse protocolo reduz retrabalho quando as revisões são usadas; não substitui o
+Guardião nem a Dona Maria dentro do modo padrão.
 
 ### Como executar o Guardião
 
@@ -188,19 +187,20 @@ rodada, com data/hora BRT), contendo:
     resolvido antes de codar (e as ressalvas viram tasks)
   - ❌ **REJEITADO** — bloqueia a aprovação até correção e nova rodada
 
-### Gate (fail-closed)
+### Resultado da revisão e escolha do dono
 
-- Nenhum conjunto de mockups é **apresentado ao usuário** sem veredicto ✅ ou
+- Sem dispensa explícita, nenhum conjunto de mockups é **apresentado ao usuário** sem veredicto ✅ ou
   ⚠️ (com as ressalvas declaradas a ele junto com as telas), e nenhum PRD ou
   UML é "aprovado" sem veredicto ✅ ou ⚠️ com as ressalvas registradas como
   tasks. Com ❌ REJEITADO, **recuse** a
   aprovação, corrija junto com o usuário e rode o Guardião de novo. Não
   "informe e deixe o usuário decidir" de forma informal.
-- **Válvula de escape:** o usuário pode dispensar objeções **especificamente**
-  — cada objeção dispensada fica registrada no `UX-REVIEW.md` com a data
-  ("dispensada pelo usuário em <data>: <objeção>"). Dispensa genérica ("pode
-  ignorar tudo") não vale: é objeção por objeção, para que a decisão seja
-  consciente e auditável.
+- O usuário pode dispensar uma objeção específica ou a revisão inteira daquele
+  escopo. Registre no `UX-REVIEW.md` ou no registro de dispensa a data, o escopo,
+  as etapas dispensadas e a fala literal. Uma dispensa geral explícita vale para
+  o escopo citado e não exige confirmação ou objeção por objeção.
+- Sem dispensa, aplique normalmente o veredicto: ❌ exige correção antes de
+  apresentar; ✅ ou ⚠️ permite avançar com as ressalvas declaradas.
 - **Anti-teatro:** veredicto ✅ sem a lista de reclamações verificadas item a
   item é inválido. Um Guardião que não reclamou de nada em nada provavelmente
   não revisou — a checklist preenchida é a prova de que a revisão aconteceu.

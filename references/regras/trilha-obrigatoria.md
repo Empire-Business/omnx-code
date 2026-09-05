@@ -1,11 +1,15 @@
 # 🚦 Trilha Obrigatória — Do Zero ao App em Produção
 
-Para quem está começando um app do zero, esta é a ordem que **deve ser seguida**. Nenhuma etapa pode ser pulada.
+Para quem está começando um app do zero, esta é a ordem recomendada. O dono pode
+dispensar explicitamente as etapas de validação de UI; os gates técnicos e de
+segurança continuam regidos por suas regras próprias.
 
-> **A FASE 0 é a tela, não o documento.** O dono do produto precisa VISUALIZAR e aprovar as telas antes de existir PRD, ROADMAP, ARQUITETURA, UML ou UX-MAP — esses documentos são escritos a partir das telas aprovadas, nunca o contrário. O porquê e o gate completo estão em `docs/regras/mockup-first.md`.
+> **Padrão:** a FASE 0 é a tela. **Modo direto:** quando o dono dispensar mockup
+> e/ou revisores para um escopo, registre a escolha e comece pela próxima etapa
+> aplicável, sem nova confirmação.
 
 ```
-FASE 0 — TELAS PRIMEIRO (mockup-first, gate 1.6f — nada antes disto)
+FASE 0 — TELAS PRIMEIRO (padrão recomendado; dispensável pelo dono)
   └─ Colher o brief mínimo (6 perguntas) e escolher sistema(s) de referência real (gate 1.6e)
   └─ Propor o baseline visual provisório, embutido nas telas (NÃO exigir design system escrito)
   └─ Gerar mockups navegáveis em docs/mockups/ — um HTML por tela, autocontido, com a tela de Loja de Apps obrigatória
@@ -14,7 +18,7 @@ FASE 0 — TELAS PRIMEIRO (mockup-first, gate 1.6f — nada antes disto)
   └─ Registrar aprovação em docs/mockups/APROVACAO.md (fonte da verdade do gate 1.6f)
   └─ Promover o baseline aprovado para docs/DESIGN.md (agora sim como fonte da verdade)
 
-FASE 0b — Segurança & Planejamento (só depois das telas aprovadas)
+FASE 0b — Segurança & Planejamento (ou início do modo direto)
   └─ Executar skill /security-auditor
   └─ Criar docs/UX-MAP.md TRANSCREVENDO as telas aprovadas (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques — gate 1.6e)
   └─ Criar PRD.md descrevendo o que está nas telas aprovadas → revisão do UX-Guardião (docs/UX-REVIEW.md, veredicto ✅/⚠️) → aprovação obrigatória do usuário

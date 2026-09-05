@@ -4,6 +4,22 @@ Histórico de versões da skill. Ao fazer qualquer atualização, registre aqui 
 
 ---
 
+## v1.27.0 — 2026-09-05
+
+### O dono escolhe o nível de validação da UI
+
+- Mantém mockup-first, UX-Guardião e Dona Maria como fluxo padrão recomendado,
+  mas remove o bloqueio absoluto dessas três etapas.
+- Reconhece frases como “não precisa de mockup”, “vai direto para o código” e
+  “pule Dona Maria” como autorização suficiente para o escopo citado, sem nova
+  confirmação ou tentativa de convencer o dono.
+- Permite dispensar mockup, referência, UX-Guardião e Dona Maria juntos ou
+  separadamente; a decisão fica registrada com escopo, data e fala literal.
+- A dispensa é local ao pedido e não flexibiliza segurança, migrations, RLS,
+  isolamento multi-tenant, UML aplicável, testes, deploy ou merge.
+- Sincroniza o fluxo principal, regras instaláveis, checklist, trilha,
+  templates de `CLAUDE.md`/`AGENTS.md` e avaliação comportamental.
+
 ## v1.26.0 — 2026-09-04
 
 ### Árvore única e legível de mockups

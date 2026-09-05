@@ -1,10 +1,10 @@
 ---
 name: omnx-code
 metadata:
-  version: "1.26.0"
+  version: "1.27.0"
   min_security_auditor: "1.11"
   contract_version: 1
-description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supabase e Vercel com tasks, segurança, multi-tenant, perfis de acesso, apps modulares, documentação e handoffs. Use em qualquer trabalho de desenvolvimento, setup, feature, mockup, protótipo, tela, documentação, retomada/handoff, migração de CLAUDE.md/AGENTS.md, atualização da própria skill ou quando o usuário mencionar OMNX/omnx-code. Aplica mockup-first, UX-Guardião e Dona Maria antes de apresentar UI; mantém uma única árvore de mockups com oficial, em aprovação e histórico; usa pré-auditoria consolidada, lotes de 3-4 telas, correções em bloco e reteste somente do escopo afetado. Em pedido puro de auditoria de segurança, delegue à security-auditor. Em multi-tenancy, subcontas, BYOK ou isolamento de credenciais/webhooks, acione também a skill especializada omnx-multi-tenancy quando disponível.
+description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supabase e Vercel com tasks, segurança, multi-tenant, perfis de acesso, apps modulares, documentação e handoffs. Use em qualquer trabalho de desenvolvimento, setup, feature, mockup, protótipo, tela, documentação, retomada/handoff, migração de CLAUDE.md/AGENTS.md, atualização da própria skill ou quando o usuário mencionar OMNX/omnx-code. Recomenda mockup-first, UX-Guardião e Dona Maria como fluxo padrão de UI, mas permite ao dono dispensar explicitamente qualquer uma dessas etapas para um escopo definido; mantém rastreabilidade sem bloquear a escolha do usuário. Em pedido puro de auditoria de segurança, delegue à security-auditor. Em multi-tenancy, subcontas, BYOK ou isolamento de credenciais/webhooks, acione também a skill especializada omnx-multi-tenancy quando disponível.
 ---
 
 # OMNX Code
@@ -14,23 +14,21 @@ description: Framework OMNX para criar ou evoluir apps React, TypeScript, Supaba
 
 ---
 
-## Regra Zero — Telas primeiro (a pessoa VISUALIZA antes de qualquer documento)
+## Regra Zero — O dono escolhe o modo de validação da UI
 
-**Em qualquer pedido de produto — sistema novo do zero ou tela nova em projeto que já existe — o primeiro entregável é o mockup visual das telas, aberto no navegador e aprovado pelo dono do produto. Só depois disso nasce PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou qualquer linha de código.**
+**Padrão recomendado:** em produto novo ou mudança relevante de interface, apresente primeiro um mockup navegável, passe pelo UX-Guardião e pela Dona Maria, obtenha a aprovação do dono e só então implemente. Isso reduz retrabalho porque decisões visuais ficam baratas enquanto ainda são HTML descartável.
 
-Por que esta ordem, e não a inversa: ninguém consegue revisar um produto lendo requisitos. Um PRD de onze seções parece certo para quem escreveu e parece certo para quem leu — até a tela existir e a pessoa dizer "não era isso". Quando essa frase aparece depois do PRD, do ROADMAP, do UML e do schema modelado, a correção já está espalhada por cinco documentos e um banco. Quando aparece na tela HTML, custa apagar um arquivo e desenhar de novo.
+**Modo direto:** o dono pode dispensar explicitamente o mockup, o UX-Guardião e/ou a Dona Maria, juntos ou separadamente. Frases como “não precisa de mockup”, “vai direto para o código”, “pule o Guardião” ou “pule a Dona Maria” já são autorização suficiente. Não discuta, não peça confirmação adicional e não transforme a escolha em novo bloqueio. Explique o trade-off em uma frase, registre a fala e avance.
 
-Tela é a única linguagem em que o dono do produto é fluente. É nela que ele enxerga o campo que falta, o botão que não existe, o passo que está sobrando — coisas que ele nunca vai achar numa lista de requisitos funcionais, porque para achá-las ele teria primeiro que traduzir a lista em imagem mental, e essa tradução é justamente o trabalho que você está aqui para fazer. O documento não perde valor nessa inversão: ganha. Ele deixa de ser uma aposta sobre o que o produto vai ser e passa a ser a transcrição de algo que já foi visto e aceito.
-
-**Isso não afrouxa nenhum gate desta skill.** PRD, UML, UX-MAP, níveis de acesso, sistema de tickets e segurança continuam todos obrigatórios, com o mesmo rigor. Só muda a ordem: eles passam a ser escritos **a partir** das telas aprovadas.
+A dispensa é limitada ao escopo pedido e não vira preferência permanente por inferência. Ela também não dispensa segurança, migrations versionadas, RLS, isolamento multi-tenant, UML quando houver mudança de domínio, testes ou autorização para deploy/merge.
 
 | Onde isto vive | O quê |
 |----------------|-------|
-| Gate operacional | **Regra 1.6f** (fail-closed), no Modo de Trabalho Normal |
+| Fluxo operacional | **Regra 1.6f**, no Modo de Trabalho Normal |
 | Procedimento completo | **"Fluxo de Mockups"**, mais adiante nesta skill |
 | Regra instalada no projeto do usuário | `docs/regras/mockup-first.md` |
 
-> **Válvula de escape (explícita e registrada):** se o usuário disser claramente que quer o documento antes das telas ("já sei exatamente o que quero, escreve o PRD primeiro"), respeite — o produto é dele. Mas antes explique em **uma frase** o que ele está trocando, e registre a dispensa em `docs/mockups/APROVACAO.md` com data. Dispensa não pedida não existe: no silêncio, telas primeiro.
+> No silêncio, use o fluxo padrão. Havendo dispensa explícita, registre em `docs/mockups/APROVACAO.md`; se a pasta ainda não existir, use `docs/handoffs/HISTORY.md`. Inclua data, escopo, etapas dispensadas e a frase literal do dono.
 
 ---
 
@@ -69,7 +67,7 @@ espere que o usuário peça por segurança para que ela exista na fundação.
 
 | Campo | Valor |
 |-------|-------|
-| Versão da skill | **1.26.0** |
+| Versão da skill | **1.27.0** |
 | Security-auditor mínimo requerido | **v1.11** |
 | GitHub (esta skill) | https://github.com/Empire-Business/omnx-code |
 | GitHub (security-auditor) | https://github.com/Empire-Business/security-auditor |
@@ -100,8 +98,8 @@ cat .empire/state.json
 |----------|------|
 | `.empire/state.json` não existe | → Fase de Setup (primeira vez) |
 | `setup_complete: false` | → Continuar Setup incompleto |
-| `setup_complete: true` e `mockups_approved: false` | → Modo de Trabalho Normal, **mas** o gate 1.6f está fechado: pedido de produto/tela nova entra pelo **Fluxo de Mockups**, não pelo PRD |
-| `setup_complete: true` e `mockups_approved: true` | → Modo de Trabalho Normal; o gate 1.6f só reabre para telas que ainda não estão em `docs/mockups/APROVACAO.md` |
+| `setup_complete: true` e `mockups_approved: false` | → Modo de Trabalho Normal; ofereça o **Fluxo de Mockups**, salvo dispensa explícita do dono para o escopo atual |
+| `setup_complete: true` e `mockups_approved: true` | → Modo de Trabalho Normal; ofereça nova validação visual apenas para telas ainda não cobertas, salvo modo direto |
 
 Se o usuário pediu explicitamente "verificar atualizações" ou "atualizar skill" → ir direto para a seção **Auto-atualização**.
 
@@ -227,11 +225,12 @@ Crie a pasta `.empire/` e o arquivo `state.json` se ainda não existirem:
   "mockups_approved": false,
   "mockups_approved_at": null,
   "mockups_round": 0,
-  "mockups_screens": 0
+  "mockups_screens": 0,
+  "ui_validation_overrides": []
 }
 ```
 
-> `mockups_approved` é o registro no state do gate 1.6f (Regra Zero): `false` significa que nenhuma tela foi aprovada pelo usuário e, portanto, PRD/ROADMAP/ARQUITETURA/UML/UX-MAP e código de produto estão bloqueados. Ele espelha `docs/mockups/APROVACAO.md`, que continua sendo a fonte da verdade detalhada (por tela); o state serve para você detectar a situação numa ativação nova sem reler tudo. `mockups_round` conta as rodadas de revisão e `mockups_screens` quantas telas estão aprovadas.
+> `mockups_approved` registra a passagem pelo fluxo visual padrão. `false` não bloqueia quando existe uma dispensa explícita cobrindo o escopo atual. `ui_validation_overrides` guarda somente registros estruturados de dispensa (`scope`, `skipped`, `quote`, `recorded_at`); não use esse histórico para presumir dispensa em outro pedido.
 
 > `last_version_gate_check` guarda o resultado da última passagem pelo gate da regra "Passo 1.5" (`"up_to_date"` ou `"network_failure_user_override"`) e `last_version_gate_checked_at` o timestamp ISO — usados para o cache de 24h que evita bater na rede a cada ativação da skill.
 
@@ -595,7 +594,7 @@ Quando `setup_complete: true` e o usuário pede qualquer coisa (codar, refatorar
 Antes de qualquer ação, crie tasks com `TaskCreate` descrevendo cada etapa. Nunca execute sem tasks visíveis.
 
 **1.5. Sugerir, não forçar — EXCETO UML sempre; segurança e níveis de acesso antes de PR/main são recomendados**
-Sempre que uma ação de Git pudesse ser arriscada ou não-ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. **Exceções inegociáveis:** o gate de **mockup-first** (regra 1.6f) e o gate de **UML** (regra 1.6c) são **fail-closed** — ali você NÃO "informa e deixa decidir"; você **recusa** escrever o documento, o commit ou a publicação até o gate passar. No 1.6f a única saída é o usuário pedir explicitamente a dispensa, que fica registrada. O gate de segurança antes de deploy (regra 1.6) e o gate de documentação de níveis de acesso (regra 1.6b) são **recomendados e opt-in** antes de publicar (push/merge para `main`/`master`, PR de release, deploy): avise o risco, ofereça rodar a `/security-auditor`, mas prossiga se o usuário optar por pular. Em commit simples de trabalho incremental em branch de feature, eles só avisam e sugerem — não bloqueiam.
+Sempre que uma ação de Git puder ser arriscada ou não ideal (como trabalhar em `main`), explique o risco e sugira a alternativa ao usuário. Como regra geral: informar o risco, esperar confirmação, executar. O gate de **UML** (regra 1.6c) e os controles de segurança, banco e isolamento continuam fail-closed quando a regra específica assim determinar. Mockup-first, UX-Guardião e Dona Maria são controles de produto recomendados: o dono pode dispensá-los explicitamente para um escopo, com registro e sem nova confirmação. O gate de segurança antes de deploy (regra 1.6) e o gate de documentação de níveis de acesso (regra 1.6b) seguem suas regras próprias.
 
 **1.6. Gate de segurança antes de deploy (opt-in, recomendado)**
 Antes de qualquer ação que publique em produção — `git push` para `main`/`master` ou branch ligada à Vercel, `git merge` em `main`, abrir PR de release, `supabase functions deploy`, `vercel --prod` — você DEVE:
@@ -661,48 +660,37 @@ Um botão que só abre um formulário de texto livre **não cumpre este gate**, 
 
 > Este gate é independente dos gates 1.6, 1.6b e 1.6c: um projeto pode ter segurança, níveis de acesso e UML em dia e ainda estar bloqueado por falta de sistema de tickets de erro, e vice-versa. Todos precisam passar antes de PR/main.
 
-**1.6e. Gate de UX na fundação — sistema de referência + UX-Guardião (fail-closed)**
+**1.6e. Revisão de UX — padrão recomendado, dispensável pelo dono**
 
-Duas peças, cada uma no ponto do tempo em que ela paga.
+No modo padrão, o usuário escolhe uma referência real, o UX-Guardião revisa o candidato e `docs/UX-MAP.md` registra rotas, ações e fluxos. Faça uma pré-auditoria consolidada, corrija em bloco e reteste somente o escopo afetado.
 
-**Antes de desenhar as telas (insumo do mockup):** o usuário escolhe pelo menos um **sistema de referência real** — produto existente cuja experiência o projeto segue ("navegação tipo Linear", "pedido tipo iFood", "organização tipo Notion"). Se ele não souber, proponha 3-5 candidatos com uma frase sobre o que cada um faz bem e deixe ele decidir; você nunca escolhe sozinho, e "sem referência, inventa" não é aceito. A referência é o insumo mínimo do mockup: sem ela você improvisa uma navegação que mistura padrões de dez produtos diferentes, e o usuário final paga a conta. Nesta fase **não se escreve o `UX-MAP.md`** — registre apenas a referência e o que se copia / não se copia dela em `docs/mockups/README.md`.
+O dono pode dispensar a referência, o UX-Guardião ou ambos para um escopo explícito. Registre a escolha e prossiga. Se o fluxo alterar rotas ou navegação, `docs/UX-MAP.md` ainda deve refletir o sistema implementado; a dispensa é da revisão, não da documentação técnica necessária para manter o projeto coerente.
 
-**Antes de o usuário ver as telas:** o **UX-Guardião** ("o chato") — agente adversarial cuja única função é reclamar da experiência — revisa os mockups gerados, e as reclamações são corrigidas **antes** de as telas chegarem ao usuário. O motivo é econômico: o tempo do dono do produto é o recurso mais escasso do projeto, e gastá-lo apontando um botão sem destino que um agente pega de graça é desperdício. Ele deve gastar esse tempo dizendo o que o produto **é** — não caçando defeito óbvio. Cada rodada fica em `docs/UX-REVIEW.md` com veredicto ✅ / ⚠️ / ❌; **veredicto ❌ não sobe para o usuário** — corrija e rode de novo.
+**1.6f. Mockup-First — padrão recomendado, não bloqueio absoluto**
 
-**Depois das telas aprovadas:** `docs/UX-MAP.md` é escrito **a partir das telas aprovadas** — mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário em vez de jargão técnico). Escrito nessa ordem ele deixa de ser previsão e passa a ser transcrição — o que também o torna verificável: rota no mapa sem HTML correspondente é bug do mapa, e link em HTML sem rota no mapa é buraco no mapa. Em seguida o Guardião revalida PRD e UML contra as telas aprovadas e o UX-MAP.
-
-**Gate:** sem `docs/UX-MAP.md` + veredicto ✅ (ou ⚠️ com ressalvas virando tasks, ou objeções dispensadas uma a uma pelo usuário e registradas no review), PRD e UML **não são aprovados** e nenhum código nasce — recuse e rode o Guardião de novo. A especificação completa (checklist de reclamações, formato do UX-MAP e do UX-REVIEW, válvula de escape e anti-teatro) vive em `docs/regras/ux-referencia-e-guardiao.md` — leia antes de planejar qualquer sistema novo, não invente a própria versão simplificada.
-
-> **Protocolo de convergência eficiente:** antes da primeira rodada formal, faça uma única pré-auditoria consolidada cobrindo rotas, ações, estados, responsividade, acessibilidade, memória de estado e linguagem comum. Corrija todos os achados dessa passada em bloco e congele o candidato. O Guardião então devolve a lista completa de defeitos reproduzíveis daquela versão, com ID, gravidade, passos, esperado, observado e correção exigida — nunca um achado isolado por rodada. Corrija o lote inteiro e reteste. Depois de um PASS, mudanças reabrem somente as telas alteradas e as dependências compartilhadas alcançadas por elas; item encerrado só reabre com uma regressão reproduzível. Preferência estética nova vira sugestão não bloqueante. Rodadas continuam aditivas no review e objeções dispensadas pelo usuário continuam registradas uma a uma.
-> Este gate é independente dos gates 1.6, 1.6b, 1.6c e 1.6d: um projeto pode ter segurança, níveis de acesso, UML e sistema de tickets em dia e ainda estar bloqueado na fundação por falta de referência de UX ou por rejeição do UX-Guardião. Ele trava a **aprovação da fundação** (telas, PRD, UML), não commits simples em branch de feature — mas nenhuma tela nova de produto vai ao ar sem atualizar o `UX-MAP.md` e, se o fluxo mudar, rodar o Guardião de novo.
-
-**1.6f. Gate de Mockup-First — nada de documento antes da tela aprovada (fail-closed, obrigatório)**
-
-Este gate é a forma executável da **Regra Zero** (topo desta skill). O princípio e o porquê estão lá; aqui está o que fazer.
-
-**O que ele trava:** escrever ou aprovar `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`, `docs/UML.md`, `docs/UX-MAP.md` ou qualquer código de produto **de uma tela que o usuário ainda não viu e aprovou**.
+Use mockup-first por padrão. Antes de iniciar, procure uma fala explícita que peça execução direta. Se houver, não crie mockup, não espere aprovação visual e não bloqueie documentos ou código por falta de `APROVACAO.md`; registre a dispensa e siga o fluxo normal do projeto.
 
 | Situação | Mockup primeiro? |
 |----------|------------------|
-| Projeto novo, do zero | **Sim, sempre.** O primeiro entregável da fundação é `docs/mockups/`, não o PRD |
-| Projeto existente, tela ou feature nova com UI | **Sim.** Mockupe só a(s) tela(s) nova(s) e os pontos de entrada afetados — não o app inteiro |
-| Mudança visível numa tela já aprovada (campo novo, coluna nova, passo novo no fluxo) | **Sim, versão leve.** Atualize o HTML daquela tela e mostre antes de codar |
+| Projeto novo, do zero | Sim por padrão; o dono pode escolher modo direto |
+| Projeto existente, tela ou feature nova com UI | Sim por padrão, somente no escopo afetado; dispensável explicitamente |
+| Mudança visível numa tela já aprovada (campo novo, coluna nova, passo novo no fluxo) | Versão leve por padrão; dispensável explicitamente |
 | Correção de bug, refactor, migration, ajuste de copy/estilo, performance | Não. Siga o Modo de Trabalho Normal direto |
 | Script interno, job de background, CLI, integração sem tela | Não. Não há o que visualizar |
 
-**Procedimento (fail-closed):**
-1. Antes de criar/editar qualquer documento de fundação ou codar tela nova, verifique: existe `docs/mockups/APROVACAO.md` com aprovação explícita do usuário cobrindo as telas em questão?
-2. Se não existe, ou existe mas não cobre a tela nova: **pare e rode o "Fluxo de Mockups"** desta skill. Não escreva "só um rascunho do PRD enquanto isso" — rascunho vira âncora, e a partir daí o mockup passa a servir o documento em vez do contrário; a regra se inverte sozinha por esse caminho, sem ninguém decidir isso.
-3. Só depois da aprovação registrada, siga para PRD → ROADMAP → ARQUITETURA → UML → código, cada documento descrevendo o que as telas aprovadas mostram.
-4. Se as telas mudarem numa revisão posterior, os documentos que descrevem aquelas telas são atualizados **no mesmo commit** — tela e documento nunca divergem.
+**Procedimento:**
+1. Sem instrução contrária, ofereça e execute o Fluxo de Mockups.
+2. Com dispensa explícita, responda em uma frase com o trade-off, registre `escopo`, `etapas dispensadas`, `fala literal` e `data`, e avance sem nova confirmação.
+3. Mantenha PRD, arquitetura, UML e UX-MAP coerentes com o que for implementado, conforme o tipo de mudança exigir.
+4. Não reutilize a dispensa em outra feature sem nova fala do dono.
 
 **O que conta como aprovação:** uma **frase do usuário**, nunca uma inferência sua. "Ok", "legal", "entendi" em contexto ambíguo não aprovam oito telas. O registro em `docs/mockups/APROVACAO.md` tem que citar o que ele disse, com data/hora BRT. `APROVACAO.md` preenchido sem fala correspondente do usuário é falsificação de aprovação, não adiantamento de trabalho.
 
-**Projeto que já tem PRD/UML aprovados:** mockup-first não é licença para contradizer a fundação existente. A tela nova respeita o que já está documentado. Se ela exigir mudar o PRD (requisito novo, regra de negócio diferente), a mudança do PRD acontece **depois** da aprovação da tela, no mesmo commit dela — e o Guardião revalida, porque o fluxo mudou.
+**Projeto que já tem PRD/UML aprovados:** mockup-first não é licença para contradizer a fundação existente. A tela nova respeita o que já está documentado. Se ela exigir mudar o PRD, atualize-o no mesmo commit. No modo padrão isso acontece depois da aprovação visual; no modo direto, a implementação e os documentos são sincronizados sem essa espera.
 
-> Este gate é independente dos gates 1.6, 1.6b, 1.6c, 1.6d e 1.6e — mas é o **primeiro na linha do tempo**: todos os outros passam a operar sobre telas que o dono do produto já viu e aceitou. A especificação completa vive em `docs/regras/mockup-first.md`.
+> Uma dispensa de mockup não autoriza pular segurança, migrations, RLS, isolamento, testes, UML aplicável, deploy ou merge. A especificação completa vive em `docs/regras/mockup-first.md`.
 
-**1.6g. Gate da Dona Maria — a pessoa que não entende testa antes do dono do produto (fail-closed, obrigatório)**
+**1.6g. Dona Maria — revisão leiga recomendada, dispensável pelo dono**
 
 O UX-Guardião (regra 1.6e) é um especialista, e é exatamente por isso que existe uma classe inteira de problema que ele nunca vai achar: **ele já sabe demais**. Um especialista lê "conectar seu repositório" e entende. Alguém que nunca programou lê a mesma frase e **para de ler ali** — não pede ajuda, não clica em nada, não reclama. Fecha o produto e não volta, e ninguém fica sabendo o porquê.
 
@@ -710,22 +698,22 @@ Esse abandono não aparece em checklist de UX, não aparece em teste de quem con
 
 **Como roda:** um subagente encarnando a **Dona Maria** — dona de negócio 50+, não técnica, usa só WhatsApp/Instagram/banco/planilha, nunca programou, trava na primeira palavra desconhecida, tem medo de clicar no que não entende, e quando trava desiste ou chama outra pessoa em vez de perguntar. Ela lê os HTMLs dos mockups e relata cada travamento com a **frase literal** que está na tela, o que entendeu, o que faria, e a gravidade. Ela tem nome porque precisa ser sempre a mesma pessoa: é isso que torna uma rodada comparável com a seguinte, e é muito mais difícil ignorar o travamento de alguém com nome do que uma linha num relatório de usabilidade. Chame-a pelo nome ao falar com o dono do produto ("a Dona Maria travou na tela de conexão").
 
-**Ordem inegociável:** UX-Guardião **primeiro**, Dona Maria **depois**, dono do produto **por último**. O Guardião limpa o defeito estrutural; a Dona Maria testa se o que sobrou é compreensível. Rodá-la antes desperdiça a passada dela reclamando de coisa que ia mudar de qualquer jeito.
+Quando as duas revisões forem usadas, rode o UX-Guardião primeiro e a Dona Maria depois. O dono pode dispensar a Dona Maria para o lote ou mudança atual; registre a fala e avance sem pedir que ele dispense objeções individualmente.
 
 **Quando roda:** antes de apresentar mockups novos ao dono do produto (sempre), e depois de qualquer mudança de texto de tela, rótulo de botão ou mensagem de erro — é exatamente onde ele pega coisa. Não roda para mudança só visual (cor, espaçamento, sombra), bug, refactor, migration ou script sem UI.
 
-**O gate (fail-closed):**
+**Quando a revisão for executada:**
 1. Registre a rodada em `docs/TESTE-DE-LEIGO.md`, **aditivo** — rodadas novas se acumulam, nada é apagado.
 2. Qualquer travamento 🔴 ("travei e não consigo continuar sozinha") → **não apresente**. Corrija o texto e rode de novo.
 3. O veredicto final — "Eu conseguiria usar isso sozinha? Sim/Não, porque..." — vale **mais que a contagem**: um "não conseguiria" bloqueia mesmo sem nenhum 🔴.
 4. Só 🟡 e 🟢 → pode apresentar, **declarando as ressalvas** ao dono do produto.
-5. O usuário pode dispensar uma objeção específica ("esse termo fica, meu público é técnico"), mas **uma a uma e com registro** no próprio `TESTE-DE-LEIGO.md`, nunca em bloco.
+5. O usuário pode aceitar ressalvas específicas ou dispensar a revisão inteira daquele escopo; registre a decisão no próprio `TESTE-DE-LEIGO.md` ou no registro de dispensa.
 
 **Aproveite o que ela elogia, não só o que ela reclama.** Quando a Dona Maria diz que uma tela específica ficou boa, ela está apontando o padrão que o resto do produto deveria seguir. Identifique a tela que passou e use o vocabulário e o tom dela para reescrever as que travaram — isso costuma resolver metade dos achados de uma vez.
 
 **Anti-teatro.** Três formas de fingir que este gate rodou: (a) **persona que sabe demais** — se a Dona Maria "entendeu pelo contexto" o que é um repositório, não é a Dona Maria, é você fingindo ser ela; leigo trava na palavra, não infere; (b) **reclamação genérica** — "a linguagem poderia ser mais simples" não é achado, achado é *"li 'cole isto na sua IA' e não sei o que é 'minha IA' — eu tenho uma IA?"*, com a frase literal; (c) **só reclamação** — um relatório sem nenhum "isso aqui eu entendi" provavelmente leu procurando defeito, não leu de verdade. O sinal de que rodou: pelo menos um achado que **surpreendeu quem escreveu a tela**.
 
-> Este gate é independente dos gates 1.6, 1.6b, 1.6c, 1.6d, 1.6e e 1.6f. Ele roda **entre** o UX-Guardião e a apresentação ao dono do produto. A especificação completa vive em `docs/regras/avaliador-leigo.md`.
+> A ausência desta revisão só bloqueia quando o dono escolheu o fluxo padrão e ainda não tomou outra decisão. Uma dispensa explícita libera imediatamente o escopo. A especificação completa vive em `docs/regras/avaliador-leigo.md`.
 
 **1.7. Confiabilidade de edições de documentos longos por subagentes (lição de campo, 22/08)**
 Quando delegar a um subagente a edição de um documento longo (>500 linhas — PRD, ARQUITETURA, UML, roadmap):
@@ -967,7 +955,7 @@ Antes de escrever qualquer schema ou tela, a IA DEVE definir e documentar em `do
 
 Ao criar a primeira migration do projeto, a tabela de catálogo de apps e a de instalação por tenant vêm **junto** com a tabela de tenants e membership (regra 21) — antes de qualquer tabela de negócio específica de um app. Se a IA encontrar em um projeto existente uma funcionalidade de produto sem app correspondente no catálogo (ou uma tabela/rota de negócio sem checagem de `tenant_apps.enabled`), interrompa e alerte o usuário antes de continuar — é uma falha de modularização, não um detalhe.
 
-Essa arquitetura só é válida se o UML (regra 1.6c) modelar `App` e `TenantApp` como entidades, o PRD (`docs/PRD.md`) organizar os requisitos por app, e os mockups (fluxo de mockups desta skill) incluírem obrigatoriamente uma tela de Loja de Apps — ver ajustes nessas seções abaixo.
+Essa arquitetura só é válida se o UML (regra 1.6c) modelar `App` e `TenantApp` como entidades e o PRD (`docs/PRD.md`) organizar os requisitos por app. Quando o fluxo de mockups for usado, inclua também uma tela de Loja de Apps; no modo direto, a falta desse mockup não bloqueia a implementação.
 
 **20. Toda alteração de banco via migration — SQL direto é proibido (regra absoluta)**
 
@@ -1119,30 +1107,30 @@ Para tarefas que envolvem múltiplos domínios em paralelo (ex: migração de ba
 
 ---
 
-## Fluxo de Mockups (o PRIMEIRO passo de todo produto)
+## Fluxo de Mockups (padrão recomendado para UI)
 
-> Este é o fluxo de abertura da skill, não um extra. Ele existe para pôr as telas na frente do dono do produto **antes** de qualquer documento, porque é olhando a tela que ele descobre o que realmente quer — ver a Regra Zero (topo desta skill) e o gate 1.6f. Um mockup pela metade é pior que nenhum: ele esconde os gaps que deveria revelar.
+> Use este fluxo quando o dono não tiver escolhido execução direta. Ele existe para pôr as telas na frente do dono antes do código e reduzir retrabalho. Se houver dispensa explícita, registre e pule as etapas dispensadas.
 
 ### Quando ativar este fluxo
 
-**Ativamente, por conta própria**, sempre que o pedido envolver uma tela que ainda não existe:
+**Ativamente, por conta própria**, sempre que o pedido envolver uma tela que ainda não existe e o dono não tiver pedido modo direto:
 - "quero fazer um sistema de...", "preciso de um app para...", "vamos começar um projeto"
 - qualquer pedido de feature nova com interface, em projeto novo ou existente
 - mockup, mockups, protótipo, wireframe, "telas do app", "fluxo de telas", "quero ver como fica"
-- **e também quando o usuário pedir direto o PRD** ("escreve o PRD do meu sistema"): nesse caso, ofereça as telas primeiro, explique em uma frase o porquê, e só siga para o PRD se ele insistir (válvula de escape do gate 1.6f).
+- **e também quando o usuário pedir direto o PRD** ("escreve o PRD do meu sistema"): ofereça as telas uma vez; se ele preferir seguir sem elas, registre e avance.
 
 Não ative para bug, refactor, migration, ajuste em tela já aprovada, script sem UI — ver a tabela do gate 1.6f.
 
-### Princípios inegociáveis
+### Princípios do modo padrão
 
-1. **Visualizar antes de documentar.** Nada de PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou código antes das telas aprovadas. Você **não precisa** desses documentos para desenhar — precisa de um brief curto e de um sistema de referência.
+1. **Visualizar antes de documentar.** No modo padrão, telas aprovadas precedem PRD, ROADMAP, ARQUITETURA, UML, UX-MAP e código. No modo direto, esta ordem não bloqueia o trabalho.
 2. **O usuário aprova vendo, não lendo.** O entregável desta fase é uma pasta que abre no navegador. Se ele não abriu, o fluxo não terminou.
 3. **Fiel ao brief, honesto sobre o resto.** Toda capacidade que o usuário mencionou aparece em alguma tela. Tudo que você preencheu por conta própria vai declarado como **suposição** no rodapé da tela — é assim que ele corrige em vez de ter que perguntar.
 4. **Design system provisório inline, promovido depois.** Você propõe o baseline visual (cores, tipografia, espaçamento) já embutido nas telas; ele aprova olhando. Só depois da aprovação isso é extraído para `docs/DESIGN.md` como fonte da verdade. Nunca peça um design system escrito como pré-condição para desenhar.
 5. **Uma tela por arquivo.** Cada tela é um HTML separado na área correspondente da árvore única `docs/mockups/`.
 6. **Navegável.** Existe um `index.html` central e cada tela linka as próximas do fluxo. Fluxo se aprova clicando, não imaginando.
 7. **Autocontido.** Abre em `file://` sem servidor, build ou dependência externa. CSS inline em cada arquivo.
-8. **Guardião antes do usuário.** As telas passam pelo UX-Guardião e as reclamações são corrigidas antes de ele ver (gate 1.6e).
+8. **Revisão proporcional.** UX-Guardião e Dona Maria entram por padrão; qualquer um pode ser dispensado explicitamente pelo dono para o escopo.
 
 ---
 
@@ -1168,8 +1156,8 @@ Task 3: Inventariar as telas (a partir do brief, não de um PRD)
 Task 4: Criar a estrutura docs/mockups/
 Task 5: Gerar o HTML de cada tela + index.html
 Task 5b: Fazer pré-auditoria consolidada e congelar o candidato
-Task 6: Rodada do UX-Guardião e correção ANTES de mostrar
-Task 6b: Rodada da Dona Maria (avaliadora leiga) e correção ANTES de mostrar (gate 1.6g)
+Task 6: Rodada do UX-Guardião e correção, salvo dispensa explícita
+Task 6b: Rodada da Dona Maria, salvo dispensa explícita
 Task 7: Abrir as telas para o usuário e rodar o loop visualizar → aprovar/alterar
 Task 8: Registrar a aprovação e promover o design system para docs/DESIGN.md
 Task 9: Commitar e só então liberar a fundação (PRD, UML, UX-MAP)
@@ -1372,14 +1360,16 @@ Corrija o conjunto encontrado em **um lote**, execute novamente a mesma matriz e
 
 ---
 
-### Task 6 — UX-Guardião ANTES de mostrar (gate 1.6e)
+### Task 6 — UX-Guardião antes de mostrar, quando escolhido
+
+Se o dono dispensou o UX-Guardião para este escopo, registre a fala e pule para a próxima etapa. Não peça nova confirmação.
 
 Rode o Guardião sobre as telas geradas — subagente dedicado se disponível, senão uma passada separada sua, anunciada ("Agora atuando como UX-Guardião..."), esquecendo que foi você que desenhou.
 
 Ele reclama da checklist de `docs/regras/ux-referencia-e-guardiao.md`: cliques demais, botão sem destino, rota órfã, beco sem saída, estado vazio/erro/carregando não pensado, jargão técnico, incoerência com a referência declarada, navegação que exige memória, formulário longo sem etapas, mobile ignorado.
 
 - Registre a rodada em `docs/UX-REVIEW.md` (aditivo, nunca sobrescrito), com "Correções exigidas por item" e "Verificado, sem reclamação". A rodada formal deve devolver a **lista completa** de achados reproduzíveis do candidato, não parar no primeiro defeito.
-- **Corrija antes de mostrar e sempre em bloco.** Veredicto ❌ não sobe para o usuário — corrija todos os itens, rode a matriz da Task 5b e só então peça o reteste.
+- **Quando o Guardião for executado, corrija antes de mostrar e sempre em bloco.** Veredicto ❌ exige correção, salvo decisão explícita posterior do dono de dispensar a revisão para o escopo.
 - Depois de um PASS, mudança localizada reabre somente as telas alteradas e dependências compartilhadas afetadas. Um item já encerrado só pode ser reaberto se o relatório trouxer passos, resultado esperado e resultado observado que provem a regressão.
 - Só apresente com ✅ ou ⚠️ (ressalvas viram tasks e são declaradas ao usuário na Task 7).
 
@@ -1387,7 +1377,9 @@ O objetivo é o usuário receber telas em que os defeitos óbvios já morreram, 
 
 ---
 
-### Task 6b — Dona Maria ANTES de mostrar (gate 1.6g)
+### Task 6b — Dona Maria antes de mostrar, quando escolhida
+
+Se o dono dispensou a Dona Maria para este escopo, registre a fala e pule para a próxima etapa. Não execute a persona, não tente substituí-la por outro nome e não peça dispensa item a item.
 
 Depois do Guardião e antes do usuário, rode a **Dona Maria** sobre as mesmas telas — subagente dedicado encarnando a persona descrita em `docs/regras/avaliador-leigo.md`. Ela não avalia UX: ela **tenta usar e trava**.
 
@@ -1441,7 +1433,7 @@ Ressalvas do UX-Guardião (já viraram tasks):
   - Cadastro em 4 cliques; proponho um atalho no dashboard
 
 Me diga, tela por tela: **aprovada** ou **o que mudar**.
-Nada de PRD, banco de dados ou código antes da sua aprovação.
+No modo padrão, PRD, banco de dados e código aguardam sua aprovação visual.
 ```
 
 **O loop:**
@@ -1450,13 +1442,13 @@ Nada de PRD, banco de dados ou código antes da sua aprovação.
 2. Para as telas com pedido de alteração: arquive a versão anterior (Task 4), regenere **só as telas afetadas** (não o conjunto inteiro — regenerar tudo apaga escolhas que ele já aprovou), rode o Guardião nas telas mexidas e apresente de novo.
 3. Aprovação de tela não mexida **não é resetada** por uma rodada de mudanças em outra tela.
 4. Se ele pedir uma tela que não estava no inventário, adicione — o inventário é vivo nesta fase, é para isso que ela existe.
-5. A fundação libera quando **todas** as telas do inventário estiverem `aprovada` (ou aprovadas com ressalvas registradas como tasks).
+5. No modo padrão, a fundação libera quando **todas** as telas do inventário estiverem `aprovada` (ou aprovadas com ressalvas registradas como tasks). No modo direto, o registro de dispensa libera o escopo sem telas.
 
 **Quando o loop não converge:** se a mesma tela voltar 3 vezes, pare de redesenhar no escuro. Duas saídas melhores: (a) faça **uma** pergunta específica sobre a decisão que está travando ("o cadastro é um formulário único ou em etapas?"); ou (b) entregue 2-3 **variantes** lado a lado (`tel-004-cadastro-var-a.html`, `-var-b.html`) e deixe ele apontar. Escolher entre opções visíveis é muito mais fácil que descrever o que se quer — e é o mesmo motivo pelo qual este fluxo existe.
 
 **O que nunca fazer nesta task:**
 - Inferir aprovação de um "ok" ambíguo, de um silêncio ou de uma mudança de assunto.
-- Começar a escrever PRD/UML "para adiantar" enquanto espera a resposta.
+- No modo padrão, começar a escrever PRD/UML "para adiantar" enquanto espera a resposta.
 - Pedir para ele aprovar lendo o README em vez de abrir as telas.
 
 ---
@@ -1509,7 +1501,9 @@ Impacto/Testes: telas abertas pelo usuário no navegador; 8/8 aprovadas (2 com r
 
 Registre no `.empire/state.json`: `mockups_approved: true`, `mockups_approved_at`, `mockups_round` e `mockups_screens` (quantas telas aprovadas). Atualize `docs/MUDANCAS.md` e o índice do `CLAUDE.md`.
 
-**Só agora a fundação está liberada.** Diga isso explicitamente ao usuário e siga a ordem:
+**No modo padrão, só agora a fundação está liberada.** No modo direto, o registro
+da dispensa substitui esta passagem visual para o escopo, e o trabalho segue
+pelos demais gates aplicáveis.
 
 ```
 ✅ Telas aprovadas — agora os documentos, descrevendo o que você já viu:
@@ -2310,9 +2304,9 @@ Skill("<nome-da-skill>", args="<contexto do projeto>")
 | Arquivo / URL | Conteúdo |
 |---------------|----------|
 | `references/regras/` | Regras inegociaveis instaladas como `docs/regras/` nos projetos |
-| `references/regras/mockup-first.md` | Regra Zero: telas aprovadas antes de qualquer documento (gate 1.6f) |
-| `references/regras/ux-referencia-e-guardiao.md` | Sistema de referencia + UX-Guardiao (gate 1.6e) |
-| `references/regras/avaliador-leigo.md` | Dona Maria, a avaliadora leiga que testa as telas antes do dono do produto (gate 1.6g) |
+| `references/regras/mockup-first.md` | Regra Zero: mockup-first por padrão e modo direto por escolha explícita do dono |
+| `references/regras/ux-referencia-e-guardiao.md` | Sistema de referência e UX-Guardião recomendados, com dispensa por escopo |
+| `references/regras/avaliador-leigo.md` | Dona Maria, revisão leiga recomendada e dispensável pelo dono |
 | `references/modelo-claude.md` | Template padrao do CLAUDE.md a instalar nos projetos |
 | `references/modelo-agents.md` | Template padrao do AGENTS.md (Lovable, Cursor, Windsurf, Codex) |
 | `references/modelo-uml.html` | Template HTML visual para UML (abas navegaveis, tema dark, Mermaid.js) |

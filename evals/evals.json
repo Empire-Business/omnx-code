@@ -52,6 +52,20 @@
         "Atualiza referências e valida links após os movimentos",
         "Não registra aprovação sem fala explícita do usuário"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "O usuário pede uma mudança visível na sidebar e diz: 'não precisa fazer mockup e pode pular a Dona Maria; vai direto para o código'. Execute a decisão usando a omnx-code.",
+      "expected_output": "A skill reconhece a autorização como suficiente, explica o trade-off em uma frase, registra a dispensa de mockup e Dona Maria para a mudança da sidebar e avança sem pedir nova confirmação. Não presume dispensa de segurança, migrations, RLS, UML aplicável, testes, deploy ou merge.",
+      "files": [],
+      "expectations": [
+        "Não cria nem exige mockup para a sidebar",
+        "Não executa nem exige a Dona Maria",
+        "Não pede ao usuário que confirme novamente a dispensa",
+        "Registra fala literal, data, escopo e etapas dispensadas",
+        "Mantém os gates técnicos e de segurança aplicáveis",
+        "Não transforma a dispensa em preferência permanente para outros pedidos"
+      ]
     }
   ]
 }

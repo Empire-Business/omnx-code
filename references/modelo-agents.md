@@ -49,7 +49,7 @@
 - Toda rota, componente e endpoint/RPC de um app não-core verifica se o app está ativo para o tenant atual, no frontend E no backend (RLS/policy) — nunca confie só na UI escondida
 - Desativar um app oculta e bloqueia acesso, nunca apaga dados
 - Exceção só é válida se o usuário confirmar explicitamente um app único sem loja, documentado em `docs/ARQUITETURA.md`
-- **Gate obrigatório (fail-closed):** os mockups incluem obrigatoriamente uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada — e ela é desenhada já na primeira rodada de telas, não depois
+- Quando o fluxo de mockups for usado, inclua uma tela de Loja de Apps listando o catálogo com estado ativo/inativo, salvo exceção documentada. No modo direto, a ausência dessa tela de mockup não bloqueia a implementação da arquitetura modular
 
 ## Regra de API & webhooks por app (inegociável) (detalhe: `docs/regras/api-webhooks-por-app.md`)
 
@@ -69,25 +69,24 @@
 - **Gate obrigatório (fail-closed):** nenhum deploy em produção acontece sem o botão de reportar, a captura automática (print real + logs reais, testados forçando um erro de propósito) e a fila estarem funcionais, e sem `docs/SISTEMA-DE-TICKETS.md` documentar todo o fluxo
 - `docs/SISTEMA-DE-TICKETS.md` é atualizado sempre que o fluxo de captura ou a fila mudar — nunca depois do deploy
 
-## Regra Zero — Mockup-first (inegociável) (detalhe: `docs/regras/mockup-first.md`)
+## Regra Zero — escolha do dono para validação de UI (detalhe: `docs/regras/mockup-first.md`)
 
-- **Telas primeiro, documento depois.** Em todo pedido de produto — sistema novo ou tela nova em projeto existente — o primeiro entregável é o mockup navegável das telas em `docs/mockups/`, aberto no navegador e aprovado pelo dono do produto
-- **Gate obrigatório (fail-closed):** não se escreve nem se aprova `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`, `docs/UML.md`, `docs/UX-MAP.md` nem código de produto de uma tela que o usuário ainda não viu e aprovou. Esses documentos descrevem as telas aprovadas — nunca o contrário
+- **Padrão recomendado:** em pedido de produto ou tela nova, apresente primeiro o mockup navegável em `docs/mockups/`, passe pelas revisões de UX e obtenha aprovação do dono
+- **Modo direto por escolha do dono:** frases como “não precisa de mockup”, “vai direto para o código”, “pule o Guardião” ou “pule a Dona Maria” dispensam imediatamente as etapas citadas para aquele escopo. Registre a fala e avance sem discutir nem pedir nova confirmação
 - Nenhum documento é pré-requisito para desenhar: bastam um brief curto e um sistema de referência real. O design system é **consequência** (o baseline visual é proposto inline nas telas e promovido a `docs/DESIGN.md` depois de aprovado), nunca pré-condição
 - Aprovação é uma frase do usuário, registrada em `docs/mockups/APROVACAO.md` com data/hora BRT — "ok" ambíguo ou silêncio não aprovam tela
 - Tela nova ou mudança visível em tela aprovada: desenha, mostra, aprova, e só então atualiza PRD/UML/código, no mesmo commit
 - Não se aplica a bug, refactor, migration, ajuste de estilo, script sem UI — aí é o fluxo normal
-- Válvula de escape: o usuário pode pedir explicitamente o documento antes das telas; a dispensa fica registrada em `docs/mockups/APROVACAO.md`. No silêncio, telas primeiro
+- No silêncio, telas primeiro. Dispensa explícita fica registrada em `docs/mockups/APROVACAO.md` ou, se a pasta não existir, em `docs/handoffs/HISTORY.md`; ela não se estende automaticamente a outro escopo
 - Use uma única árvore: oficiais aprovados na raiz de `docs/mockups/`, candidatos em `docs/mockups/em-aprovacao/<lote>/` e versões substituídas em `docs/mockups/historico/<versao>-<apelido>/`. Nunca crie `docs/mockups-v2`, `docs/mockups-final` ou pasta paralela equivalente
 
-## Regra de UX na fundação (inegociável) (detalhe: `docs/regras/ux-referencia-e-guardiao.md`)
+## Regra de UX na fundação (recomendada e dispensável pelo dono) (detalhe: `docs/regras/ux-referencia-e-guardiao.md`)
 
-- Nenhum sistema novo é desenhado "do zero": antes de desenhar as telas, o usuário escolhe pelo menos um sistema de referência real (produto existente cuja experiência o projeto segue) — a IA pode propor candidatos, mas nunca escolhe sozinha, e "sem referência" não é aceito
-- **Gate obrigatório (fail-closed):** nenhum conjunto de mockups é apresentado ao usuário sem passar antes pelo UX-Guardião — um agente adversarial cuja única função é reclamar da experiência do usuário, com checklist de reclamações obrigatórias (cliques demais, botão sem destino, rota órfã, estado vazio não pensado, jargão técnico, inconsistência com a referência) e veredicto registrado em `docs/UX-REVIEW.md` (✅ / ⚠️ / ❌). Veredicto ❌ não sobe para o usuário: corrige e roda de novo
+- No modo padrão, o usuário escolhe uma referência real e o UX-Guardião revisa os mockups antes da apresentação. O dono pode dispensar referência, Guardião ou ambos para o escopo atual; registre e avance
 - **Convergência eficiente:** antes dos avaliadores formais, faça uma pré-auditoria consolidada; revise preferencialmente em lotes de 3-4 telas; devolva e corrija achados em bloco; depois de PASS, reteste apenas telas alteradas + dependências compartilhadas afetadas. Item encerrado só reabre com regressão reproduzível
-- **Gate da Dona Maria** (`docs/regras/avaliador-leigo.md`): depois do Guardião e antes do dono do produto, a Dona Maria — persona leiga fixa, dona de negócio 50+, não técnica, que trava na primeira palavra desconhecida — lê as telas e registra cada travamento em `docs/TESTE-DE-LEIGO.md` com a frase literal. Ela tem nome porque precisa ser sempre a mesma pessoa: é o que torna uma rodada comparável com a seguinte. Travamento 🔴 ou o veredicto "não usaria sozinha" bloqueia a apresentação; objeção só é dispensada uma a uma, com registro.
+- **Dona Maria** (`docs/regras/avaliador-leigo.md`): revisão leiga recomendada depois do Guardião. O dono pode dispensá-la integralmente para um lote ou mudança, com registro e sem confirmação adicional
 - Depois das telas aprovadas, a IA cria `docs/UX-MAP.md` **transcrevendo** os HTMLs aprovados: mapa de rotas, grafo de navegação, inventário de ações por tela (nenhum botão sem destino, nenhuma rota órfã), fluxos críticos com contagem de cliques e os compromissos "fácil de usar SEMPRE" (ação principal em ≤3 cliques, estado vazio que ensina, língua do usuário sem jargão técnico). Rota no mapa sem HTML é bug do mapa; link em HTML sem rota no mapa é buraco no mapa
-- Nenhum PRD ou UML é aprovado sem o Guardião revalidando contra as telas aprovadas e o UX-MAP; ❌ bloqueia até correção e nova rodada; ⚠️ exige ressalvas registradas como tasks; o usuário só dispensa objeções uma a uma, com registro no review
+- Quando o Guardião for executado, ❌ exige correção antes de apresentar e ⚠️ gera ressalvas. Uma dispensa explícita do dono libera o escopo sem revisão
 - `docs/UX-MAP.md` é atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo — e mudança relevante no PRD ou no mapa reaciona o Guardião
 
 ## Regra de banco de dados (inegociável) (detalhe: `docs/regras/migrations.md` e `docs/regras/acesso-supabase.md`)
@@ -118,7 +117,7 @@
 
 ## Fluxo de desenvolvimento
 
-- **Tela nova, antes de tudo:** gere o mockup em `docs/mockups/`, mostre ao usuário e obtenha aprovação registrada em `docs/mockups/APROVACAO.md`. Nenhum documento e nenhum código de tela nova antes disso (Regra Zero)
+- **Tela nova:** ofereça mockup-first por padrão. Se o dono escolher modo direto, registre a dispensa e siga para documentos/código sem bloquear por falta de mockup
 - Para criar mockups **não** exija `PRD.md`, `UML.md` nem design system — eles vêm depois. Exija apenas um brief curto e um sistema de referência real
 - Antes de codar qualquer feature: verifique se as telas dela estão aprovadas e se existem `PRD.md`, `ROADMAP.md` e `ARQUITETURA.md`
 - Se não existirem → telas aprovadas primeiro, depois esses documentos. Não comece a codar sem eles

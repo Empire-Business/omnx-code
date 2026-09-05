@@ -1,8 +1,10 @@
-# 📋 Etapas 0-3 — Mockups, UX-MAP, PRD, ROADMAP e ARQUITETURA
+# 📋 Etapas 0-3 — validação visual e planejamento
 
-> **A ordem aqui é telas → documentos.** Nenhum destes documentos é escrito antes de o usuário VISUALIZAR e aprovar os mockups das telas (Etapa 0). O porquê está em `docs/regras/mockup-first.md` (gate 1.6f, fail-closed): documento aprovado por leitura é aposta; documento escrito a partir de tela aprovada é transcrição.
+> **Padrão recomendado:** telas → documentos. **Modo direto:** o dono pode
+> dispensar mockup, UX-Guardião e/ou Dona Maria para um escopo; registre e
+> avance para o planejamento ou código aplicável sem nova confirmação.
 
-## Etapa 0 — Mockups das telas (o PRIMEIRO passo, obrigatório antes de tudo)
+## Etapa 0 — Mockups das telas (primeiro passo recomendado)
 
 Nenhum sistema novo começa pelo PRD nem pelo UX-MAP: começa pela tela que a pessoa consegue ver.
 
@@ -13,7 +15,8 @@ Nenhum sistema novo começa pelo PRD nem pelo UX-MAP: começa pela tela que a pe
 5. A IA **abre as telas no navegador** e o usuário aprova ou pede alteração, tela por tela — o loop repete até todas estarem aprovadas
 6. A aprovação é registrada em `docs/mockups/APROVACAO.md` e o baseline aprovado é promovido para `docs/DESIGN.md`
 
-> ⚠️ Sem `docs/mockups/APROVACAO.md` com aprovação explícita do usuário, **nada abaixo é escrito**. Detalhes completos: `docs/regras/mockup-first.md` e a seção "Fluxo de Mockups" do `SKILL.md` da `omnx-code`.
+> Sem dispensa explícita, aguarde a aprovação visual. Com dispensa registrada,
+> as etapas abaixo podem começar sem `APROVACAO.md` de telas.
 
 ## Etapa 0b — UX-MAP.md (transcrição das telas aprovadas)
 
@@ -23,7 +26,7 @@ Escrito nesta ordem ele deixa de ser previsão e passa a ser transcrição verif
 
 > ⚠️ Sem `docs/UX-MAP.md`, o PRD não é escrito. Especificação completa: `docs/regras/ux-referencia-e-guardiao.md` (gate 1.6e).
 
-## Etapa 1 — PRD.md (depois das telas aprovadas, antes de qualquer código)
+## Etapa 1 — PRD.md (depois das telas ou no modo direto)
 
 A IA deve criar `docs/PRD.md` **descrevendo o que está nas telas aprovadas** — cada requisito funcional aponta para a(s) tela(s) `TEL-XXX` que o mostram. Requisito sem tela e tela sem requisito são gaps a resolver, não detalhes. Seções:
 
@@ -39,7 +42,9 @@ A IA deve criar `docs/PRD.md` **descrevendo o que está nas telas aprovadas** �
 10. **Critérios de Aceitação** — Como saber quando cada feature está "pronta"
 11. **Fora de Escopo** — O que NÃO será feito nesta versão
 
-> ⚠️ A IA **não pode avançar para o ROADMAP** sem PRD aprovado pelo usuário — e a aprovação do PRD **só é válida depois da revisão do UX-Guardião** (veredicto ✅ ou ⚠️ registrado em `docs/UX-REVIEW.md`, conforme `docs/regras/ux-referencia-e-guardiao.md`). Veredicto ❌ bloqueia: corrige e roda o Guardião de novo. O mesmo vale para o UML (regra 1.6c). E nada disso é escrito antes das telas aprovadas (gate 1.6f).
+> No fluxo padrão, o UX-Guardião revisa a coerência antes de avançar. Se o dono
+> dispensou essa revisão para o escopo, registre e continue. O gate técnico de
+> UML continua independente.
 
 ## Etapa 2 — ROADMAP.md
 
@@ -70,7 +75,9 @@ Após PRD e ROADMAP aprovados, criar `docs/ARQUITETURA.md` com:
 
 ## Etapa 3b — Manutenção dos mockups
 
-Os mockups não morrem depois da fundação: eles são a referência visual do produto. Toda tela nova, e toda mudança visível em tela já aprovada, volta a passar pela Etapa 0 em versão leve — desenha, mostra, aprova, e só então atualiza PRD/UML/código no mesmo commit (gate 1.6f).
+Quando adotados, os mockups permanecem como referência visual do produto. Para
+nova tela ou mudança visível, ofereça uma versão leve; se o dono escolher modo
+direto, registre e mantenha PRD/UML/código sincronizados sem bloquear pela tela.
 
 ### Entregáveis da pasta
 

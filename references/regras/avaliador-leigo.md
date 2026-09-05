@@ -1,7 +1,7 @@
-# Regra — Dona Maria, a avaliadora leiga (gate de usabilidade real)
+# Regra — Dona Maria, revisão leiga opcional de usabilidade
 
-> **Fail-closed antes de apresentar telas ao dono do produto**, junto com o UX-Guardião.
-> Nenhum conjunto de mockups sobe sem passar pelos dois.
+> **Recomendada por padrão**, junto com o UX-Guardião. O dono pode dispensar
+> esta revisão explicitamente para um lote ou mudança; a IA registra e avança.
 
 ## Por que existe
 
@@ -39,12 +39,12 @@ do que uma linha num relatório de usabilidade.
 
 | Momento | Roda? |
 |---------|-------|
-| Antes de apresentar mockups novos ao dono do produto | **Sim, sempre** — junto com o UX-Guardião |
+| Antes de apresentar mockups novos ao dono do produto | Sim por padrão; dispensável explicitamente |
 | Depois de mudar texto de tela, rótulo de botão ou mensagem de erro | **Sim** — é exatamente onde ele pega coisa |
 | Mudança só visual (cor, espaçamento, sombra) | Não |
 | Bug, refactor, migration, script sem UI | Não |
 
-Ordem: **UX-Guardião primeiro, Dona Maria depois**. O Guardião limpa os defeitos estruturais;
+Quando ambos forem usados: **UX-Guardião primeiro, Dona Maria depois**. O Guardião limpa os defeitos estruturais;
 a Dona Maria testa se o que sobrou é compreensível. Rodá-la antes desperdiça a passada dela
 reclamando de coisas que iam mudar de qualquer jeito.
 
@@ -68,7 +68,7 @@ E no fim, obrigatoriamente:
 - As 5 coisas mais urgentes, em ordem
 - **O que ficou claro** — para não virar um gerador de reclamação; elogio específico também é sinal
 
-## O gate
+## Resultado quando a revisão é executada
 
 | Resultado | O que acontece |
 |-----------|----------------|
@@ -76,8 +76,9 @@ E no fim, obrigatoriamente:
 | Só 🟡 e 🟢 | Pode apresentar, declarando as ressalvas ao dono do produto |
 | "Não conseguiria usar sozinha" | **Não apresenta**, mesmo sem 🔴 — é o veredicto que mais importa |
 
-O usuário pode dispensar uma objeção específica ("esse termo fica, meu público é técnico"), mas
-**uma a uma e com registro**, nunca em bloco.
+O usuário pode aceitar uma objeção específica ou dispensar a revisão inteira do
+escopo. No segundo caso, registre a fala literal, o lote/mudança e a data, sem
+pedir confirmação adicional nem exigir dispensa item a item.
 
 ### Reteste sem repetir trabalho
 

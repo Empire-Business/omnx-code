@@ -1,9 +1,9 @@
-# 🖼️ Mockup-First — a pessoa VISUALIZA antes de qualquer documento
+# 🖼️ Mockup-First — fluxo padrão com escolha do dono
 
-> **Regra:** em qualquer pedido de produto — sistema novo do zero ou tela nova
-> em projeto que já existe — o primeiro entregável é o **mockup visual das
-> telas**, aberto no navegador e aprovado pelo dono do produto. Só depois nasce
-> PRD, ROADMAP, ARQUITETURA, UML, UX-MAP ou qualquer linha de código.
+> **Padrão recomendado:** em produto novo ou tela nova, o primeiro entregável é
+> o mockup visual. **Escolha do dono:** ele pode pedir execução direta e dispensar
+> o mockup para um escopo definido. A IA registra a decisão e avança sem discutir
+> nem pedir nova confirmação.
 
 ## Por que esta ordem, e não a inversa
 
@@ -25,41 +25,34 @@ sobre o que o produto vai ser e passa a ser a transcrição fiel de algo que já
 foi visto e aceito. PRD escrito depois da tela aprovada é PRD que não precisa
 de segunda rodada.
 
-**Isso não afrouxa nenhum gate.** PRD, UML, UX-MAP, níveis de acesso, sistema
-de tickets e segurança continuam todos obrigatórios, com o mesmo rigor. Só
-muda a ordem: eles passam a ser escritos **a partir** das telas aprovadas, em
-vez de as telas serem desenhadas a partir deles.
+Esta escolha flexibiliza somente o processo de validação visual. Segurança,
+migrations, RLS, isolamento multi-tenant, UML aplicável, testes e autorização
+para publicar continuam sujeitos às suas próprias regras.
 
 ---
 
-## O que o gate trava
+## Quando o fluxo padrão se aplica
 
-Escrever ou aprovar `docs/PRD.md`, `docs/ROADMAP.md`, `docs/ARQUITETURA.md`,
-`docs/UML.md`, `docs/UX-MAP.md` ou qualquer código de produto **de uma tela que
-o usuário ainda não viu e aprovou**.
+Na ausência de uma escolha explícita, use mockup-first antes de documentos e
+código da interface. Uma dispensa explícita remove esse bloqueio somente para o
+escopo citado.
 
 | Situação | Mockup primeiro? |
 |----------|------------------|
-| Projeto novo, do zero | **Sim, sempre.** O primeiro entregável da fundação é `docs/mockups/`, não o PRD |
-| Projeto existente, tela ou feature nova com UI | **Sim.** Mockupe só a(s) tela(s) nova(s) e os pontos de entrada afetados — não o app inteiro |
-| Mudança visível numa tela já aprovada (campo novo, coluna nova, passo novo no fluxo) | **Sim, versão leve.** Atualize o HTML daquela tela e mostre antes de codar |
+| Projeto novo, do zero | Sim por padrão; dispensável pelo dono |
+| Projeto existente, tela ou feature nova com UI | Sim por padrão no escopo afetado; dispensável pelo dono |
+| Mudança visível numa tela já aprovada (campo novo, coluna nova, passo novo no fluxo) | Versão leve por padrão; dispensável pelo dono |
 | Correção de bug, refactor, migration, ajuste de copy/estilo, performance | Não. Siga o Modo de Trabalho Normal direto |
 | Script interno, job de background, CLI, integração sem tela | Não. Não há o que visualizar |
 
-## Procedimento (fail-closed)
+## Procedimento
 
-1. Antes de criar/editar documento de fundação ou codar tela nova, verifique se
-   existe `docs/mockups/APROVACAO.md` com aprovação **explícita** do usuário
-   cobrindo as telas em questão.
-2. Se não existe, ou existe mas não cobre a tela nova: **pare e rode o fluxo de
-   mockups** da skill `omnx-code`. Não escreva "só um rascunho do PRD enquanto
-   isso" — rascunho vira âncora, e a partir daí o mockup passa a servir o
-   documento em vez do contrário. A regra se inverte sozinha por esse caminho.
-3. Só depois da aprovação registrada, siga para PRD → ROADMAP → ARQUITETURA →
-   UML → código, cada documento descrevendo o que as telas aprovadas mostram.
-4. Se as telas mudarem numa revisão posterior, os documentos que descrevem
-   aquelas telas são atualizados **no mesmo commit** — tela e documento nunca
-   divergem.
+1. Verifique se o dono pediu modo direto ou dispensou o mockup para o escopo.
+2. Sem dispensa, rode o fluxo visual e registre a aprovação.
+3. Com dispensa, explique o trade-off em uma frase, registre a fala literal,
+   data, escopo e etapas dispensadas, e avance sem nova confirmação.
+4. Mantenha os documentos técnicos sincronizados com o que for implementado.
+5. Nunca presuma que uma dispensa vale para outra feature ou projeto.
 
 ## Uma única árvore de mockups
 
@@ -96,19 +89,19 @@ Aprovação é uma **frase do usuário**, nunca uma inferência da IA. "Ok",
 ## Projeto que já tem PRD/UML aprovados
 
 Mockup-first **não é licença para contradizer a fundação existente**. A tela
-nova respeita o que já está documentado e aprovado. Se ela exigir mudar o PRD
-(requisito novo, regra de negócio diferente), a mudança do PRD acontece
-**depois** da aprovação da tela, no mesmo commit da tela — e o UX-Guardião
-revalida, porque fluxo mudou.
+nova respeita o que já está documentado e aprovado. Se ela exigir mudar o PRD,
+sincronize a mudança no mesmo commit. No modo padrão isso acontece depois da
+aprovação da tela; no modo direto, sem essa espera visual.
 
-## Válvula de escape (explícita e registrada)
+## Escolha explícita e registrada
 
-Se o usuário disser claramente que quer o documento antes das telas ("já sei
-exatamente o que quero, escreve o PRD primeiro"), respeite: o produto é dele.
-Mas antes explique em **uma frase** o que ele está trocando, e registre a
-dispensa em `docs/mockups/APROVACAO.md` com data e o que foi dispensado.
+Se o usuário disser claramente que quer documento ou código antes das telas,
+que “não precisa de mockup” ou que quer “ir direto”, respeite: o produto é dele.
+Registre a dispensa em `docs/mockups/APROVACAO.md`; se a pasta não existir, use
+`docs/handoffs/HISTORY.md`.
 
-Dispensa não pedida não existe. No silêncio, telas primeiro.
+Dispensa não pedida não existe. No silêncio, telas primeiro. Dispensa pedida
+não exige confirmação adicional e não pode ser transformada em novo gate.
 
 ## Anti-teatro
 

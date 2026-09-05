@@ -9,6 +9,7 @@
 - Cria e mantém o `CLAUDE.md` do seu projeto (guia vivo de arquitetura e decisões)
 - Instala e mantém a skill `/security-auditor` atualizada de forma verificada (auditoria RLS, auth, env vars); a correção é assistida e só roda com confirmação explícita
 - Executa todo trabalho com tasks visíveis — você sempre sabe o que está sendo feito
+- Oferece mockup e revisões de UX por padrão, com modo direto quando o dono optar por pular essas etapas
 - Funciona em projetos novos e existentes (merge inteligente no CLAUDE.md)
 
 ## Instalação
@@ -57,7 +58,7 @@ git verify-tag <TAG> && git checkout <TAG>
 
 ## Versão
 
-`v1.26.0` — [ver CHANGELOG](./CHANGELOG.md)
+`v1.27.0` — [ver CHANGELOG](./CHANGELOG.md)
 
 ---
 

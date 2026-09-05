@@ -3,7 +3,7 @@
 A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 
 **Telas aprovadas (Regra Zero)** — ver `docs/regras/mockup-first.md`
-- [ ] **Toda tela nova ou visivelmente alterada nesta entrega tem mockup em `docs/mockups/` e status `aprovada` em `docs/mockups/APROVACAO.md`, com a fala do usuário e data/hora BRT?** Sem isso, o documento e o código dessa tela estão BLOQUEADOS (gate 1.6f). Aprovação inferida de "ok" ambíguo não conta.
+- [ ] A entrega seguiu o fluxo visual padrão **ou** há dispensa explícita registrada com fala literal, data, escopo e etapas puladas? Sem fala explícita, use mockup-first; com ela, não bloqueie por ausência de mockup.
 - [ ] Os documentos que descrevem essas telas (PRD, UX-MAP, UML) foram atualizados no mesmo commit em que a tela mudou?
 
 **Documentação**
@@ -23,10 +23,9 @@ A IA deve verificar cada item antes de considerar qualquer tarefa concluída:
 - [ ] Toda entidade/relacionamento/fluxo crítico alterado nesta entrega está refletido no `docs/UML.md` e `docs/UML.html`, no mesmo commit?
 
 **Experiência do Usuário (UX)** — ver `docs/regras/ux-referencia-e-guardiao.md`
-- [ ] **O sistema tem sistema(s) de referência real escolhido(s) pelo usuário, registrado em `docs/mockups/README.md`, e `docs/UX-MAP.md` existe transcrevendo as telas aprovadas?** (rotas, grafo de navegação, ações por tela, fluxos com contagem de cliques). Em sistema novo, sem isso o PRD/UML não foi aprovado validamente — a fundação está BLOQUEADA (gate 1.6e).
-- [ ] **`docs/UX-REVIEW.md` tem veredicto ✅ ou ⚠️ do UX-Guardião sobre as telas (antes de terem sido apresentadas ao usuário) e sobre a fundação (PRD, UML), com a checklist de reclamações preenchida item a item?** Veredicto ❌ ou ausência de review = fundação não aprovada. Objeções dispensadas pelo usuário estão registradas uma a uma, com data?
-- [ ] **A Dona Maria (avaliadora leiga) leu as telas desta entrega, depois do UX-Guardião e antes do dono do produto, com o registro em `docs/TESTE-DE-LEIGO.md`?** (ver `docs/regras/avaliador-leigo.md`, gate 1.6g). Nenhum travamento 🔴 em aberto e nenhum veredicto "não conseguiria usar sozinha" — qualquer um dos dois BLOQUEIA a apresentação, mesmo com o Guardião ✅. Objeções dispensadas pelo usuário estão registradas uma a uma?
-- [ ] Todo texto de tela, rótulo de botão ou mensagem de erro alterado nesta entrega passou por uma rodada nova da Dona Maria? (é exatamente onde ela pega coisa)
+- [ ] Referência e UX-Guardião foram executados ou dispensados explicitamente para o escopo? Se executados, os resultados estão em `docs/UX-REVIEW.md`?
+- [ ] A Dona Maria foi executada ou dispensada explicitamente para o escopo? Se executada, o resultado está em `docs/TESTE-DE-LEIGO.md`?
+- [ ] Mudanças de texto passaram pela Dona Maria quando essa revisão foi escolhida para a entrega?
 - [ ] Todo fluxo crítico da entrega é alcançável em ≤3 cliques a partir da home, nenhum botão novo ficou sem destino e nenhuma rota ficou órfã?
 - [ ] Todo estado vazio/erro/carregando das telas novas foi pensado e rotulado na língua do usuário (sem jargão técnico)?
 - [ ] `docs/UX-MAP.md` foi atualizado no mesmo commit de qualquer mudança de rota, navegação ou fluxo?
