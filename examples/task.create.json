@@ -1,0 +1,11 @@
+{
+  "title": "Exemplo: corrigir título do dashboard",
+  "status": "backlog",
+  "authorization": {
+    "status": "proposed",
+    "basis_ref": null
+  },
+  "acceptance": [
+    "Título corresponde ao requisito que ainda deve ser definido."
+  ]
+}

@@ -1,8 +1,6 @@
 interface:
   display_name: "OMNX Code"
-  short_description: "Vibe coding framework: CLAUDE.md, tasks, security, docs"
-  brand_color: "#00FF88"
-  default_prompt: "Use the omnx-code skill to set up or work on this project following the OMNX framework."
-
+  short_description: "Desenvolvimento proporcional com tarefas e migração segura."
+  default_prompt: "Use $omnx-code neste pedido, respeitando escopo e permissões."
 policy:
   allow_implicit_invocation: true

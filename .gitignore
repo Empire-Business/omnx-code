@@ -1,40 +1,5 @@
-# OMNX Code — .gitignore
-# IMPORTANT: design-system-empire/ is private and must NEVER be committed
-
-# Private design system (never publish)
-design-system-empire/
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-*.env
-
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-.output/
-
-# Vercel
-.vercel/
-
-# macOS
-.DS_Store
-**/.DS_Store
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Security reports (never commit)
-security-report/
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.omnx/local/
