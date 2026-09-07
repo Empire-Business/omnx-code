@@ -274,6 +274,15 @@
           "maxLength": 4096
         }
       ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
     }
   },
   "required": [

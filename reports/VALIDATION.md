@@ -1,91 +1,48 @@
-# Validação da entrega — omnx-code 2.0.0-rc.1
+# Validação da OMNX Code 2.1.0-rc.2
 
-## Estado
+## O que foi executado
 
-Candidato a release com implementação e validação local. Não é declaração de homologação universal,
-de auditoria de uma aplicação real ou de segurança garantida.
+| Camada | Resultado | Evidência |
+|---|---|---|
+| Runtime, estado, migração, HTTP real, paths, locks e processos Linux | 247 testes, 0 falhas, 0 erros, 0 pulados | `test-results-2.1.0-rc.2.json` |
+| Interface no Chromium 144, com assets reais e transporte de fixtures offline | 13 cenários completos passaram | `browser-dom-rc2.json` |
+| Navegador acessando servidor por HTTP real | Bloqueado pelo ambiente: `ERR_BLOCKED_BY_ADMINISTRATOR` | `browser-http-status.json` |
+| Projeto sintético criado com pacote rc.1 e adotado pela rc.2 | Passou; Task/código preservados, aprovação antiga não herdada | `upgrade-rc1-to-rc2.json` |
+| Projeção com 500, 2.000 e 10.000 Tasks | Contagem completa; atualização sem alteração fez zero releituras de conteúdo | `scale-rc2.json` |
+| Manifestos, sintaxe JS, 13 schemas e contrato/catálogo pinado do auditor | Verificados | `contract-check-rc2.json` |
 
-## Execução registrada
+Os testes foram executados em Linux/Python 3.13.5. Há verificação gramatical de Python 3.10, não execução real nessa versão. Nenhuma aplicação do usuário, produção, conta externa, segredo real ou cobrança foi usada.
 
-| Item | Resultado |
-|---|---|
-| Suíte deste pacote | **141 testes; 0 falhas; 0 erros; 0 pulados** |
-| Ambiente | Python 3.13.5; Linux-6.18.35-x86_64-with-glibc2.41 |
-| Registro | 2026-09-06T21:47:37.923373+00:00 |
-| Resultados por caso | `test-results.json` |
-| Schemas e exemplos | `schema-and-examples.json`: 30 verificações nos dois pacotes; oráculo JSON Schema independente |
-| Compatibilidade estática do par | `pair-check.json`; contratos, catálogo e módulos compartilhados iguais |
-| Modelo/host | Não executado; ver limites abaixo |
+## O que “teste no navegador” significa aqui
 
-OMNX executou 141 testes e auditor 48. Há componentes e testes comuns; não tratar a soma como
-189 cenários exclusivos de produto nem como execução dos 130 cenários de comportamento de LLM.
+O ensaio DOM abriu a interface no Chromium com **app.js/style.css reais**, sem reescrever seu código. A camada de teste substituiu fetch por um adaptador local que opera fixtures pela engine. Histórico de navegação, geração de UUID, clipboard e URL do iframe foram substituídos por doubles; o iframe recebeu documento offline sanitizado. Não houve túnel para contornar a política de rede do navegador.
 
-Os testes usam diretórios temporários e dados sintéticos. Foram verificadas transições/autorização
-de Task, compare-and-swap, locks locais, parsing seguro, esquema futuro, snapshots dirty/staged,
-contrato de auditoria, recibos imutáveis, separação de gates e efeitos, atualização por ZIP e
-preservação de dados de fixtures na migração.
-A suíte OMNX inclui fault injection em pontos de migração, rollback com edição posterior e um
-subprocesso encerrado abruptamente para verificar retomada. Isso não cobre toda falha possível
-de filesystem nem torna a sequência inteira uma transação atômica.
+Foram exercitados: inicialização, clones, Kanban/bloqueados, erro isolado, conteúdo hostil como texto, prompt, preview estático, opção obrigatória, persistência, duas abas com revisão desatualizada, sujeito alterado, release somente leitura, transição de Task, teclado e layout mobile. O teste HTTP separado usa servidor real e cliente Python, com cookies, CSRF, origem, capabilities, expiração e idempotência.
 
-## Implementado
+**As duas camadas não equivalem à homologação ponta a ponta browser→HTTP.** O runner real está incluído em `tests/browser/run.py`, sem `--isolated-dom`, para executar onde essa conexão for permitida. Não remover políticas corporativas para fazê-lo passar.
 
-Núcleos condicionais, CLI local, parser YAML seguro vendorizado, schemas e validação de relações;
-Task Store com autorização separada; planejamento sem mutação; aplicação/retomada/rollback por journal;
-contrato de auditoria 2.0; catálogo canônico; snapshots e persistência sanitizada; avaliação local
-de gates; instalação em novo destino com SHA-256; wrappers explícitos de host; testes e conjunto de evals.
+Durante desenvolvimento, houve execuções preliminares interrompidas no encerramento do ensaio Playwright e correções do próprio adaptador offline. Não foram contadas como rodadas aprovadas. O JSON indicado registra uma execução completa que chegou ao fim. Isso reforça a distinção entre validação DOM e homologação do ambiente real.
 
-A CLI do auditor não chama modelo algum nem descobre vulnerabilidades por si só. A skill instrui
-o modelo hospedeiro a analisar código e evidências. O runtime valida dados e oferece ferramentas
-mecânicas; `response-template` começa parcial/inconclusivo, nunca produz PASS automático.
+## Escala observada — uma execução por tamanho
 
-## Não homologado / não alegado
+| Tasks | Leitura fria | Atualização sem alterações | Arquivos relidos sem alteração | Arquivos relidos após mudar uma Task |
+|---:|---:|---:|---:|---:|
+| 500 | 0,35 s | 0,04 s | 0 | 1 |
+| 2.000 | 1,39 s | 0,16 s | 0 | 1 |
+| 10.000 | 6,91 s | 0,84 s | 0 | 1 |
 
-- Nenhuma sessão real de Claude Code ou Codex foi executada. Adaptadores foram verificados por
-  construção de argumentos, leitura e testes locais; descoberta, precedência, sandbox e subagentes
-  reais precisam de homologação no ambiente de destino.
-- Python 3.10+ é alvo de sintaxe; execução foi em 3.13.5/Linux. Windows, macOS, ACLs equivalentes,
-  NFS/SMB e concorrência entre computadores não foram homologados.
-- Nenhum projeto real do usuário foi migrado, nenhuma produção alterada, nenhum deploy feito,
-  nenhum webhook real/Asaas/Hotmart/Supabase acionado e nenhum pentest realizado.
-- Os 130 cenários de agente estão preparados, mas não executados em LLM. Não há comparação real
-  de tokens/custo/latência com a skill antiga. Contagem de linhas não é benchmark de economia.
-- Gates são decisões locais com evidências declaradas. Não há enforcement de CI, autenticação
-  de aprovadores ou atestação independente. Hash comprova correspondência, não autoria.
-- Pacotes não são assinados digitalmente. SHA-256 deve vir de origem confiada.
+Medição da projeção local, não benchmark estatístico de navegador, múltiplos usuários, disco lento ou rede. O processo ainda consulta metadados e monta resumos; não significa zero CPU/I/O. O prompt compacto dessas fixtures tinha 1.086 caracteres; não é contagem de tokens nem comprovação de economia no modelo.
 
-## Limites deliberados para preservar o usuário
+## Limites e suporte
 
-Migração de linguagem natural exige mapa explícito de blocos/destinos pelo agente/revisor. O motor
-não adivinha que dois requisitos são equivalentes. Original protegido no backup não substitui a
-preservação de uma regra ativa: há bloqueio quando o plano não demonstra um destino coerente.
+Não foram executados modelos independentes/subagentes, Claude Code/Codex reais, macOS, Windows, Safari, pentest externo, integrações de pagamento/banco ou os 130 evals comportamentais de modelo. O catálogo de controles continua pinado ao auditor 2.0.0-rc.1; compatibilidade estrutural não comprova uma chamada ao modelo.
 
-Paths perigosos, links, schemas futuros, documentos sem encoding suportado e conflitos não são
-“consertados” destruindo conteúdo. Normalização semântica, colisão de nomes dependente do filesystem
-ou regra customizada ambígua pode exigir resolução específica. O rollback preserva bytes e usa
-permissões conservadoras; não promete restaurar toda ACL/ownership/metadata de qualquer filesystem.
+Launchers Mac/Windows foram gerados e seus conteúdos verificados, mas não clicados nesses sistemas. Abertura/reuso/stop em processos Linux foram testados por CLI sem navegador. O runtime requer Python; não é um app nativo assinado.
 
-Não há daemon nem update in-place que substitui toda instalação. Instale em nova pasta versionada,
-valide e ative explicitamente. O host deve carregar a versão compatível; o lock sozinho não a ativa.
-Não há backend externo de Tasks nem lock distribuído.
+Aprovação local não é prova forte de identidade. Hash/histórico não impedem um processo hostil com controle irrestrito da mesma conta de regravar arquivos. Gates locais não são CI protegido. Redaction não é detector perfeito de segredos/PII, especialmente em imagens. Previews são estáticos e podem ter aparência simplificada pela sanitização.
 
-O avaliador local é conservador para exceções: não oferece bypass genérico por um JSON de “aceito”.
-Uma política organizacional externa e confiável pode exigir integração adicional; não alegar que
-esta integração já existe. Limites do hospedeiro sempre prevalecem.
+## Liberação
 
-## Reproduzir
+Esta é **release candidate corrigida**, não certificação “sem falhas”. Falhas conhecidas R01–R12 têm correções e testes em `REGRESSIONS.md`. Não aceitar aprovações v1 da rc.1 como atuais: reapresentar e reconfirmar somente o escopo necessário.
 
-Na raiz desta skill:
-
-```sh
-python tests/run.py --output /tmp/resultados-omnx-code.json
-python scripts/omnx.py verify-package
-```
-
-O diretório de saída deve existir. `verify-package` requer o `integrity.json` incluído na distribuição;
-se alterar o código, reconstrua o inventário com a ferramenta de release após testar as alterações.
-O kit conjunto contém ferramentas de comparação/empacotamento e o relatório da validação após
-extração dos ZIPs. Não editar resultados para aparentar que um teste foi executado.
-
-Consulte `TRACEABILITY.md`, `LEGACY-CAPABILITIES.md` e `SOURCES.md` para cobertura, preservação
-do legado e fontes consultadas. Instruções de release estão em `REPOSITORY-UPGRADE.md`.
+A distribuição deve ser verificada após extração com `verify-package` e suas suítes locais. Resultados de reexecução do ZIP final são fornecidos junto à entrega quando disponíveis; testes não chamam sua aplicação.

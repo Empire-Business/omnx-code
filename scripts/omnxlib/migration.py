@@ -201,7 +201,10 @@ def apply(fs,plan,approved_digest,*,resume=False,fault=None):
             for s in plan['sources']:require(fs.hash(s['path'])==s['sha256'],'stale_plan','Fonte mudou desde o planejamento.',3,path=s['path'])
             for op in plan['operations']:require(fs.hash(op['path'])==op['before_sha256'],'stale_plan','Destino mudou desde o planejamento.',3,path=op['path'])
             require(not git(fs,['ls-files','--','.omnx/local']),'tracked_private_state','Área privada já está rastreada; resolva antes de criar backups.',5)
-            fs.write(base+'/plan.json',json_bytes(plan),None)
+            existing_plan=fs.read(base+'/plan.json')
+            require(existing_plan is None or existing_plan==json_bytes(plan),'journal_conflict','Plano recuperável diverge do plano recebido.',3)
+            if existing_plan is None:fs.write(base+'/plan.json',json_bytes(plan),None)
+            fault('plan_saved')
             j={'schema_version':1,'migration_id':plan['migration_id'],'plan_digest':plan['plan_digest'],'phase':'preparing','snapshot_ready':False,'completed_ops':[],'rollback_ops':[],'created_at':now(),'updated_at':now()};_save(fs,base,j);fault('journal_created')
         if not j['snapshot_ready']:
             for op in plan['operations']:
@@ -259,9 +262,11 @@ def rollback(fs,mid,approved_digest,*,fault=None):
         if j['phase']=='rolled_back':return result('Rollback já concluído; no-op.')
         if any(o['path']=='.omnx/project.yaml' and o['before_sha256'] is None for o in plan['operations']):
             planned={o['path'] for o in plan['operations']}
-            taskroot=fs.path('.omnx/tasks')
-            later=[p for p in taskroot.rglob('TASK-*.md') if p.relative_to(fs.root).as_posix() not in planned] if taskroot.exists() else []
-            require(not later,'rollback_dependents','Novas Tasks dependem desta adoção. Preserve/reconcilie antes de remover a configuração.',3)
+            later=[]
+            for directory in ('.omnx/tasks','.omnx/decisions','.omnx/security/runs','.omnx/security/decisions','.omnx/releases'):
+                recordroot=fs.path(directory)
+                if recordroot.exists():later.extend(p for p in recordroot.rglob('*') if p.is_file() and p.relative_to(fs.root).as_posix() not in planned)
+            require(not later,'rollback_dependents','Novos registros dependem desta adoção. Preserve/reconcilie antes de remover a configuração.',3)
         # Preflight all files prevents predictable partial rollback on a user edit.
         for op in plan['operations']:
             require(fs.hash(op['path']) in (op['before_sha256'],op['after_sha256']),'rollback_conflict','Há edição posterior; rollback não a sobrescreverá.',3,path=op['path'])

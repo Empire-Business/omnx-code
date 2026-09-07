@@ -27,3 +27,8 @@ Rascunho pode ser mostrado cedo; divergência de revisores não bloqueia feedbac
 
 Sem browser: declare ausência de verificação visual/interativa. Screenshot não comprova jornada;
 inspeção de código não comprova clique. Não instalar nova infraestrutura sem autorização para fingir teste.
+
+No Console, a aprovação canônica fica em Decision v2, não em outro APPROVAL.md editável.
+Um Markdown da proposta pode apontar ao DEC sem duplicar resultado/autoridade.
+Aprovação de arquivo se vincula ao manifesto capturado, incluindo CSS/imagens locais pertinentes.
+Previews do Console são estáticos: não use essa visualização como evidência de jornada interativa.

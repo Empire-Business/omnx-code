@@ -3,7 +3,7 @@ name: omnx-code
 description: "Coordena desenvolvimento e manutenção de software com escopo explícito, AGENTS.md único, tarefas canônicas, UX proporcional, auditoria de segurança delimitada e migração recuperável de projetos OMNX legados. Use para implementar, corrigir, planejar ou reorganizar projetos quando esse método for pertinente. Não instala nada em pedidos apenas de análise. Não publica nem modifica dados reais automaticamente."
 compatibility: "Agente com leitura de arquivos; ferramentas locais opcionais exigem Python 3.10+. CLI sem rede. Integração real do host deve ser verificada."
 metadata:
-  version: "2.0.0-rc.1"
+  version: "2.1.0-rc.2"
   specification: "4"
   audit-contract: "2.0"
 ---
@@ -58,6 +58,7 @@ Uma edição local S3 não vira autorização para publicar em O3.
 | Contrato funcional proposto/aprovado | PRD |
 | Direção e iniciativas | Roadmap |
 | Trabalho, autorização e conclusão | `.omnx/tasks/TASK-<id>.md` |
+| Decisão pendente/registrada | `.omnx/decisions/DEC-<id>.json` |
 | Desenho atual/alvo/delta | Arquitetura |
 | Justificativa duradoura | ADR |
 | Uso por versão/ambiente | Guias |
@@ -85,6 +86,24 @@ Nunca reescreva um requisito automaticamente para legitimar um possível bug.
 
 Leia `references/task-lifecycle.md` para transições, conclusão, arquivo e concorrência.
 Não confunda `done` com publicado. A Task declara se entregou patch, branch, PR ou release.
+
+
+## 5A. Console visual opcional
+
+O OMNX Console é uma projeção local para humanos: portfólio de projetos, Kanban, mockups, decisões e prompts para continuar no Claude Code/Codex. Ele não é fonte de verdade, não chama IA, não executa shell, não publica e não possui banco de estado do projeto.
+
+- Projetos podem estar em pastas diferentes; o catálogo global distingue projeto de cópia de trabalho; clones/worktrees não são mesclados.
+- Registre decisão material pela engine; Decision não substitui PRD/ADR/Task e não autoriza deploy.
+- Schema 1 é histórico não verificado. Use `decision revise` para reapresentar; não herde aprovação da rc.1.
+- Aprovação é para revisão exata; não edite escolha, pergunta ou artefato de uma aprovação existente.
+- O Console aceita apenas decisões de produto/UX. Produção e risco não são aprovados pelo painel.
+- Antes de repetir uma pergunta bloqueante, consulte decisões relacionadas.
+- Previews HTML são estáticos, delimitados e sem scripts/APIs; não equivalem a teste de interação.
+- Preservar feedback não significa ampliar escopo. Releia autorização da Task antes de implementar.
+- Use `omnx console open` somente quando acompanhamento visual ajudar. Não abra o Console em toda Task.
+- Prompts do Console são templates determinísticos; o agente ainda deve reler `AGENTS.md`, Task e decisões canônicas.
+
+Detalhes: `references/console.md`.
 
 ## 6. UX sem réplica eterna
 
@@ -156,6 +175,7 @@ Não prometa execução em segundo plano sem infraestrutura real.
 | PRD/Docs/ADR e captura de decisões | `references/information-model.md` |
 | Tarefas, autorização, CAS e conclusão | `references/task-lifecycle.md` |
 | UX e inspeções | `references/ux.md` |
+| Console, Kanban, mockups e decisões | `references/console.md` |
 | Auditoria/recibos/gates | `references/security-integration.md` |
 | Publicação/dados/efeitos externos | `references/operations-and-release.md` |
 | Migrar legado | `references/migration.md` |

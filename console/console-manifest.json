@@ -1,0 +1,21 @@
+{
+  "name": "omnx-console",
+  "version": "1.0.0-rc.2",
+  "project_schema_versions": [
+    1
+  ],
+  "decision_schema_versions": [
+    1,
+    2
+  ],
+  "bundled": true,
+  "network_required": false,
+  "telemetry": false,
+  "decision_schema_read_versions": [
+    1,
+    2
+  ],
+  "decision_schema_write_versions": [
+    2
+  ]
+}

@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.1.0-rc.2 — Console 1.0.0-rc.2
+
+- Corrige inicialização JavaScript, elimina handlers interpolados e restringe previews a capabilities registradas.
+- Decision v2: criação apenas pendente, escolha explícita, manifestos, CAS de bytes únicos, histórico atômico e imutabilidade de aprovação.
+- Decision v1 preservada como histórico não verificado, com reapresentação explícita; sem aprovação retroativa.
+- Kanban inclui bloqueados/cancelados; erro isolado não remove tarefas válidas. Clones/worktrees mantêm entradas independentes.
+- Prompts por referência, limitados e conscientes de intenção/autorização, sem copiar bodies ou credenciais.
+- Indexação incremental, resumos, paginação, detalhes sob demanda e limites de leitura.
+- Sessão com cookie/CSRF/expiração, CSP e isolamento; UI não aprova release/risco/O3.
+- Open destacado/reutilizável, stop autenticado, instalação local nova e launchers com quoting e Python explícito.
+- Recovery cobre interrupção antes do journal; rollback não apaga novas decisões/evidências; gate considera controles adicionais falhos.
+- Regressões de engine, HTTP, processos, concorrência e DOM isolado. Limitações reais de host/navegador registradas em reports/VALIDATION.md.
+
+## Histórico anterior
+
+## 2.1.0-rc.1 — 2026-09-06
+
+### Added
+- OMNX Console local bundled: portfolio de projetos, Kanban, galeria de mockups, decisões e prompts determinísticos.
+- Decision Store canônico em `.omnx/decisions/` com schema, CAS e autoridade explícita.
+- `omnx console open/register/projects/unregister/shortcut`.
+- Visualização de versões adotadas por projeto sem exigir que projetos estejam na mesma pasta.
+
+### Safety / architecture
+- Console não chama IA, não executa shell, não faz deploy e não possui banco de verdade próprio.
+- Servidor restrito a loopback com token efêmero, Origin check em mutações e previews HTML sem scripts.
+- Catálogo global é conveniência local reconstruível; dados canônicos continuam no projeto.
+
 ## 2.0.0-rc.1 — 2026-09-06
 
 Recriação coordenada baseada na especificação v4. Release candidate implementada e testada localmente.

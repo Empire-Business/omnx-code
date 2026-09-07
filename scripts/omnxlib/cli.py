@@ -1,4 +1,4 @@
-"""Explicit CLI. No network calls, background work, auto-deploy or hidden setup."""
+"""Explicit CLI. No remote calls, auto-deploy or hidden setup. Console open explicitly starts a local service."""
 from __future__ import annotations
 import argparse
 import subprocess
@@ -43,6 +43,21 @@ def parser():
     for action in ('check','plan'):
         q=u.add_parser(action);q.add_argument('--archive',required=True);q.add_argument('--expected-sha256',required=True);q.add_argument('--current-version');q.add_argument('--destination',required=True);q.add_argument('--output')
     q=u.add_parser('apply');q.add_argument('--plan',required=True);q.add_argument('--approved-digest',required=True)
+    d=sub.add_parser('decision').add_subparsers(dest='action',required=True)
+    q=d.add_parser('list');q.add_argument('--status');q.add_argument('--type')
+    q=d.add_parser('show');q.add_argument('id')
+    q=d.add_parser('create');q.add_argument('--data',required=True)
+    q=d.add_parser('revise');q.add_argument('id');q.add_argument('--expected-sha256',required=True);q.add_argument('--data',required=True)
+    q=d.add_parser('update');q.add_argument('id');q.add_argument('--expected-sha256',required=True);q.add_argument('--status');q.add_argument('--selected-option');q.add_argument('--feedback');q.add_argument('--authority-ref')
+    cns=sub.add_parser('console').add_subparsers(dest='action',required=True)
+    q=cns.add_parser('open');q.add_argument('--port',type=int,default=0);q.add_argument('--no-browser',action='store_true')
+    q=cns.add_parser('serve');q.add_argument('--port',type=int,default=0);q.add_argument('--no-browser',action='store_true');q.add_argument('--ready-file')
+    cns.add_parser('stop')
+    q=cns.add_parser('install');q.add_argument('--destination',required=True)
+    q=cns.add_parser('register')
+    q=cns.add_parser('projects')
+    q=cns.add_parser('unregister');q.add_argument('project_id')
+    q=cns.add_parser('shortcut');q.add_argument('--destination');q.add_argument('--name',default='OMNX Console')
     s=sub.add_parser('session').add_subparsers(dest='action',required=True)
     q=s.add_parser('check');q.add_argument('id')
     q=s.add_parser('save');q.add_argument('id');q.add_argument('--task-id',required=True);q.add_argument('--paths',nargs='+',required=True);q.add_argument('--next-action',required=True);q.add_argument('--context',default='');q.add_argument('--expected-sha256')
@@ -80,8 +95,32 @@ def dispatch(a):
         if a.action=='catalog':return result('Selecione controles; isto não cria plano universal.',controls=[c for c in audit.registry()['controls'] if not a.family or c['id'].startswith('SEC-'+a.family+'-')])
         r=external_data(a.request);audit.validate_request(r)
         return audit.response_template(r) if a.action=='response-template' else result('Request estruturalmente válido; permissões declaradas não concedem autoridade.')
+    if a.command=='console':
+        from . import console as cs
+        if a.action=='projects': return result('Catálogo local do Console; não é fonte de verdade do projeto.',projects=cs._catalog_read()['projects'])
+        if a.action=='unregister': return result('Projeto removido apenas do catálogo local.',removed=cs.unregister(a.project_id))
+        if a.action=='shortcut':
+            from . import launcher
+            return launcher.create(a.destination,a.name)
+        if a.action=='register':
+            require(a.root,'root_required','Informe --root para registrar um projeto.')
+            return result('Projeto registrado no catálogo local.',project=cs.register(Path(a.root)))
+        from . import launcher
+        if a.action=='install':return launcher.install(a.destination)
+        if a.action=='stop':return launcher.stop_console()
+        if a.action=='serve':return cs.serve(Path(a.root) if a.root else None,a.port,not a.no_browser,ready_file=a.ready_file)
+        return launcher.open_console(Path(a.root) if a.root else None,a.port,not a.no_browser)
     require(a.root,'root_required','Informe --root para operações que leem/escrevem um projeto.')
     fs=RootFS(a.root)
+    if a.command=='decision':
+        from .decisions import Store
+        store=Store(fs)
+        if a.action=='list': return result('Decisões canônicas; nenhuma execução é autorizada por listagem.',decisions=[{'path':p,'sha256':sha,**d} for p,d,sha in (store.read_record(x[1]['id']) for x in store.entries()) if (not a.status or d['status']==a.status) and (not a.type or d['type']==a.type)])
+        if a.action=='show':
+            path,d,sha=store.read_record(a.id); return result('Decisão lida.',path=path,sha256=sha,decision=d)
+        if a.action=='create': return store.create(external_data(a.data,yaml_ok=True))
+        if a.action=='revise':return store.revise(a.id,a.expected_sha256,external_data(a.data,yaml_ok=True))
+        return store.update(a.id,a.expected_sha256,status=a.status,selected_option=a.selected_option,feedback=a.feedback,authority_ref=a.authority_ref)
     if a.command=='method':
         from . import project as pr
         if a.action=='verify':return pr.verify_adoption(fs,a.auditor_dir)
@@ -101,9 +140,9 @@ def dispatch(a):
     if a.command=='task':
         from .tasks import Store
         store=Store(fs)
-        if a.action=='list':return result('Tasks canônicas; nenhuma escrita.',tasks=[{'path':p,'sha256':fs.hash(p),**m} for p,m,b in store.entries() if (not a.status or m['status']==a.status) and (not a.authorization or m['authorization']['status']==a.authorization)])
+        if a.action=='list':return result('Tasks canônicas; nenhuma escrita.',tasks=[{'path':p,'sha256':sha,**m} for p,m,b,sha in (store.read_record(x[1]['id']) for x in store.entries()) if (not a.status or m['status']==a.status) and (not a.authorization or m['authorization']['status']==a.authorization)])
         if a.action=='show':
-            p,m,b=store.get(a.id);return result('Task lida.',path=p,sha256=fs.hash(p),task=m,body=b)
+            p,m,b,sha=store.read_record(a.id);return result('Task lida.',path=p,sha256=sha,task=m,body=b)
         if a.action=='create':return store.create(external_data(a.data,yaml_ok=True),read_text(a.body_file))
         if a.action=='archive':return store.archive(a.id,a.expected_sha256)
         return store.update(a.id,external_data(a.data,yaml_ok=True) if a.data else {},a.expected_sha256,body=read_text(a.body_file) if a.body_file else None,transition=a.to if a.action=='transition' else None,authority_ref=a.authority_ref)

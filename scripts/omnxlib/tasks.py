@@ -65,24 +65,43 @@ class Store:
             require(meta['id'] not in seen,'duplicate_task','ID de Task duplicado; reconcilie antes de escrever.',3)
             seen.add(meta['id']);out.append((rel,meta,body))
         return out
+    def read_record(self,task_id):
+        require(isinstance(task_id,str) and re.fullmatch(r'TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}',task_id) is not None,'invalid_id','ID de Task inválido.')
+        active='.omnx/tasks/'+task_id+'.md'
+        paths=[active] if self.fs.path(active).exists() else []
+        archive=self.fs.path('.omnx/tasks/archive')
+        if archive.exists():
+            paths += [p.relative_to(self.fs.root).as_posix() for p in archive.glob('*/'+task_id+'.md')]
+        require(len(paths)==1,'duplicate_task' if paths else 'missing_task','Task duplicada ou não encontrada.',3 if paths else 4)
+        raw=self.fs.read(paths[0]);m,body=parse(raw)
+        require(m['id']==task_id,'task_filename','ID e nome de arquivo divergem.',3)
+        return paths[0],m,body,digest(raw)
     def get(self,task_id):
-        require(re.fullmatch(r'TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}',task_id) is not None,'invalid_id','ID de Task inválido.')
-        matches=[x for x in self.entries() if x[1]['id']==task_id]
-        require(len(matches)==1,'missing_task','Task não encontrada.',4)
-        return matches[0]
+        path,m,body,_=self.read_record(task_id)
+        return path,m,body
     def graph(self,candidate=None):
-        metas={m['id']:m for _,m,_ in self.entries()}
-        if candidate: metas[candidate['id']]=candidate
-        for tid,m in metas.items():
-            require(all(d in metas for d in m.get('depends_on',[])),'missing_dependency','Dependência não encontrada.')
-        visiting=set();done=set()
-        def visit(t):
-            require(t not in visiting,'dependency_cycle','Dependências de Tasks formam ciclo.',3)
-            if t in done:return
-            visiting.add(t)
-            for d in metas[t].get('depends_on',[]):visit(d)
-            visiting.remove(t);done.add(t)
-        for t in metas:visit(t)
+        # For one mutation only its dependency closure can introduce a new
+        # cycle. Unrelated malformed tasks must not freeze all project work.
+        # Explicit full graph diagnosis still validates the complete store.
+        metas={candidate['id']:candidate} if candidate else {m['id']:m for _,m,_ in self.entries()}
+        roots=[candidate['id']] if candidate else list(metas)
+        finished=set()
+        for node in roots:
+            active=set();stack=[(node,False)]
+            while stack:
+                current,exit_node=stack.pop()
+                if exit_node:
+                    active.discard(current);finished.add(current);continue
+                if current in finished:continue
+                require(current not in active,'dependency_cycle','Dependências de Tasks formam ciclo.',3)
+                if current not in metas:
+                    try:metas[current]=self.read_record(current)[1]
+                    except MethodError as e:
+                        if e.code=='missing_task':raise MethodError('missing_dependency','Dependência não encontrada.') from None
+                        raise
+                active.add(current);stack.append((current,True))
+                for dependency in reversed(metas[current].get('depends_on',[])):
+                    stack.append((dependency,False))
         return metas
     def create(self,payload,body):
         from .project import ensure_writable
@@ -93,7 +112,10 @@ class Store:
             m={'schema_version':1,'id':new_id('TASK'),'status':'backlog','authorization':{'status':'proposed','basis_ref':None},'created_at':now(),'updated_at':now(),**payload}
             require(m['status'] in ('backlog','ready'),'invalid_initial_state','Task nova começa em backlog ou ready.')
             raw=dump(m,body)
-            require(not any(x[1]['id']==m['id'] for x in self.entries()),'duplicate_task','ID já existe.',3)
+            active='.omnx/tasks/'+m['id']+'.md'
+            archive=self.fs.path('.omnx/tasks/archive')
+            occupied=self.fs.path(active).exists() or (archive.exists() and any(archive.glob('*/'+m['id']+'.md')))
+            require(not occupied,'duplicate_task','ID já existe.',3)
             self.graph(m)
             path='.omnx/tasks/'+m['id']+'.md'
             self.fs.write(path,raw,None)
@@ -103,12 +125,13 @@ class Store:
         ensure_writable(self.fs)
         with metadata_lock(self.fs):
             ensure_writable(self.fs)
-            path,old,oldbody=self.get(tid)
-            require(self.fs.hash(path)==expected,'stale_state','Task mudou; releia antes de atualizar.',3)
+            path,old,oldbody,read_hash=self.read_record(tid)
+            require(read_hash==expected,'stale_state','Task mudou; releia antes de atualizar.',3)
             require('/archive/' not in path,'archived_task','Task arquivada é histórica; restaure explicitamente antes de reabrir.',3)
             require(not(set(patch)&{'id','schema_version','created_at','updated_at','status'}),'immutable_field','Campo gerenciado ou estado deve ser alterado pela operação correspondente.')
             if old.get('owner') and 'owner' in patch and patch['owner']!=old['owner'] and old['status']=='in_progress':
                 require(bool(authority_ref),'owner_transfer_required','Transferir Task ativa exige origem explícita.',5)
+            require(old['status'] not in ('done','cancelled') or (transition=='in_progress' and old['status']=='done'),'invalid_transition' if transition else 'terminal_task','Task encerrada exige reabertura explícita antes de editar.',3)
             m={**old,**patch,'updated_at':now()}
             if 'authorization' in patch and patch['authorization']!=old['authorization']:
                 require(bool(authority_ref),'missing_authority','Alteração de autorização exige --authority-ref.',5)
@@ -121,10 +144,10 @@ class Store:
                 if transition not in ('blocked',):m['blocked_reason']=None
             if m['authorization']['status']=='revoked' and m['status'] in ('ready','in_progress','review'):
                 m['status']='blocked';m['blocked_reason']='Autorização revogada.'
+            raw=dump(m,oldbody if body is None else body)
             metas=self.graph(m)
             if m['status'] in ('in_progress','review','done'):
                 require(all(metas[d]['status']=='done' for d in m.get('depends_on',[])),'dependency_not_done','Há dependência ainda não concluída.',5)
-            raw=dump(m,oldbody if body is None else body)
             self.fs.write(path,raw,expected)
         return result('Task atualizada com controle de concorrência.',changed_paths=[path],task=m,sha256=digest(raw))
     def archive(self,tid,expected):

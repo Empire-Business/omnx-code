@@ -1,0 +1,1140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Decision v2 (legacy records remain read-only)",
+  "anyOf": [
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "decision",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^DEC-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "product",
+            "ux",
+            "architecture",
+            "risk",
+            "operation",
+            "release",
+            "migration",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "changes_requested",
+            "rejected",
+            "superseded",
+            "cancelled"
+          ]
+        },
+        "subject_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          ]
+        },
+        "subject_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "task_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 20
+        },
+        "recommended_option": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          ]
+        },
+        "selected_option": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          ]
+        },
+        "feedback": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "maxItems": 100
+        },
+        "authority_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 40
+        },
+        "updated_at": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 40
+        },
+        "decided_at": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 40
+            }
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "type",
+        "title",
+        "question",
+        "status",
+        "subject_ref",
+        "subject_sha256",
+        "task_refs",
+        "options",
+        "recommended_option",
+        "selected_option",
+        "feedback",
+        "authority_ref",
+        "created_at",
+        "updated_at",
+        "decided_at",
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "decision",
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": 2
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^DEC-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "product",
+            "ux",
+            "architecture",
+            "risk",
+            "operation",
+            "release",
+            "migration",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "changes_requested",
+            "rejected",
+            "superseded",
+            "cancelled"
+          ]
+        },
+        "subject_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          ]
+        },
+        "subject_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "task_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "description"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 20
+        },
+        "recommended_option": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          ]
+        },
+        "selected_option": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          ]
+        },
+        "feedback": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "maxItems": 100
+        },
+        "authority_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 40
+        },
+        "updated_at": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 40
+        },
+        "decided_at": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 40
+            }
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subject_manifest": {
+          "type": "array",
+          "maxItems": 150,
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "history": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "previous": {
+                "title": "decision",
+                "type": "object",
+                "properties": {
+                  "schema_version": {
+                    "const": 2
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^DEC-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "product",
+                      "ux",
+                      "architecture",
+                      "risk",
+                      "operation",
+                      "release",
+                      "migration",
+                      "other"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240
+                  },
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "approved",
+                      "changes_requested",
+                      "rejected",
+                      "superseded",
+                      "cancelled"
+                    ]
+                  },
+                  "subject_ref": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      }
+                    ]
+                  },
+                  "subject_sha256": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      }
+                    ]
+                  },
+                  "task_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 100
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 120
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 500
+                        },
+                        "description": {
+                          "type": "string",
+                          "maxLength": 4096
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "description"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "maxItems": 20
+                  },
+                  "recommended_option": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      }
+                    ]
+                  },
+                  "selected_option": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      }
+                    ]
+                  },
+                  "feedback": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096
+                    },
+                    "maxItems": 100
+                  },
+                  "authority_ref": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 40
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 40
+                  },
+                  "decided_at": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 40
+                      }
+                    ]
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "subject_manifest": {
+                    "type": "array",
+                    "maxItems": 150,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "sha256"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "legacy_record": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "data": {
+                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                            "title": "decision",
+                            "type": "object",
+                            "properties": {
+                              "schema_version": {
+                                "const": 1
+                              },
+                              "id": {
+                                "type": "string",
+                                "pattern": "^DEC-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "product",
+                                  "ux",
+                                  "architecture",
+                                  "risk",
+                                  "operation",
+                                  "release",
+                                  "migration",
+                                  "other"
+                                ]
+                              },
+                              "title": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 240
+                              },
+                              "question": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 4096
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "pending",
+                                  "approved",
+                                  "changes_requested",
+                                  "rejected",
+                                  "superseded",
+                                  "cancelled"
+                                ]
+                              },
+                              "subject_ref": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 4096
+                                  }
+                                ]
+                              },
+                              "subject_sha256": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^[a-f0-9]{64}$"
+                                  }
+                                ]
+                              },
+                              "task_refs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                                },
+                                "uniqueItems": true,
+                                "maxItems": 100
+                              },
+                              "options": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 120
+                                    },
+                                    "label": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 500
+                                    },
+                                    "description": {
+                                      "type": "string",
+                                      "maxLength": 4096
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label",
+                                    "description"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "maxItems": 20
+                              },
+                              "recommended_option": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 120
+                                  }
+                                ]
+                              },
+                              "selected_option": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 120
+                                  }
+                                ]
+                              },
+                              "feedback": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 4096
+                                },
+                                "maxItems": 100
+                              },
+                              "authority_ref": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 4096
+                                  }
+                                ]
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "minLength": 20,
+                                "maxLength": 40
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "minLength": 20,
+                                "maxLength": 40
+                              },
+                              "decided_at": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 20,
+                                    "maxLength": 40
+                                  }
+                                ]
+                              },
+                              "revision": {
+                                "type": "integer",
+                                "minimum": 1
+                              }
+                            },
+                            "required": [
+                              "schema_version",
+                              "id",
+                              "type",
+                              "title",
+                              "question",
+                              "status",
+                              "subject_ref",
+                              "subject_sha256",
+                              "task_refs",
+                              "options",
+                              "recommended_option",
+                              "selected_option",
+                              "feedback",
+                              "authority_ref",
+                              "created_at",
+                              "updated_at",
+                              "decided_at",
+                              "revision"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "sha256",
+                          "data"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "id",
+                  "type",
+                  "title",
+                  "question",
+                  "status",
+                  "subject_ref",
+                  "subject_sha256",
+                  "task_refs",
+                  "options",
+                  "recommended_option",
+                  "selected_option",
+                  "feedback",
+                  "authority_ref",
+                  "created_at",
+                  "updated_at",
+                  "decided_at",
+                  "revision",
+                  "subject_manifest",
+                  "legacy_record"
+                ],
+                "additionalProperties": false
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "feedback",
+                  "approve",
+                  "reject",
+                  "request_changes",
+                  "revise",
+                  "supersede",
+                  "cancel",
+                  "legacy_import"
+                ]
+              },
+              "recorded_at": {
+                "type": "string",
+                "minLength": 20,
+                "maxLength": 40
+              }
+            },
+            "required": [
+              "previous",
+              "sha256",
+              "action",
+              "recorded_at"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "legacy_record": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "data": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "title": "decision",
+                  "type": "object",
+                  "properties": {
+                    "schema_version": {
+                      "const": 1
+                    },
+                    "id": {
+                      "type": "string",
+                      "pattern": "^DEC-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "product",
+                        "ux",
+                        "architecture",
+                        "risk",
+                        "operation",
+                        "release",
+                        "migration",
+                        "other"
+                      ]
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 240
+                    },
+                    "question": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 4096
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "changes_requested",
+                        "rejected",
+                        "superseded",
+                        "cancelled"
+                      ]
+                    },
+                    "subject_ref": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        }
+                      ]
+                    },
+                    "subject_sha256": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      ]
+                    },
+                    "task_refs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"
+                      },
+                      "uniqueItems": true,
+                      "maxItems": 100
+                    },
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 120
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 500
+                          },
+                          "description": {
+                            "type": "string",
+                            "maxLength": 4096
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "description"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "maxItems": 20
+                    },
+                    "recommended_option": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 120
+                        }
+                      ]
+                    },
+                    "selected_option": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 120
+                        }
+                      ]
+                    },
+                    "feedback": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "maxItems": 100
+                    },
+                    "authority_ref": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 40
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 40
+                    },
+                    "decided_at": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 20,
+                          "maxLength": 40
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "schema_version",
+                    "id",
+                    "type",
+                    "title",
+                    "question",
+                    "status",
+                    "subject_ref",
+                    "subject_sha256",
+                    "task_refs",
+                    "options",
+                    "recommended_option",
+                    "selected_option",
+                    "feedback",
+                    "authority_ref",
+                    "created_at",
+                    "updated_at",
+                    "decided_at",
+                    "revision"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "sha256",
+                "data"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "type",
+        "title",
+        "question",
+        "status",
+        "subject_ref",
+        "subject_sha256",
+        "task_refs",
+        "options",
+        "recommended_option",
+        "selected_option",
+        "feedback",
+        "authority_ref",
+        "created_at",
+        "updated_at",
+        "decided_at",
+        "revision",
+        "subject_manifest",
+        "history",
+        "legacy_record"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

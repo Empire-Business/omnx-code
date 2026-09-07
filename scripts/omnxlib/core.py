@@ -253,6 +253,8 @@ def metadata_lock(fs:RootFS, resource='metadata'):
             except BlockingIOError: raise MethodError('locked','Outro processo está escrevendo estes metadados.',3) from None
         else:
             import msvcrt
+            if os.fstat(fd).st_size==0:os.write(fd,b' ');os.fsync(fd)
+            os.lseek(fd,0,0)
             try: msvcrt.locking(fd,msvcrt.LK_NBLCK,1)
             except OSError: raise MethodError('locked','Metadados ocupados por outra execução.',3) from None
         owner=json_bytes({'token':uuid.uuid4().hex,'pid':os.getpid(),'created_at':now(),'resource':resource})
@@ -298,8 +300,14 @@ def validate(value,schema,path='$'):
         require(value>=schema.get('minimum',float('-inf')) and value<=schema.get('maximum',float('inf')),'schema_validation',f'{path}: número fora dos limites.')
     return value
 
+from functools import lru_cache
+@lru_cache(maxsize=64)
+def _schema_cached(path,mtime_ns,size):
+    return load_data(Path(path).read_bytes())
+
 def schema(name,area='schemas'):
-    return load_data((PACKAGE/area/(name+'.schema.json')).read_bytes())
+    p=PACKAGE/area/(name+'.schema.json');st=p.stat()
+    return _schema_cached(str(p),st.st_mtime_ns,st.st_size)
 
 def result(summary,*,changed_paths=None,limitations=None,**data):
     return {'status':'ok','code':'OK','summary':summary,'changed_paths':changed_paths or [],'limitations':limitations or [],**data}

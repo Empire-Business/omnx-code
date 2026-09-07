@@ -132,7 +132,9 @@ def gate(fs,r,a,operation,environment,authority_ref=None,environment_digest=None
     if r['mode']=='design':reasons.append('DESIGN_IS_NOT_IMPLEMENTATION')
     if a['execution_status']!='completed' or a['surface_discovery_status']!='completed':reasons.append('INCOMPLETE_COVERAGE')
     for row in a['control_results']:
-        if row['control_id'] in r['requested_controls'] and row['result'] in ('unknown','fail'):reasons.append('REQUIRED_CONTROL_'+row['result'].upper()+':'+row['control_id'])
+        if row['result'] in ('unknown','fail'):
+            prefix='REQUIRED_CONTROL_' if row['control_id'] in r['requested_controls'] else 'ADDED_CONTROL_'
+            reasons.append(prefix+row['result'].upper()+':'+row['control_id'])
     for f in a['findings']:
         if f['severity'] in ('critical','high') and f['exposure'] in ('in_scope','known_exposed'):reasons.append('EXPOSED_HIGH_RISK:'+f['id'])
         if operation=='deploy' and f['severity']=='critical' and f['exposure']=='out_of_scope_unknown':reasons.append('CRITICAL_EXPOSURE_UNRESOLVED:'+f['id'])

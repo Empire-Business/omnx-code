@@ -1,0 +1,18 @@
+{
+  "type": "product",
+  "title": "Exemplo — comportamento a decidir",
+  "question": "Qual opção atende ao objetivo aprovado?",
+  "options": [
+    {
+      "id": "a",
+      "label": "Opção A",
+      "description": "Descreva a consequência real."
+    },
+    {
+      "id": "b",
+      "label": "Opção B",
+      "description": "Descreva a alternativa real."
+    }
+  ],
+  "task_refs": []
+}

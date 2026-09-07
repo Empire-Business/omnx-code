@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "package": "omnx-code",
+  "version": "2.1.0-rc.2",
+  "executed_at": "2026-09-07T02:13:08+00:00",
+  "browser": "Chromium 144.0.7559.96",
+  "platform": "linux",
+  "transport": "Offline DOM + in-process fixture engine. Fetch/history/UUID/clipboard doubled; iframe URLs become offline srcdoc. No HTTP, cookies, CSP-header or native clipboard coverage.",
+  "tests_run": 13,
+  "failures": 0,
+  "tests": [
+    {
+      "test": "B01-panel-bootstrap-and-two-workspaces",
+      "status": "pass",
+      "seconds": 0.066
+    },
+    {
+      "test": "B02-blocked-tasks-visible",
+      "status": "pass",
+      "seconds": 0.214
+    },
+    {
+      "test": "B03-invalid-task-does-not-hide-board",
+      "status": "pass",
+      "seconds": 0.192
+    },
+    {
+      "test": "B04-untrusted-title-is-literal-data",
+      "status": "pass",
+      "seconds": 0.211
+    },
+    {
+      "test": "B05-compact-prompt-and-copy-action",
+      "status": "pass",
+      "seconds": 0.349
+    },
+    {
+      "test": "B06-malicious-preview-name-and-static-isolation",
+      "status": "pass",
+      "seconds": 0.266
+    },
+    {
+      "test": "B07-visual-approval-requires-choice-and-persists",
+      "status": "pass",
+      "seconds": 0.511
+    },
+    {
+      "test": "B08-two-tabs-stale-approval-rejected",
+      "status": "pass",
+      "seconds": 0.569
+    },
+    {
+      "test": "B09-subject-changed-after-view-is-not-approved",
+      "status": "pass",
+      "seconds": 0.347
+    },
+    {
+      "test": "B10-release-not-approved-from-console",
+      "status": "pass",
+      "seconds": 0.157
+    },
+    {
+      "test": "B11-state-transition-through-ui-and-engine",
+      "status": "pass",
+      "seconds": 0.348
+    },
+    {
+      "test": "B12-keyboard-and-mobile-layout",
+      "status": "pass",
+      "seconds": 0.221
+    },
+    {
+      "test": "B13-no-uncaught-errors-or-external-network",
+      "status": "pass",
+      "seconds": 0.0
+    }
+  ],
+  "scope": "Synthetic local projects. No real Codex/Claude session, production, Windows/macOS browser, or model-token benchmark."
+}

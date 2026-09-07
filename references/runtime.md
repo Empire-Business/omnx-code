@@ -27,3 +27,11 @@ Locks são locais/cooperantes. Não alegar proteção contra processo hostil com
 Schemas adicionais de release e decisão de risco são registros para integrar ao fluxo humano/CI;
 não existe comando que publique, conceda exceção, rotacione segredo ou autentique consentimento por texto.
 Valores de autoridade são referências, não assinatura. Campos de evidência não executam testes por si só.
+
+## Console e Decision rc.2
+
+`decision list/show/create/update/revise`; `console register/projects/unregister/open/serve/stop/install/shortcut`.
+Open inicia/reutiliza explicitamente servidor local; não inicia agentes. Serve fica em primeiro plano.
+Decision schema 1 é leitura histórica; somente schema 2 é escrito. Criar não aprova; revise não herda aprovação.
+Na API do Console, autenticação usa pareamento de uma vez + cookie/CSRF, não token em query.
+Comando de adoção do pacote não migra Decision automaticamente. Veja references/console.md.

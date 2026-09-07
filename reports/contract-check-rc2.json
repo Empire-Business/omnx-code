@@ -1,0 +1,30 @@
+{
+  "version": "2.1.0-rc.2",
+  "skill_lines": 191,
+  "description_characters": 408,
+  "schemas_checked": 13,
+  "manifest_consistent": true,
+  "python_310_grammar": "checked_not_runtime_test",
+  "javascript_syntax": "node --check passed",
+  "pinned_contract_checks": [
+    {
+      "file": "audit-request.schema.json",
+      "identical_to_pinned_auditor": true
+    },
+    {
+      "file": "control-index.json",
+      "identical_to_pinned_auditor": true
+    },
+    {
+      "file": "audit-response.schema.json",
+      "identical_to_pinned_auditor": true
+    },
+    {
+      "file": "default-policy.json",
+      "identical_to_pinned_auditor": true
+    }
+  ],
+  "limitations": [
+    "Schema/catalog equality is not a live security-auditor model invocation."
+  ]
+}

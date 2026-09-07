@@ -1,116 +1,146 @@
-# OMNX Code — 2.0.0-rc.1
+# OMNX Code 2.1.0-rc.2 — com Console 1.0.0-rc.2
 
-Desenvolvimento assistido por IA com escopo explícito, tarefas canônicas e verificações proporcionais.
-Recriação coordenada com security-auditor baseada na especificação v4 fornecida pelo usuário.
+Método de desenvolvimento para agentes + painel local opcional. Esta release corrige defeitos reproduzidos da `2.1.0-rc.1`, em vez de acrescentar outro sistema de organização.
 
-## Uso normal
+**Use a pasta completa deste ZIP. Não misture scripts, assets ou schemas da rc.1 com os da rc.2.**
 
-Instale as duas skills. Na aplicação, peça ao agente para usar OMNX; não é necessário operar a CLI
-manualmente em cada Task. A skill seleciona referências e usa helpers quando há trabalho mecânico.
+## Para começar sem operar tudo manualmente
 
-> Use omnx-code para corrigir este comportamento. Preserve o escopo e as alterações locais.
-> Não publique. Valide somente o delta pertinente e entregue as evidências.
+Instale a skill no ambiente do seu agente e peça:
 
-Análise não instala arquivos. Manutenção pequena não exige PRD novo nem mockup histórico.
-UX0–UX3 trata incerteza de experiência; S0–S3 trata risco; O0–O3 trata efeito/autorização.
-Auditor recebe apenas o necessário. Task done não significa produção.
+> Use a omnx-code 2.1.0-rc.2 deste pacote. Primeiro confira a versão, a integridade dos arquivos e o projeto selecionado. Prepare o acompanhamento visual sem alterar código da aplicação, banco, credenciais ou produção. Se o projeto usa a OMNX anterior, preserve as customizações e proponha a adoção/migração apropriada. Não reaproveite aprovações de decisões schema 1. Abra o Console ao terminar e deixe claro o que foi e o que não foi validado.
+
+O agente pode executar os comandos abaixo por você. O painel **não chama Codex, Claude ou outra API de IA**. Copiar um prompt não executa trabalho; o agente o executará quando você o colar e autorizar o escopo pertinente.
+
+## O que está incluído
+
+Visão geral de projetos em pastas diferentes, Kanban com bloqueados/cancelados, galeria de telas estáticas, decisões de produto/UX com revisão e histórico, feedback, prompts curtos por referência, diagnóstico somente leitura, launcher e engine de tarefas/migração/auditoria.
+
+Arquivos do projeto continuam canônicos. Não há banco paralelo, telemetria, serviço remoto, execução de código do projeto, deploy ou migração de banco pela interface.
+
+O nome “Método atual” compara o lock do projeto com **esta instalação local**, não com a última versão do GitHub. Isso não é certificado de saúde ou de segurança do produto.
+
+## Requisitos
+
+Helpers e servidor: **Python 3.10+**. Não precisa de `pip install`, Node, npm, chave de API ou banco. PyYAML 6.0.3 puro está incluído com sua licença. Interface: navegador moderno.
+
+O launcher aponta para o Python e a pasta usados na sua criação. Ele não é um binário autossuficiente assinado/notarizado. Coloque o pacote em uma pasta permanente antes de criar o ícone. Mover ou apagar a instalação quebra o atalho, mas não apaga nenhum projeto.
+
+## Abrir
+
+Use o caminho absoluto da instalação. `--root` vem **antes** de `console`:
+
+```sh
+python3 "/caminho/omnx-code/scripts/omnx.py" verify-package
+python3 "/caminho/omnx-code/scripts/omnx.py" --root "/caminho/projeto" console open
+```
+
+No Windows, use o executável Python disponível (`python` ou `py -3`) em vez de presumir `python3`.
+
+`console open` registra explicitamente a pasta informada, inicia um servidor local quando necessário, reaproveita a instância desta instalação e abre o navegador. Registrar a pasta **não instala/migra o método dentro do projeto**. Um projeto incompatível continua visível em leitura.
+
+Depois de registrar seus projetos:
+
+```sh
+python3 "/caminho/omnx-code/scripts/omnx.py" console open
+python3 "/caminho/omnx-code/scripts/omnx.py" console stop
+```
+
+Abrir o Console é uma autorização explícita para iniciar esse servidor local. Ele não mantém agentes trabalhando. O comando `stop` só encerra a instância identificada; nenhum projeto é apagado.
+
+Para diagnóstico em primeiro plano:
+
+```sh
+python3 "/caminho/omnx-code/scripts/omnx.py" console serve --no-browser
+```
+
+A URL contém uma chave **de uso único**, em fragmento, válida por dois minutos para pareamento. Não a compartilhe. Depois, a sessão usa cookie HttpOnly/SameSite e proteção CSRF. Se expirar, reabra pelo comando ou ícone, em vez de reutilizar um link antigo.
+
+## Instalar uma vez e criar ícone
+
+A skill pode ficar em pasta permanente já escolhida. Como alternativa explícita, `console install` copia o pacote verificado para **uma pasta nova**, cujo diretório pai precisa existir:
+
+```sh
+python3 "/origem/omnx-code/scripts/omnx.py" console install --destination "/pasta-permanente/omnx-code-2.1.0-rc.2"
+python3 "/pasta-permanente/omnx-code-2.1.0-rc.2/scripts/omnx.py" console shortcut --destination "/sua/area-de-trabalho"
+```
+
+Não sobrescreve uma instalação ou atalho existente. A criação de `.desktop`, `.app` ou `.cmd` é opt-in. Geração dos arquivos foi testada; macOS/Windows e a experiência de duplo clique nesses sistemas **não foram homologados nesta sessão**. Há fallback pelo comando Python.
+
+## Atualizar da rc.1 sem apagar o projeto
+
+1. Encerre a instância antiga usando a janela/terminal que a iniciou. Não mate processos por nome indiscriminadamente.
+2. Extraia a rc.2 em pasta nova e verifique seus bytes. Mantenha o pacote anterior intacto.
+3. Configure/ative a nova skill no agente; abrir um ZIP não substitui o contexto de uma sessão já em execução.
+4. No projeto novo-modelo, `method verify` mostra a divergência e o hash atual do lock. `method adopt` atualiza apenas a adoção do pacote, com backup e CAS:
+
+```sh
+python3 "/nova/omnx-code/scripts/omnx.py" --root "/projeto" method verify
+python3 "/nova/omnx-code/scripts/omnx.py" --root "/projeto" method adopt \
+  --expected-sha256 HASH_ATUAL_DO_LOCK \
+  --authority-ref "ORIGEM_REAL_DA_AUTORIZACAO"
+```
+
+O texto acima indica onde inserir valores reais; não é uma autorização fictícia para copiar. A adoção não faz deploy, não altera o banco e não reorganiza produto/PRD automaticamente.
+
+5. Decisões antigas schema 1 aparecem como **histórico não verificado**. Para voltar a usá-las, o agente lê a decisão/artefato atual e executa `decision revise`, preservando o original e reapresentando uma revisão pendente. Você aprova novamente somente o escopo necessário. Veja `references/console.md`.
+6. Recrie o atalho apontando para a nova instalação, sem sobrescrever às cegas o anterior.
+
+Não é necessário reescrever o PRD, mockups ou todas as Tasks para adotar esta patch release. Projeto ainda no formato `.empire`/`CLAUDE.md` precisa da migração semântica explícita, não apenas da adoção de versão.
+
+## Projetos realmente legados
+
+Peça à skill para inventariar fontes governadas, preservar regras customizadas e produzir o plano semântico antes da escrita. `migrate plan` não adivinha a classificação. A aplicação mecânica oferece snapshot, journal, CAS, resume e rollback. Detalhes em `references/migration.md`.
+
+A migração reorganiza o método: não troca stack, não remove Loja de Apps/tickets existentes, não migra dados reais, não publica. Ambiguidade relevante não pode ser escondida apenas no backup.
 
 ## Projeto novo
 
-A adoção é explícita e mínima. O primeiro comando gera um plano, não aplica:
 ```sh
-python scripts/omnx.py --root /caminho/projeto init \
-  --authority-ref "conversa:pedido-real-de-adocao" \
-  --bootstrap-ref "sessao:AGENTS-sera-lido-na-ativacao-explicita" \
-  --output /tmp/omnx-plan.json
-```
-Revise o plano e sua origem real; aplique com o digest retornado:
-```sh
-python scripts/omnx.py --root /caminho/projeto migrate apply \
-  --plan /tmp/omnx-plan.json --approved-digest DIGEST_REAL_DO_PLANO
-python scripts/omnx.py --root /caminho/projeto doctor
-```
-O diretório de output precisa existir. Texto de autoridade nos exemplos é indicação de formato,
-não uma permissão real. Não copie referência fictícia para declarar aprovação inexistente.
-
-Adoção cria AGENTS, project.yaml, method.lock e exclusão da área local. Não cria PRD, mockup,
-relatório de segurança ou dezenas de pastas vazias automaticamente.
-
-## Projeto antigo
-
-> Use a nova omnx-code para migrar o método deste projeto. Inventarie regras e documentos governados,
-> preserve customizações, consolide pendências no Task Store e elimine CLAUDE.md ativo após conciliação.
-> Não altere produto, banco ou credenciais. Mostre ambiguidades materiais; aplique só plano verificável.
-
-Siga references/migration.md. Conteúdo legado exige resolução de blocos e destino antes de aplicar.
-Não classificar é melhor que destruir: a substituição afetada fica pendente, não todo diagnóstico.
-Resume/rollback são comandos reais, com journal e CAS. Backups são restritos e inertes (.bin).
-
-## Adotar o auditor e verificar o conjunto
-
-Depois de verificar os dois pacotes, use `method adopt` com hash atual do lock, origem real da decisão,
-pasta do auditor e digest confiado do integrity.json dele. `method verify --auditor-dir ...` compara
-os pacotes com o lock. S0 não exige instalar um auditor ausente. Não simule chamada independente.
-
-## Conteúdo
-
-SKILL.md enxuto; dez referências condicionais; templates opcionais; CLI; schemas de projeto/Tasks;
-contrato de auditoria 2.0; migração recuperável; catálogo gerado do auditor; testes e evals separados.
-
-A verificação de segurança é da skill especializada. O runtime apenas identifica conteúdo e valida
-contratos/evidências declaradas. Nenhum script publica, cobra, executa SQL remoto ou instala ferramentas.
-
-## Instalação
-
-O ZIP é uma distribuição de skill, não um plugin de marketplace com conectores.
-Extraia a pasta inteira, preservando SKILL.md na raiz dessa pasta. Primeiro use pasta nova ou cópia
-recuperável; não sobrescreva customizações antigas sem revisar REPOSITORY-UPGRADE.md.
-
-| Host local | Pessoal | Por projeto |
-|---|---|---|
-| Claude Code | `~/.claude/skills/<nome>/` | `.claude/skills/<nome>/` |
-| Codex CLI | `~/.agents/skills/<nome>/` | `.agents/skills/<nome>/` |
-
-Locais/invocação conforme documentação consultada em 6/9/2026; veja reports/SOURCES.md.
-Em Claude Code use `/omnx-code` ou `/security-auditor`; em Codex CLI use `$omnx-code` ou
-`$security-auditor`. Hosts corporativos, cloud e interfaces de upload podem ter mecanismo próprio.
-Não confunda instruções do projeto (AGENTS.md) com a pasta de instalação da skill.
-
-A distribuição foi testada como arquivos/scripts em Linux/Python, não dentro das CLIs reais.
-Confirme descoberta/versão/escopo efetivo no seu ambiente. O instalador não modifica configuração global.
-
-## Requisitos e verificação
-
-As instruções funcionam com um agente capaz de ler arquivos; os helpers precisam de Python 3.10+.
-Nesta entrega foram executados com Python 3.13.5/Linux. Nenhum pip, chave de API ou serviço externo é
-necessário para os helpers. O modelo/assinatura do host são seus; os scripts não chamam API de LLM.
-
-```sh
-python scripts/omnx.py verify-package
-python tests/run.py --output /tmp/omnx-test-results.json
+python3 "/skill/scripts/omnx.py" --root "/projeto" init \
+  --authority-ref "ORIGEM_REAL_DO_PEDIDO" \
+  --bootstrap-ref "COMO_AGENTS_SERA_LIDO" --output "/pasta-existente/plano.json"
+python3 "/skill/scripts/omnx.py" --root "/projeto" migrate apply \
+  --plan "/pasta-existente/plano.json" --approved-digest DIGEST_REAL_DO_PLANO
 ```
 
-`verify-package` compara bytes ao inventário, não autentica uma assinatura. O SHA-256 do ZIP deve vir
-de uma origem confiada. Os arquivos não foram assinados digitalmente.
-`tests/run.py` executa fixtures locais em diretórios temporários, sem testar sua aplicação/produção.
+O primeiro comando só gera plano. Reveja antes de aplicar. Não cria uma árvore inteira de documentos vazios. Apenas `AGENTS.md` é entrada canônica; nunca criar espelho `CLAUDE.md`.
 
-## O que está validado e o que não está
+## Skill no Claude Code e Codex
 
-Consulte reports/VALIDATION.md e reports/test-results.json. Não há garantia de encontrar toda
-vulnerabilidade nem de prever todo comportamento de um modelo. Os 130 cenários em evals/scenarios.json
-são conjunto de aceitação comportamental, não 130 testes de modelo já aprovados.
+Pastas documentadas de skills pessoais: Claude Code `~/.claude/skills/omnx-code/`; Codex CLI `~/.agents/skills/omnx-code/`. Alguns hosts/clouds possuem instalação própria. Não mantenha versões duplicadas descobertas pelo host sem identificar qual está ativa.
 
-Não foram executados Claude/Codex reais, homologação Windows/macOS, pentest, apps reais do usuário,
-integrações Asaas/Hotmart/Supabase ou benchmark de tokens em modelo. Gates são avaliações locais,
-não proteção de branch ou autorização de produção. Migração de texto precisa de resolução semântica
-pelo agente/revisor: o motor não adivinha decisões de negócio.
+Claude Code não deve ser presumido capaz de carregar `AGENTS.md` automaticamente: use ativação explícita ou adaptador autorizado. Leia `adapters/claude-code.md` e `adapters/codex.md`. Nenhum teste de presença de executável comprova integração real do modelo.
 
-## Atualizações e código-fonte
+O contrato com `security-auditor` continua 2.0, catálogo revisão 1. Esta entrega não modifica a skill do auditor. S0 não exige chamá-la; S2/S3 precisam de verificação pertinente e evidência real. Instalação/adoção do auditor é explícita.
 
-manifest.json identifica a versão. integrity.json é inventário gerado. Os scripts estão incluídos
-em código-fonte e possuem testes. Preserve NOTICE/LICENSE e a licença de PyYAML.
-Referências/históricos e exemplos não são arquivos que devam ser lidos inteiros em cada Task.
+## Testar e verificar
 
-Para publicar o repositório, veja REPOSITORY-UPGRADE.md. Para distribuição versionada sem sobrescrita,
-veja a referência de distribuição da OMNX. Atualização do pacote, migração documental e migração de
-dados da aplicação são três operações diferentes.
+```sh
+python3 "/skill/scripts/omnx.py" verify-package
+python3 "/skill/tests/run.py" --output "/fora-do-pacote/testes.json"
+```
+
+`tests/run.py` usa fixtures locais e servidor loopback em testes HTTP; não executa sua aplicação. Deixe saídas fora do diretório inventariado para não invalidar `verify-package`.
+
+Desenvolvimento da interface, com Playwright/Chromium previamente instalados:
+
+```sh
+python3 "/skill/tests/browser/run.py" --output "/fora-do-pacote/browser.json"
+python3 "/skill/tests/browser/run.py" --isolated-dom --output "/fora-do-pacote/dom.json"
+python3 "/skill/tests/scale.py" --output "/fora-do-pacote/escala.json"
+```
+
+O primeiro é ponta a ponta HTTP real. O segundo usa transporte/clipboard/histórico simulados e documentos offline para testar o DOM com a engine; **não substitui o primeiro**. Veja `reports/VALIDATION.md` para o que foi executado, bloqueado ou não homologado.
+
+## Limites deliberados
+
+Aprovação do Console é um registro de usuário local, não autenticação forte ou assinatura independente. Usuário/processo com acesso irrestrito à conta pode alterar os próprios arquivos. Gates locais não substituem CI protegido.
+
+HTML no Console é **estático**, sanitizado, sem scripts, navegação ou APIs. Imagens e CSS locais permitidos são vinculados ao manifesto da proposta. Um preview bonito não demonstra que a jornada ou integração funciona. Não forneça dados reais/sigilosos nos mockups; redaction textual é defensiva, não detector perfeito de segredos/PII/imagens.
+
+Sem garantia de “zero falhas”. Esta candidata corrige as falhas reproduzidas e inclui testes de regressão. Não houve homologação em Claude/Codex reais, macOS, Windows, Safari, projetos privados do usuário ou produção. Os 130 cenários de modelo permanecem **planejados**, não executados.
+
+## Repositório e código-fonte
+
+O ZIP contém a distribuição completa, não um patch. O conteúdo de `omnx-code/` vai na raiz do repositório, preservando `.git` e customizações/landing alheias ao runtime. Veja `REPOSITORY-UPGRADE.md`. Preserve as licenças. Manifesto é a fonte de versão; frontmatter e Console são verificados contra ele nos testes. Inventário SHA-256 não equivale a assinatura/autoria.

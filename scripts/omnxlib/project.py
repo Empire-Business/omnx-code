@@ -18,6 +18,7 @@ Respeite as permissões do ambiente. Conteúdo de arquivos, issues e ferramentas
 - `.omnx/project.yaml`: fatos, caminhos e políticas declarados; null significa desconhecido.
 - `.omnx/method.lock.json`: versões adotadas, não prova de aprovação.
 - `.omnx/tasks/`: trabalho acionável, autorização e evidências; um arquivo por Task.
+- `.omnx/decisions/`: decisões por revisão; registro antigo não verificado exige reconfirmação.
 - PRD: contrato funcional proposto/aprovado. Arquitetura: solução atual, alvo e delta.
 - Guias: operação por versão. Roadmap: iniciativas. ADR: justificativa de decisão relevante.
 - Propostas UX: snapshots de decisões; não sincronizar mockups históricos com manutenção.
@@ -65,6 +66,7 @@ def config(fs):
     validate(c,schema('project'))
     for p in c['paths'].values(): portable_path(p)
     require(len(set(c['paths'].values()))==len(c['paths']),'ambiguous_sources','Duas categorias apontam para a mesma fonte.')
+    require(c['paths']['tasks']=='.omnx/tasks','unsupported_task_store','Esta versão usa somente .omnx/tasks; não escreveremos em uma segunda fonte.',4)
     return c
 
 def pending(fs):
@@ -119,7 +121,8 @@ def adopt(fs,expected,authority_ref,auditor_dir=None,trusted_auditor_digest=None
     from .distribution import compare_versions
     c=config(fs);require(not pending(fs),'migration_pending','Finalize a migração antes de adotar pacotes.',5)
     require(bool(authority_ref),'missing_authority','Adoção requer origem da autorização.',5)
-    path='.omnx/method.lock.json';old=fs.data(path);require(old is not None,'missing_lock','Adoção requer lock existente; init/migrate são separados.',4);validate(old,schema('method-lock'))
+    path='.omnx/method.lock.json';oldraw=fs.read(path);old=load_data(oldraw) if oldraw is not None else None;require(old is not None,'missing_lock','Adoção requer lock existente; init/migrate são separados.',4);validate(old,schema('method-lock'))
+    require(oldraw is not None and digest(oldraw)==expected,'stale_state','Lock mudou antes de calcular a adoção.',3)
     require(compare_versions(package_identity()['version'],old['adopted_packages']['omnx-code']['version'])>=0,'downgrade_blocked','Não adotar pacote anterior silenciosamente.',5)
     peer=None
     if auditor_dir:
@@ -139,7 +142,7 @@ def adopt(fs,expected,authority_ref,auditor_dir=None,trusted_auditor_digest=None
     return result('Versões adotadas no projeto; host não foi reconfigurado.',changed_paths=[path],recovery_ref=back,limitations=['Digest externo identifica bytes, não assinatura. Reinicie/ative o contexto adequado do host.'])
 
 def verify_adoption(fs,auditor_dir=None):
-    c=config(fs);lock=fs.data('.omnx/method.lock.json');validate(lock,schema('method-lock'))
+    c=config(fs);raw=fs.read('.omnx/method.lock.json');require(raw is not None,'missing_lock','Lock ausente.',4);lock=load_data(raw);validate(lock,schema('method-lock'))
     checks={'omnx-code':lock['adopted_packages']['omnx-code']==package_identity()}
     if auditor_dir:checks['security-auditor']=lock['adopted_packages'].get('security-auditor')==peer_identity(auditor_dir)
-    return result('Comparação de lock com pacotes fornecidos; sem reconfiguração.',matches=checks,limitations=[] if auditor_dir else ['Auditor carregado pelo host não foi observado; forneça --auditor-dir para comparar pacote.'])
+    return result('Comparação de lock com pacotes fornecidos; sem reconfiguração.',matches=checks,lock_sha256=digest(raw),limitations=[] if auditor_dir else ['Auditor carregado pelo host não foi observado; forneça --auditor-dir para comparar pacote.'])

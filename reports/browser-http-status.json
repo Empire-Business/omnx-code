@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "package": "omnx-code",
+  "version": "2.1.0-rc.2",
+  "executed_at": "2026-09-07T02:09:51+00:00",
+  "browser": "Chromium 144.0.7559.96",
+  "platform": "linux",
+  "transport": "Real HTTP on 127.0.0.1, unmodified shipped JavaScript",
+  "tests_run": 1,
+  "failures": 1,
+  "tests": [
+    {
+      "test": "browser-capability",
+      "status": "blocked",
+      "error": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:35837/#key=[REDACTED]\n"
+    }
+  ],
+  "scope": "Synthetic local projects. No real Codex/Claude session, production, Windows/macOS browser, or model-token benchmark."
+}
