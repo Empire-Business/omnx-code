@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "model-policy",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": 1},
+    "profiles": {
+      "type": "object",
+      "properties": {
+        "deterministic": {"type":"object","properties":{"model":{"anyOf":[{"type":"string","minLength":1,"maxLength":160},{"type":"null"}]},"effort":{"anyOf":[{"type":"string","enum":["low","medium","high","xhigh"]},{"type":"null"}]}},"required":["model","effort"],"additionalProperties":false},
+        "economical": {"type":"object","properties":{"model":{"anyOf":[{"type":"string","minLength":1,"maxLength":160},{"type":"null"}]},"effort":{"anyOf":[{"type":"string","enum":["low","medium","high","xhigh"]},{"type":"null"}]}},"required":["model","effort"],"additionalProperties":false},
+        "balanced": {"type":"object","properties":{"model":{"anyOf":[{"type":"string","minLength":1,"maxLength":160},{"type":"null"}]},"effort":{"anyOf":[{"type":"string","enum":["low","medium","high","xhigh"]},{"type":"null"}]}},"required":["model","effort"],"additionalProperties":false},
+        "advanced": {"type":"object","properties":{"model":{"anyOf":[{"type":"string","minLength":1,"maxLength":160},{"type":"null"}]},"effort":{"anyOf":[{"type":"string","enum":["low","medium","high","xhigh"]},{"type":"null"}]}},"required":["model","effort"],"additionalProperties":false}
+      },
+      "required": ["deterministic", "economical", "balanced", "advanced"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["schema_version", "profiles"],
+  "additionalProperties": false
+}

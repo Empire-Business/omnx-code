@@ -256,8 +256,8 @@ class CatalogAndRecovery(Base):
         with tempfile.TemporaryDirectory(prefix='launcher with space ') as out:
             with patch('platform.system',return_value='Linux'):
                 result=launcher.create(out)
-            text=Path(result['changed_paths'][0]).read_text();self.assertIn('"'+sys.executable+'"',text);self.assertIn('Terminal=false',text)
-            self.expect('stale_state',lambda:launcher.create(out))
+                text=Path(result['changed_paths'][0]).read_text();self.assertIn('"'+sys.executable+'"',text);self.assertIn('Terminal=false',text)
+                self.expect('stale_state',lambda:launcher.create(out))
     def test_macos_launcher_structure_generated_not_host_homologation(self):
         with tempfile.TemporaryDirectory() as out:
             with patch('platform.system',return_value='Darwin'):r=launcher.create(out)

@@ -172,7 +172,8 @@ class RootFS:
                 try: nxt=os.open(part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd)
                 except FileNotFoundError:
                     if not create: raise
-                    os.mkdir(part,mode=0o700,dir_fd=fd)
+                    try: os.mkdir(part,mode=0o700,dir_fd=fd)
+                    except FileExistsError: pass # Another cooperating writer created it; O_NOFOLLOW below revalidates it.
                     nxt=os.open(part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd)
                 os.close(fd); fd=nxt
             yield fd,parts[-1],None
@@ -233,7 +234,11 @@ class RootFS:
         # Do not make historical instruction files discoverable; backups use .bin.
         rel='.omnx/local/.gitignore'
         if self.read(rel) is None:
-            self.write(rel,b'*\n',None)
+            try: self.write(rel,b'*\n',None)
+            except MethodError as exc:
+                # Concurrent initialization may win the create between our
+                # initial read and compare-and-swap. Accept only our exact file.
+                if exc.code!='stale_state' or self.read(rel)!=b'*\n': raise
         p=self.path('.omnx/local')
         if os.name=='posix': os.chmod(p,0o700)
         return p

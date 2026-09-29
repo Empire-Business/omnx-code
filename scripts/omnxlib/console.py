@@ -1,7 +1,8 @@
-"""Optional local Console. No AI calls, arbitrary shell, deploy or application writes.
+"""Local Console. No AI calls, arbitrary shell, deploy or application writes.
 
 HTTP is loopback-only. A one-use fragment pairs a browser, then HttpOnly cookies
-and CSRF protect the API. Previews get short-lived, read-only bundle capabilities.
+and CSRF protect the API. Trusted project hooks may request one session-linked launch.
+Previews get short-lived, read-only bundle capabilities.
 """
 from __future__ import annotations
 import contextlib
@@ -28,11 +29,37 @@ STATUS_LABEL={'backlog':'Backlog','ready':'Pronto','in_progress':'Em execução'
 
 @contextlib.contextmanager
 def catalog_lock():
-    """Serialize cooperating processes without a fixed temporary filename."""
+    """Serialize catalog writers using a lock directly in the private catalog root."""
     # Explicit registration/startup may create this per-user state. Reads don't.
     CATALOG_DIR.mkdir(mode=0o700,parents=True,exist_ok=True)
     fs=RootFS(CATALOG_DIR)
-    with metadata_lock(fs,'catalog'):yield fs
+    for attempt in range(40):
+        lock_path=fs.path('.catalog.lock')
+        fd=os.open(lock_path,os.O_RDWR|os.O_CREAT|getattr(os,'O_NOFOLLOW',0),0o600)
+        try:
+            require(os.fstat(fd).st_nlink==1,'unsafe_link','Lock do catálogo com hardlink recusado.')
+            if os.name=='posix':
+                import fcntl
+                try:fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                except BlockingIOError:
+                    if attempt==39:raise MethodError('locked','Outro processo está atualizando o catálogo.',3) from None
+                    time.sleep(.025)
+                    continue
+            else:
+                import msvcrt
+                if os.fstat(fd).st_size==0:os.write(fd,b' ');os.fsync(fd)
+                os.lseek(fd,0,0)
+                try:msvcrt.locking(fd,msvcrt.LK_NBLCK,1)
+                except OSError:
+                    if attempt==39:raise MethodError('locked','Outro processo está atualizando o catálogo.',3) from None
+                    time.sleep(.025)
+                    continue
+            owner=json_bytes({'token':secrets.token_hex(16),'pid':os.getpid(),'created_at':now(),'resource':'catalog'})
+            os.lseek(fd,0,0);os.ftruncate(fd,0);os.write(fd,owner);os.fsync(fd)
+            yield fs
+            return
+        finally:
+            os.close(fd)
 
 def _catalog_read():
     if not CATALOG_DIR.exists():return {'schema_version':2,'projects':[]}
@@ -100,12 +127,13 @@ def _read_project(root):return projection.read_project(root)
 def overview(projects):
     usable=[p for p in projects if p.get('available',True)]
     for p in usable:p['version_status']=version_status(p)
+    bundle=load_data((PACKAGE/'manifest.json').read_bytes())
     return {'projects':len(projects),'available_projects':len(usable),
         'tasks':sum(p.get('counts',{}).get('tasks',len(p.get('tasks',[]))) for p in usable),
         'active_tasks':sum(sum(p.get('counts',{}).get('by_status',{}).get(k,0) for k in ('in_progress','review','blocked')) for p in usable),
         'pending_decisions':sum(p.get('counts',{}).get('pending_decisions',0) for p in usable),
         'outdated_projects':sum(p['version_status']['status']=='outdated' for p in usable),
-        'bundle_version':load_data((PACKAGE/'manifest.json').read_bytes())['version']}
+        'bundle_version':bundle['version'],'console_version':bundle['console']['version']}
 
 def prompt_for_task(p,task_id,mode='compact'):
     require(mode in ('compact','complete','explain','investigate','review','continue'),'invalid_prompt_mode','Modo de prompt inválido.')
@@ -148,12 +176,20 @@ class ConsoleServer(ThreadingHTTPServer):
         self.launcher_token=secrets.token_urlsafe(32);self.instance_id=uuid.uuid4().hex
         self.origin=f'http://127.0.0.1:{self.server_port}';self.host=f'127.0.0.1:{self.server_port}';self.cookie_name=f'omnx_{self.server_port}'
         self.summary_cache={};self.project_cache=OrderedDict();self.project_locks={};self.workers=threading.BoundedSemaphore(24)
-    def issue_bootstrap(self):
+    def issue_bootstrap(self,context=None):
         with self.guard:
-            now_m=time.monotonic();self.bootstraps={k:v for k,v in self.bootstraps.items() if v>now_m}
+            now_m=time.monotonic();self.bootstraps={k:v for k,v in self.bootstraps.items() if v['expires']>now_m}
             require(len(self.bootstraps)<32,'pairing_limit','Muitas tentativas de abertura; reutilize uma janela.',6)
-            key=secrets.token_urlsafe(32);self.bootstraps[key]=now_m+120
+            key=secrets.token_urlsafe(32);self.bootstraps[key]={'expires':now_m+120,'context':context or {}}
             return self.origin+'/#key='+key
+    def presence(self,workspace_id):
+        t=time.monotonic();rows=[]
+        with self.guard:
+            for session in self.sessions.values():
+                if session.get('workspace_id')==workspace_id and session.get('expires',0)>t and t-session.get('last_seen',0)<90:
+                    rows.append(session.get('last_client_signal_at'))
+        rows=[x for x in rows if isinstance(x,str)]
+        return {'client_connected':bool(rows),'sessions':len(rows),'last_connected_at':max(rows) if rows else None}
     def process_request(self,request,client_address):
         if not self.workers.acquire(blocking=False):
             request.close();return
@@ -168,14 +204,18 @@ class ConsoleServer(ThreadingHTTPServer):
             lock=self.project_locks.setdefault(wid,threading.Lock())
         with lock:
             with self.guard:cached=self.project_cache.get(wid)
-            if not force and cached and now_m-cached[0]<3:return deepcopy(cached[1])
-            p=projection.read_project(Path(item['path']))
-            if p['project_id']!=item['project_id']:
-                p['read_only']=True;p['read_only_reasons'].append('Identidade do projeto mudou nesta pasta. Registre novamente.')
-            p['version_status']=version_status(p)
-            with self.guard:
-                self.project_cache[wid]=(time.monotonic(),deepcopy(p));self.project_cache.move_to_end(wid)
-                while len(self.project_cache)>8:self.project_cache.popitem(last=False)
+            if not force and cached and now_m-cached[0]<3:p=deepcopy(cached[1])
+            else:
+                p=projection.read_project(Path(item['path']))
+                if p['project_id']!=item['project_id']:
+                    p['read_only']=True;p['read_only_reasons'].append('Identidade do projeto mudou nesta pasta. Registre novamente.')
+                p['version_status']=version_status(p)
+                from .updates import read_console_state
+                p['update_state']=read_console_state(RootFS(item['path']))
+                with self.guard:
+                    self.project_cache[wid]=(time.monotonic(),deepcopy(p));self.project_cache.move_to_end(wid)
+                    while len(self.project_cache)>8:self.project_cache.popitem(last=False)
+            p['console_presence']=self.presence(wid)
             return p
     def summary(self,item,force=False):
         try:
@@ -191,7 +231,7 @@ class ConsoleServer(ThreadingHTTPServer):
 from copy import deepcopy
 
 class Handler(BaseHTTPRequestHandler):
-    server_version='OMNXConsole/1.0-rc.2'
+    server_version='OMNXConsole/1.1-rc.1'
     def setup(self):super().setup();self.connection.settimeout(10)
     def log_message(self,*args):pass # no paths, tokens or project data in logs
     def _base_check(self,mutating=False):
@@ -225,7 +265,7 @@ class Handler(BaseHTTPRequestHandler):
             s=self.server.sessions.get(key);t=time.monotonic()
             require(s and s['expires']>t and t-s['last_seen']<2*3600,'session_required','Sessão encerrada. Reabra o Console pelo ícone ou comando.',5)
             if write:require(secrets.compare_digest(self.headers.get('X-OMNX-CSRF',''),s['csrf']),'csrf_rejected','Ação sem verificação de sessão.',5)
-            s['last_seen']=t
+            s['last_seen']=t;s['last_client_signal_at']=now()
         return key,s
     def _query(self):
         pairs=urllib.parse.parse_qsl(urllib.parse.urlsplit(self.path).query,keep_blank_values=True,max_num_fields=20)
@@ -259,10 +299,14 @@ class Handler(BaseHTTPRequestHandler):
             if path in ('/','/index.html','/assets/app.js','/assets/style.css','/assets/icon.svg'):
                 rel='assets/index.html' if path in ('/','/index.html') else path.lstrip('/')
                 raw=(CONSOLE/rel).read_bytes();return self._send(200,raw,mimetypes.guess_type(rel)[0] or 'application/octet-stream')
-            if path=='/api/health':return self._json(200,{'status':'ok','instance_id':self.server.instance_id,'version':load_data((PACKAGE/'manifest.json').read_bytes())['version']})
+            if path=='/api/health':
+                q=self._query();workspace=q.get('workspace_id')
+                if workspace is not None:require(re.fullmatch(r'WSP-[0-9a-f]{24}',workspace),'invalid_workspace','Identificador de cópia inválido.')
+                with self.server.guard:connected=sum(1 for s in self.server.sessions.values() if s.get('last_seen',0)>time.monotonic()-90 and s.get('expires',0)>time.monotonic() and (workspace is None or s.get('workspace_id')==workspace))
+                return self._json(200,{'status':'ok','instance_id':self.server.instance_id,'version':load_data((PACKAGE/'manifest.json').read_bytes())['version'],'client_connected_count':connected})
             if path.startswith('/preview/'):return self._preview(path)
             _,session=self._session();q=self._query()
-            if path=='/api/session':return self._json(200,{'csrf':session['csrf'],'identity':'usuário local — sem atestação externa','instance_id':self.server.instance_id})
+            if path=='/api/session':return self._json(200,{'csrf':session['csrf'],'identity':'usuário local — sem atestação externa','instance_id':self.server.instance_id,'launch_context':session.get('launch_context',{})})
             if path=='/api/projects':
                 rows=[self.server.summary(item,q.get('refresh')=='1') for item in _catalog_read()['projects']]
                 return self._json(200,{'projects':rows,'overview':overview(rows),'refreshed_at':now()})
@@ -325,14 +369,29 @@ class Handler(BaseHTTPRequestHandler):
             self._base_check(True);body=self._body();path=urllib.parse.urlsplit(self.path).path
             if path in ('/api/launch','/api/shutdown'):
                 require(secrets.compare_digest(self.headers.get('X-OMNX-Launcher',''),self.server.launcher_token),'forbidden','Credencial de abertura inválida.',5)
-                require(not body,'invalid_body','Abertura não aceita argumentos de execução.')
                 if path=='/api/shutdown':
+                    require(not body,'invalid_body','Encerramento não aceita argumentos.')
                     self._json(200,{'status':'stopping'});threading.Thread(target=self.server.shutdown,daemon=True).start();return
-                return self._json(200,{'url':self.server.issue_bootstrap(),'instance_id':self.server.instance_id})
+                require(not(set(body)-{'workspace_id','task_id','automation_ref'}),'invalid_body','Contexto de abertura inválido.')
+                context={}
+                if body.get('workspace_id'):
+                    wid=body['workspace_id'];require(isinstance(wid,str) and re.fullmatch(r'WSP-[0-9a-f]{24}',wid),'invalid_workspace','Identificador de cópia inválido.')
+                    item=find_workspace(wid);ctxfs=RootFS(item['path'])
+                    if body.get('task_id'):
+                        require(isinstance(body['task_id'],str),'invalid_task','Task inválida.')
+                        _,task,_,_=TaskStore(ctxfs).read_record(body['task_id'])
+                        if body.get('automation_ref'):require(task.get('automation_ref')==body['automation_ref'],'automation_context_mismatch','Task não corresponde à sessão automática.',5)
+                    context['workspace_id']=wid
+                else:require(not body.get('task_id') and not body.get('automation_ref'),'invalid_body','Contexto de Task exige uma cópia de trabalho.')
+                if body.get('automation_ref'):
+                    require(isinstance(body['automation_ref'],str) and re.fullmatch(r'AUTO-[0-9a-f]{24}',body['automation_ref']),'invalid_automation_ref','Referência automática inválida.')
+                    context['automation_ref']=body['automation_ref']
+                if body.get('task_id'):context['task_id']=body['task_id']
+                return self._json(200,{'url':self.server.issue_bootstrap(context),'instance_id':self.server.instance_id,'workspace_id':context.get('workspace_id'),'task_id':context.get('task_id')})
             if path=='/api/session':
                 key=self.headers.get('X-OMNX-Bootstrap','')
                 with self.server.guard:
-                    expiry=self.server.bootstraps.pop(key,None);require(expiry and expiry>time.monotonic(),'pairing_expired','Abertura expirada. Use o ícone novamente.',5)
+                    issued=self.server.bootstraps.pop(key,None);require(issued and issued['expires']>time.monotonic(),'pairing_expired','Abertura expirada. Use o ícone novamente.',5)
                     t=time.monotonic();self.server.sessions={k:s for k,s in self.server.sessions.items() if s['expires']>t and t-s['last_seen']<2*3600}
                     # Reopening the launcher in a second tab shares the cookie
                     # jar. Preserve a valid session/CSRF so the first tab does
@@ -343,9 +402,16 @@ class Handler(BaseHTTPRequestHandler):
                         if e.code!='session_required':raise
                         require(len(self.server.sessions)<32,'session_limit','Muitas sessões locais; encerre e reabra o painel.',6)
                         sid=secrets.token_urlsafe(32);csrf=secrets.token_urlsafe(32)
-                        self.server.sessions[sid]={'csrf':csrf,'expires':t+8*3600,'last_seen':t,'identity':uuid.uuid4().hex}
+                        self.server.sessions[sid]={'csrf':csrf,'expires':t+8*3600,'last_seen':t,'last_client_signal_at':now(),'identity':uuid.uuid4().hex}
+                    session=self.server.sessions[sid];session['launch_context']=issued.get('context',{});session['workspace_id']=session['launch_context'].get('workspace_id');session['last_seen']=t;session['last_client_signal_at']=now()
                 cookie=f'{self.server.cookie_name}={sid}; HttpOnly; SameSite=Strict; Path=/'
-                return self._json(200,{'csrf':csrf,'instance_id':self.server.instance_id},{'Set-Cookie':cookie})
+                context=issued.get('context',{})
+                if context.get('automation_ref'):
+                    try:
+                        from .automation import confirm_console
+                        confirm_console(RootFS(find_workspace(context.get('workspace_id',''))['path']),context['automation_ref'],context.get('task_id'))
+                    except Exception:pass
+                return self._json(200,{'csrf':csrf,'instance_id':self.server.instance_id,'launch_context':context,'client_connected':True},{'Set-Cookie':cookie})
             sid,session=self._session(write=True)
             if path=='/api/project/register':
                 require(set(body)=={'path'} and isinstance(body['path'],str),'invalid_body','Informe uma pasta absoluta.')
@@ -424,8 +490,11 @@ def serve(root=None,port=0,open_browser=True,*,ready_file=None,launcher_token=No
     descriptor={'schema_version':1,'pid':os.getpid(),'port':server.server_port,'instance_id':server.instance_id,'launcher_token':server.launcher_token,'version':load_data((PACKAGE/'manifest.json').read_bytes())['version']}
     if ready_file:
         p=Path(ready_file);RootFS(p.parent).write(p.name,json_bytes(descriptor),None)
-    if open_browser:threading.Timer(.2,lambda:webbrowser.open(url)).start()
-    print(json.dumps({'status':'ok','console_url':url,'port':server.server_port,'note':'A chave de abertura é local, de uso único e expira em dois minutos.'},ensure_ascii=False),flush=True)
+    opened=False
+    if open_browser:
+        try:opened=webbrowser.open(url) is True
+        except Exception:opened=False
+    print(json.dumps({'status':'ok','console_url':url,'port':server.server_port,'server_status':'started','browser_status':'open_requested' if opened else 'unavailable' if open_browser else 'not_requested','client_status':'not_confirmed','note':'A abertura do navegador não confirma conexão do cliente; a chave é local, de uso único e expira em dois minutos.'},ensure_ascii=False),flush=True)
     try:server.serve_forever(poll_interval=.25)
     except KeyboardInterrupt:pass
     finally:

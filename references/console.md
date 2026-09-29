@@ -1,14 +1,20 @@
-# Console e decisões — contrato da rc.2
+# Console e decisões — contrato da rc.1
 
-Carregar somente quando abrir/instalar o painel, preparar uma decisão ou gerar contexto de acompanhamento.
+Consultar ao configurar hooks, abrir/instalar o painel, preparar uma decisão ou diagnosticar acompanhamento.
 
 ## Fronteiras
 
-Console é interface opcional. Sem LLM, shell da aplicação, deploy, migrations de dados, produção, editor arbitrário de PRD ou segundo banco. A instalação/open explicitamente autorizados podem iniciar o servidor local da OMNX, não a aplicação.
+Console é interface local de acompanhamento. Sem LLM, shell da aplicação, deploy, migrations de dados, produção, editor arbitrário de PRD ou segundo banco. Hooks locais confiados podem solicitar sua abertura no início de sessão de implementação e associar workspace/Task; abertura manual continua disponível.
 
 Catálogo local `~/.omnx-console/projects.json` distingue `workspace_id` (cópia/pasta) de `project_id` (produto). Clones e worktrees podem ter o mesmo project_id sem mesclar estado. Remover da lista não apaga arquivos. Versão exibida é comparação local; ausência de consulta remota não vira “última versão”.
 
 A API resume projetos e pagina coleções. Bodies/histórico são carregados no detalhe. Cache usa identidade do arquivo/size/mtime/ctime; nunca autoriza escrita. Erro num item não oculta os itens válidos. Leituras incompletas mostram aviso, não contagem aparentemente completa. Estado `in_progress` não é presença da IA.
+
+## Sessão e versão
+
+No início de implementação, hooks confiados podem solicitar a abertura uma vez por sessão e direcionar o painel ao workspace e à Task. O retorno distingue servidor iniciado/reutilizado, navegador solicitado/indisponível e cliente conectado/não confirmado. Cliente autenticado só comprova uma conexão técnica desta máquina, não leitura humana. Sem hook instalado ou com falha de browser, o trabalho canônico continua.
+
+O Console mostra a versão deste bundle, a versão adotada pelo projeto, candidato preparado e estado de conexão local separadamente. O modelo de skill já carregado na conversa não é observável uniformemente e deve aparecer como não confirmado; baixar/preparar um candidato não significa que a sessão o está usando.
 
 ## Única escrita pelas operações da engine
 

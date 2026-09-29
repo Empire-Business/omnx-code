@@ -45,7 +45,7 @@ def _snapshot(fs,rel,parser):
 
 def _task_summary(raw):
     m,_=tasks.parse(raw)
-    return {k:m.get(k) for k in ('id','title','status','owner','blocked_reason','updated_at','impact','priority','depends_on')} | {'authorization':m['authorization']['status'],'acceptance_count':len(m['acceptance'])}
+    return {k:m.get(k) for k in ('id','title','status','owner','blocked_reason','updated_at','impact','priority','depends_on','automation_ref','model_policy')} | {'authorization':m['authorization']['status'],'acceptance_count':len(m['acceptance'])}
 
 def _decision_summary(raw):
     d=decisions.check(load_data(raw))
@@ -129,7 +129,8 @@ def read_project(root,*,summary_only=False):
 
 def task_detail(fs,tid):
     path,m,body,sha=tasks.Store(fs).read_record(tid)
-    return public_object({**m,'authorization_status':m['authorization']['status'],'body':body,'path':path,'sha256':sha})
+    from .automation import activity_for_task
+    return public_object({**m,'authorization_status':m['authorization']['status'],'body':body,'path':path,'sha256':sha,'activity':activity_for_task(fs,tid)})
 
 def decision_detail(fs,did):
     path,d,sha=decisions.Store(fs).read_record(did)

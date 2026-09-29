@@ -1,14 +1,14 @@
-# OMNX Code 2.1.0-rc.2 — com Console 1.0.0-rc.2
+# OMNX Code 2.2.0-rc.1 — com Console 1.1.0-rc.1
 
-Método de desenvolvimento para agentes + painel local opcional. Esta release corrige defeitos reproduzidos da `2.1.0-rc.1`, em vez de acrescentar outro sistema de organização.
+Método de desenvolvimento para agentes com Task canônica, captura local de sessão e Console. Esta release acrescenta integração de hooks opt-in, política de modelos, referências PNG e consulta opt-in de releases.
 
-**Use a pasta completa deste ZIP. Não misture scripts, assets ou schemas da rc.1 com os da rc.2.**
+**Use a pasta completa desta distribuição. Não misture scripts, assets ou schemas entre versões.**
 
 ## Para começar sem operar tudo manualmente
 
 Instale a skill no ambiente do seu agente e peça:
 
-> Use a omnx-code 2.1.0-rc.2 deste pacote. Primeiro confira a versão, a integridade dos arquivos e o projeto selecionado. Prepare o acompanhamento visual sem alterar código da aplicação, banco, credenciais ou produção. Se o projeto usa a OMNX anterior, preserve as customizações e proponha a adoção/migração apropriada. Não reaproveite aprovações de decisões schema 1. Abra o Console ao terminar e deixe claro o que foi e o que não foi validado.
+> Use a omnx-code 2.2.0-rc.1 deste pacote. Confira a integridade e o projeto selecionado. Se os hooks locais já foram autorizados e confiados nesse projeto, registre a implementação na Task canônica e tente abrir o Console no início; pedidos de análise continuam sem setup. Preserve requisitos do PRD e use PNG como referência visual sem inventar rotas. Não altere aplicação, dados, credenciais ou produção fora do escopo. No fim, informe o que foi e o que não foi validado.
 
 O agente pode executar os comandos abaixo por você. O painel **não chama Codex, Claude ou outra API de IA**. Copiar um prompt não executa trabalho; o agente o executará quando você o colar e autorizar o escopo pertinente.
 
@@ -16,7 +16,7 @@ O agente pode executar os comandos abaixo por você. O painel **não chama Codex
 
 Visão geral de projetos em pastas diferentes, Kanban com bloqueados/cancelados, galeria de telas estáticas, decisões de produto/UX com revisão e histórico, feedback, prompts curtos por referência, diagnóstico somente leitura, launcher e engine de tarefas/migração/auditoria.
 
-Arquivos do projeto continuam canônicos. Não há banco paralelo, telemetria, serviço remoto, execução de código do projeto, deploy ou migração de banco pela interface.
+Arquivos do projeto continuam canônicos. Não há banco/backend remoto, telemetria, execução de código do projeto, deploy ou migração de banco pela interface. Uma consulta opcional ao GitHub só ocorre após consentimento explícito de update.
 
 O nome “Método atual” compara o lock do projeto com **esta instalação local**, não com a última versão do GitHub. Isso não é certificado de saúde ou de segurança do produto.
 
@@ -61,16 +61,16 @@ A URL contém uma chave **de uso único**, em fragmento, válida por dois minuto
 A skill pode ficar em pasta permanente já escolhida. Como alternativa explícita, `console install` copia o pacote verificado para **uma pasta nova**, cujo diretório pai precisa existir:
 
 ```sh
-python3 "/origem/omnx-code/scripts/omnx.py" console install --destination "/pasta-permanente/omnx-code-2.1.0-rc.2"
-python3 "/pasta-permanente/omnx-code-2.1.0-rc.2/scripts/omnx.py" console shortcut --destination "/sua/area-de-trabalho"
+python3 "/origem/omnx-code/scripts/omnx.py" console install --destination "/pasta-permanente/omnx-code-2.2.0-rc.1"
+python3 "/pasta-permanente/omnx-code-2.2.0-rc.1/scripts/omnx.py" console shortcut --destination "/sua/area-de-trabalho"
 ```
 
 Não sobrescreve uma instalação ou atalho existente. A criação de `.desktop`, `.app` ou `.cmd` é opt-in. Geração dos arquivos foi testada; macOS/Windows e a experiência de duplo clique nesses sistemas **não foram homologados nesta sessão**. Há fallback pelo comando Python.
 
-## Atualizar da rc.1 sem apagar o projeto
+## Atualizar ou adotar uma versão sem apagar o projeto
 
 1. Encerre a instância antiga usando a janela/terminal que a iniciou. Não mate processos por nome indiscriminadamente.
-2. Extraia a rc.2 em pasta nova e verifique seus bytes. Mantenha o pacote anterior intacto.
+2. Extraia a versão em pasta nova e verifique seus bytes. Mantenha o pacote anterior intacto.
 3. Configure/ative a nova skill no agente; abrir um ZIP não substitui o contexto de uma sessão já em execução.
 4. No projeto novo-modelo, `method verify` mostra a divergência e o hash atual do lock. `method adopt` atualiza apenas a adoção do pacote, com backup e CAS:
 
@@ -87,6 +87,38 @@ O texto acima indica onde inserir valores reais; não é uma autorização fict�
 6. Recrie o atalho apontando para a nova instalação, sem sobrescrever às cegas o anterior.
 
 Não é necessário reescrever o PRD, mockups ou todas as Tasks para adotar esta patch release. Projeto ainda no formato `.empire`/`CLAUDE.md` precisa da migração semântica explícita, não apenas da adoção de versão.
+
+### Atualização de disponibilidade (opt-in por projeto)
+
+A consulta começa desativada. Após uma autorização única para consultar e preparar releases oficiais compatíveis, a checagem pode ocorrer uma vez no início de uma sessão de implementação, conforme o intervalo local. Stable é padrão; RC exige seleção explícita. A versão em uso continua fixa.
+
+```sh
+python3 "/skill/scripts/omnx.py" --root "/projeto" update policy --enable --consent --channel stable --check-interval-hours 24
+python3 "/skill/scripts/omnx.py" --root "/projeto" update auto-check
+```
+
+O candidato verificado fica em `.omnx/local/method-updates/` e aguarda seleção explícita em uma próxima sessão. Isso preserva a skill já carregada e o host configurado. Hash SHA-256 verifica bytes, não autoria/assinatura. Falta de rede não altera o runtime atual. Veja `references/distribution.md`.
+
+## Começar uma sessão com acompanhamento
+
+Em uma raiz OMNX confiável, a configuração inicial é uma única instalação de hooks local por host. Confirme e revise `AGENTS.md` antes; use o hash atual do próprio arquivo:
+
+```sh
+shasum -a 256 AGENTS.md
+python3 "/skill/scripts/omnx.py" --root "/projeto" hooks install codex --trust-root --expected-agents-sha256 HASH_ATUAL
+python3 "/skill/scripts/omnx.py" --root "/projeto" hooks install claude --trust-root --expected-agents-sha256 HASH_ATUAL
+```
+
+O comando instala apenas no projeto escolhido e preserva os demais hooks. Codex ainda exige revisão e confiança em `/hooks`; Claude aplica hooks de projeto segundo as configurações de confiança. A partir daí, uma solicitação direta e explícita de implementação cria/reutiliza Task, grava eventos mínimos e tenta abrir o Console uma vez naquela sessão. Sessões abertas sem hooks ativos não são interceptadas. Interrupções criam checkpoint; fechamento ou parada do host não conclui a Task.
+
+Uma verificação de perfil é local e não chama um modelo:
+
+```sh
+python3 "/skill/scripts/omnx.py" --root "/projeto" model choose --risk low --ambiguity low --verification objective
+python3 "/skill/scripts/omnx.py" --root "/projeto" model configure economical --model ID_DO_HOST --effort low
+```
+
+`requested_model` e `effective_model` são campos diferentes. O último só é preenchido se um sinal do host expuser o modelo. A CLI não troca o modelo da sessão ativa nem inicia cobranças.
 
 ## Projetos realmente legados
 
@@ -139,7 +171,7 @@ Aprovação do Console é um registro de usuário local, não autenticação for
 
 HTML no Console é **estático**, sanitizado, sem scripts, navegação ou APIs. Imagens e CSS locais permitidos são vinculados ao manifesto da proposta. Um preview bonito não demonstra que a jornada ou integração funciona. Não forneça dados reais/sigilosos nos mockups; redaction textual é defensiva, não detector perfeito de segredos/PII/imagens.
 
-Sem garantia de “zero falhas”. Esta candidata corrige as falhas reproduzidas e inclui testes de regressão. Não houve homologação em Claude/Codex reais, macOS, Windows, Safari, projetos privados do usuário ou produção. Os 130 cenários de modelo permanecem **planejados**, não executados.
+Sem garantia de “zero falhas”. Consulte `reports/VALIDATION.md` para resultados desta candidata. Hooks, seleção efetiva de modelo e ativação do host não foram homologados em sessões Claude/Codex reais. As avaliações comportamentais de modelo permanecem **não executadas**.
 
 ## Repositório e código-fonte
 

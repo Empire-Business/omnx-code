@@ -1,9 +1,9 @@
 ---
 name: omnx-code
 description: "Coordena desenvolvimento e manutenção de software com escopo explícito, AGENTS.md único, tarefas canônicas, UX proporcional, auditoria de segurança delimitada e migração recuperável de projetos OMNX legados. Use para implementar, corrigir, planejar ou reorganizar projetos quando esse método for pertinente. Não instala nada em pedidos apenas de análise. Não publica nem modifica dados reais automaticamente."
-compatibility: "Agente com leitura de arquivos; ferramentas locais opcionais exigem Python 3.10+. CLI sem rede. Integração real do host deve ser verificada."
+compatibility: "Agente com leitura de arquivos; runtime local exige Python 3.10+. Consulta de release usa rede somente após opt-in. Integração real do host deve ser verificada."
 metadata:
-  version: "2.1.0-rc.2"
+  version: "2.2.0-rc.1"
   specification: "4"
   audit-contract: "2.0"
 ---
@@ -88,9 +88,9 @@ Leia `references/task-lifecycle.md` para transições, conclusão, arquivo e con
 Não confunda `done` com publicado. A Task declara se entregou patch, branch, PR ou release.
 
 
-## 5A. Console visual opcional
+## 5A. Acompanhamento automático e Console local
 
-O OMNX Console é uma projeção local para humanos: portfólio de projetos, Kanban, mockups, decisões e prompts para continuar no Claude Code/Codex. Ele não é fonte de verdade, não chama IA, não executa shell, não publica e não possui banco de estado do projeto.
+O OMNX Console é uma projeção local para humanos: portfólio de projetos, Kanban, mockups, decisões e prompts para continuar no Claude Code/Codex. Ele não é fonte de verdade, não chama IA, não executa shell, não publica e não possui banco de estado do projeto. Após ativação inicial autorizada dos hooks locais, sessões de implementação em projetos geridos registram uma Task canônica e solicitam a abertura do Console no início.
 
 - Projetos podem estar em pastas diferentes; o catálogo global distingue projeto de cópia de trabalho; clones/worktrees não são mesclados.
 - Registre decisão material pela engine; Decision não substitui PRD/ADR/Task e não autoriza deploy.
@@ -100,10 +100,12 @@ O OMNX Console é uma projeção local para humanos: portfólio de projetos, Kan
 - Antes de repetir uma pergunta bloqueante, consulte decisões relacionadas.
 - Previews HTML são estáticos, delimitados e sem scripts/APIs; não equivalem a teste de interação.
 - Preservar feedback não significa ampliar escopo. Releia autorização da Task antes de implementar.
-- Use `omnx console open` somente quando acompanhamento visual ajudar. Não abra o Console em toda Task.
+- Configure uma vez os hooks locais do host em projeto confiável com `hooks install`; não altere arquivos globais. Sem hooks confiados, a cobertura automática não existe.
+- A abertura é tentada uma vez por sessão de implementação. Servidor iniciado, navegador solicitado, cliente autenticado e leitura humana são estados distintos. Fechar a janela não encerra a Task.
+- Pedidos de leitura não abrem Tasks, serviços ou sessões. O Console continua opcional no uso manual e sua indisponibilidade não bloqueia a implementação.
 - Prompts do Console são templates determinísticos; o agente ainda deve reler `AGENTS.md`, Task e decisões canônicas.
 
-Detalhes: `references/console.md`.
+Detalhes: `references/console.md` e `references/host-automation.md`.
 
 ## 6. UX sem réplica eterna
 
@@ -116,6 +118,7 @@ Aprovação de UX não congela tela nem autoriza operações de produção.
 Dona Maria é inspeção simulada, não teste real. Não invente achado nem exija surpresa.
 Uma rodada inicial e até duas correções; divergência persistente exige alternativa/decisão, não loop.
 Detalhes: `references/ux.md`.
+Mockups oficiais novos usam PNG. PRD, decisões e rotas definem o contrato funcional; PNG define a direção visual. Para implementação visual a partir de PNG, use o perfil OMNX do `image-to-html` em `adapters/image-to-html.md` e adapte à stack existente.
 
 ## 7. Segurança por delta
 
@@ -141,8 +144,9 @@ snapshot/staging → apply → validação. Resume/rollback preservam alteraçõ
 Não substitua regras customizadas por cópia no backup. Preserve efeito ou pare a substituição afetada.
 Não reative TODOs históricos indiscriminadamente. Não crie duas fontes ativas e declare sucesso.
 
-Updates são explícitos e offline por padrão. Pacote novo não se autoexecuta para provar confiança.
-Não sobrescreva instalações customizadas. Não faça downgrade silencioso.
+Consulta e staging de updates são opt-in por projeto; Stable é o canal padrão e RC exige escolha explícita. Compatibilidade e SHA-256 do release oficial são verificados antes de preparar uma pasta versionada. Staging não altera a versão carregada pela sessão nem ativa o host automaticamente. Pacote novo não se executa para provar confiança; checksum não é assinatura.
+Não sobrescreva instalações customizadas. Não faça downgrade silencioso. Veja `references/distribution.md`.
+Modelo e esforço são recomendações por perfil configurável; marque uso efetivo somente quando o host o expuser. Veja `references/model-policy.md`.
 Incidente em legado permite recuperação delimitada sem fingir migração concluída.
 
 ## 9. Evidências e encerramento
@@ -180,6 +184,9 @@ Não prometa execução em segundo plano sem infraestrutura real.
 | Publicação/dados/efeitos externos | `references/operations-and-release.md` |
 | Migrar legado | `references/migration.md` |
 | Interrupção/incidente/concorrência | `references/recovery.md` |
+| Hooks, journal de sessão e Console no início | `references/host-automation.md` |
+| Modelo, esforço e custo observado | `references/model-policy.md` |
+| PNG e perfil image-to-html na stack do projeto | `adapters/image-to-html.md` |
 | CLI e schemas | `references/runtime.md` |
 | Instalar ou atualizar pacote | `references/distribution.md` |
 

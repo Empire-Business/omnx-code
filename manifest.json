@@ -1,6 +1,6 @@
 {
   "name": "omnx-code",
-  "version": "2.1.0-rc.2",
+  "version": "2.2.0-rc.1",
   "specification_revision": "4",
   "project_schema_version": 1,
   "audit_contract_versions": [
@@ -17,7 +17,7 @@
   "telemetry": false,
   "console": {
     "bundled": true,
-    "version": "1.0.0-rc.2",
+    "version": "1.1.0-rc.1",
     "project_schema_versions": [
       1
     ],

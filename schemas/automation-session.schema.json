@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "automation-session",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": 1},
+    "project_id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "worktree_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "host": {"type": "string", "enum": ["codex", "claude"]},
+    "session_id_hash": {"type": "string", "pattern": "^[0-9a-f]{24,64}$"},
+    "task_id": {"anyOf": [{"type": "string", "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"}, {"type": "null"}]},
+    "state": {"type": "string", "enum": ["active", "interrupted", "idle", "ended", "unavailable"]},
+    "stage": {"type": "string", "enum": ["unknown", "implementation", "blocked", "review", "completed", "cancelled"]},
+    "last_signal": {"type": "string", "minLength": 1, "maxLength": 240},
+    "last_signal_at": {"type": "string", "minLength": 20, "maxLength": 40},
+    "next_step": {"type": "string", "minLength": 1, "maxLength": 500},
+    "console_attempted": {"type": "boolean"},
+    "console_server_status": {"type": "string", "enum": ["not_started", "starting", "started", "reused", "unavailable"]},
+    "browser_status": {"type": "string", "enum": ["not_requested", "open_requested", "unavailable"]},
+    "client_status": {"type": "string", "enum": ["not_confirmed", "connected"]},
+    "client_connected_at": {"type": ["string", "null"], "maxLength": 40},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "type": {"type": "string", "enum": ["UserPromptSubmit", "PostToolUse", "Stop", "Interrupt", "SessionEnd", "console-launch-requested", "console-launch-failed", "console-result", "console-client-connected", "task-state"]},
+          "at": {"type": "string", "minLength": 20, "maxLength": 40},
+          "state": {"type": "string", "enum": ["active", "interrupted", "idle", "ended", "unavailable"]},
+          "stage": {"type": "string", "enum": ["unknown", "implementation", "blocked", "review", "completed", "cancelled"]},
+          "task_id": {"anyOf": [{"type": "string", "pattern": "^TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}$"}, {"type": "null"}]},
+          "signal": {"type": "string", "minLength": 1, "maxLength": 200}
+        },
+        "required": ["event_id", "type", "at", "state", "stage", "task_id", "signal"],
+        "additionalProperties": false
+      },
+      "maxItems": 100
+    }
+  },
+  "required": ["schema_version", "project_id", "worktree_id", "host", "session_id_hash", "task_id", "state", "stage", "last_signal", "last_signal_at", "next_step", "console_attempted", "console_server_status", "browser_status", "client_status", "client_connected_at", "events"],
+  "additionalProperties": false
+}

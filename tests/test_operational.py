@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 PACKAGE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(PACKAGE/'scripts'));sys.dont_write_bytecode=True
 from omnxlib.core import *
-from omnxlib import console as cs, launcher, tasks, migration as mg, project
+from omnxlib import console as cs, launcher, tasks, migration as mg, project, cli
 from omnxlib.decisions import Store
 from test_runtime import Base
 
@@ -96,6 +96,14 @@ class LauncherProcesses(unittest.TestCase):
             self.assertEqual(e.exception.code,'invalid_instance')
 
 class Assets(unittest.TestCase):
+    def test_verify_package_ignores_repository_metadata(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'.git').mkdir();(root/'.git/HEAD').write_text('ref: refs/heads/main\n')
+            (root/'__pycache__').mkdir();(root/'__pycache__/module.pyc').write_bytes(b'compiled')
+            payload=b'checked package file\n';(root/'note.txt').write_bytes(payload)
+            (root/'integrity.json').write_text(json.dumps({'algorithm':'sha256','files':{'note.txt':digest(payload)}}))
+            with patch.object(cli,'PACKAGE',root):out=cli.verify_package()
+        self.assertEqual(out['files_verified'],1)
     def test_runtime_js_has_no_inline_execution_or_html_interpolation(self):
         js=(PACKAGE/'console/assets/app.js').read_text();self.assertNotIn('innerHTML',js);self.assertNotIn('eval(',js);self.assertNotIn('new Function',js)
         self.assertIn("$$('.nav').forEach",js);self.assertNotIn("$('.nav').forEach",js.replace("$$('.nav').forEach",''))

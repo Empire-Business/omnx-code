@@ -30,3 +30,17 @@ Os testes listados foram executados em fixtures locais. Um teste parcial de um i
 | INV-24 | Bloquear somente a operação afetada | test_local_commit_not_universal_gate; test_completed_unknown_not_gate_pass | Fallback/incidente está nas referências; incidentes reais não executados. |
 
 IDs completos e resultados estão em `test-results.json` do pacote OMNX. O pacote auditor executa um subconjunto próprio independente; os testes OMNX não devem ser atribuídos ao auditor como execuções exclusivas.
+
+
+## Complemento de fluxo diário — 2.2.0-rc.1
+
+| Comportamento | Evidência mecânica | Limite |
+|---|---|---|
+| Registro por sessão sem segundo backlog | test_clear_implementation_creates_canonical_task_and_minimal_journal; test_read_only_prompt_does_not_create_task_or_console_state | Hook real do host ainda não homologado |
+| Idempotência, sessões paralelas e separação entre clones/worktrees | test_duplicate_hook_is_idempotent; test_parallel_sessions_and_replay_keep_tasks_separate; test_same_host_session_in_two_worktrees_keeps_local_journals; test_interruption_checkpoint_and_canonical_status_mirror | Fixtures de filesystem, sem duas máquinas |
+| Console sem falso positivo | test_console_launch_is_once_and_failed_browser_does_not_lose_task; test_launcher_reports_browser_failure_and_unconfirmed_client | Sem navegador gráfico/Chromium nesta rodada |
+| PNG sem inferir viewport CSS | test_png_inspection_reports_pixels_without_guessing_viewport | Teste sintético do cabeçalho, sem inspeção visual de PNG real |
+| Política de modelos e custo desconhecido | test_model_profiles_escalate_for_risk_and_use_scripts_for_determinism | Nenhum modelo ou subagente foi chamado |
+| Release segura e isolada | tests de consentimento, canal, digest, timeout, compatibilidade, concorrência e staging em test_daily.py | Requests simulados; candidato não ativado |
+
+Resultados atuais: test-results-2.2.0-rc.1.json. Casos de comportamento de host/modelo continuam not_run em evals/daily-workflow.json.

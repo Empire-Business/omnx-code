@@ -18,6 +18,10 @@ Ready/in_progress/review/done exigem autorização. In_progress exige owner.
 Dependências precisam existir e formar grafo sem ciclos; para executar/concluir precisam estar done.
 Bloqueio tem causa e condição de saída. Cancelamento/reabertura/alteração de autorização tem origem explícita.
 
+Hooks de host em um projeto confiável podem iniciar uma Task proporcional a um pedido explícito de implementação. A Task canônica permanece em .omnx/tasks; automation_ref deduplica o vínculo entre evento/sessão e Task. A origem do prompt é registrada sem conceder publicação, produção, dinheiro, credenciais ou migração de dados. Pedidos de leitura não criam Task.
+
+Campos model_policy guardam perfil e configuração solicitados, modelo efetivo somente quando observado, razão e status de custo. Não use esse registro como prova de seleção pelo host ou de tokens/preço medidos.
+
 ## Escrita
 Use CLI com --expected-sha256 obtido em task show/list. Releia em conflito; não substitua arquivo inteiro
 para resolver divergência. Atualizações usam lock local e CAS. Arquivo arquivado mantém ID resolvível.

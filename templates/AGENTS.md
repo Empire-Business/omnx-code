@@ -28,6 +28,14 @@ S2/S3 usa auditoria delimitada; desconhecido não é PASS. Segurança bloqueia a
 Não execute melhorias fora do escopo. Conclua com evidências reais e local de entrega explícito.
 Done não significa deployed. Não altere contrato para legitimar um possível bug.
 
+## Hooks e Console
+Hooks OMNX só existem depois de instalação local autorizada em uma raiz confiável e revisão das opções
+do host. Nessa condição, pedidos explícitos de implementação podem criar/reutilizar Task canônica,
+registrar sinais compactos e tentar abrir o Console no início. Sem sinal confirmado, não anuncie captura,
+abertura ou presença. Console fechado não interrompe desenvolvimento; sessão encerrada não conclui Task.
+Histórico operacional fica em .omnx/local/automation/; não armazene conversa, tool args, código,
+segredos ou dados de cliente.
+
 ## Retomada e escrita
 Task é autoridade de trabalho; Decision registra decisão humana; checkpoint é contexto da worktree/sessão.
 Confira hashes e estado real antes de reutilizar evidências. Use CAS nas alterações de metadados.

@@ -17,10 +17,10 @@ from .core import *
 
 ENTRY=PACKAGE/'scripts'/'omnx.py'
 
-def _http(port,path,token=None):
+def _http(port,path,token=None,payload=None):
     require(type(port)is int and 1024<=port<=65535,'invalid_instance','Porta da instância inválida.')
     url=f'http://127.0.0.1:{port}{path}'
-    req=urllib.request.Request(url,headers={'Content-Type':'application/json',**({'X-OMNX-Launcher':token} if token else {})},data=b'{}' if token else None)
+    req=urllib.request.Request(url,headers={'Content-Type':'application/json',**({'X-OMNX-Launcher':token} if token else {})},data=json_bytes(payload or {}) if token else None)
     # Do not inherit proxy configuration for the local control connection.
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
     with opener.open(req,timeout=2) as r:
@@ -51,7 +51,7 @@ def _existing(fs,name):
         require(not alive,'instance_unresponsive','Console anterior não responde. Use diagnóstico/encerramento manual, sem iniciar outra cópia.',3)
         fs.delete(name,digest(raw));return None
 
-def open_console(root=None,port=0,open_browser=True):
+def open_console(root=None,port=0,open_browser=True,context=None):
     from . import console as cs
     if root is not None:cs.register(root)
     cs.CATALOG_DIR.mkdir(mode=0o700,parents=True,exist_ok=True);fs=RootFS(cs.CATALOG_DIR);name=_descriptor_name()
@@ -78,10 +78,26 @@ def open_console(root=None,port=0,open_browser=True):
                     d=load_data(raw);break
                 time.sleep(.05)
             require(d is not None,'console_start_timeout','Abertura ainda não confirmada. Não iniciamos outra cópia.',4)
-        launch=_http(d['port'],'/api/launch',d['launcher_token'])
+        launch_context=dict(context or {})
+        if root is not None:
+            from .projection import workspace_id
+            launch_context.setdefault('workspace_id',workspace_id(root))
+        launch=_http(d['port'],'/api/launch',d['launcher_token'],launch_context)
         require(launch.get('instance_id')==d['instance_id'],'instance_changed','Instância mudou; abertura cancelada.',3)
-    if open_browser:webbrowser.open(launch['url'])
-    return result('Console aberto.' if not reused else 'Console já estava aberto; instância reutilizada.',console_url=launch['url'],reused=reused,pid=d['pid'],limitations=['Python local é necessário. O ícone não é um binário nativo assinado. Nenhuma IA foi chamada.'])
+    opened=False
+    if open_browser:
+        try:opened=webbrowser.open(launch['url']) is True
+        except Exception:opened=False
+    health_path='/api/health'+('?workspace_id='+launch['workspace_id'] if launch.get('workspace_id') else '')
+    try:client_connected=(_http(d['port'],health_path).get('client_connected_count',0)>0)
+    except Exception:client_connected=False
+    browser_status='open_requested' if opened else 'unavailable' if open_browser else 'not_requested'
+    server_status='reused' if reused else 'started'
+    message=('Instância do Console reutilizada.' if reused else 'Servidor local do Console iniciado.')
+    if opened:message+=' Abertura do navegador solicitada; '+('cliente conectado tecnicamente.' if client_connected else 'conexão do cliente ainda não confirmada.')
+    elif open_browser:message+=' Navegador indisponível; o registro local continua ativo.'
+    else:message+=' Abertura do navegador não solicitada.'
+    return result(message,console_url=launch['url'],reused=reused,pid=d['pid'],server_status=server_status,browser_status=browser_status,client_connected=client_connected,client_status='connected' if client_connected else 'not_confirmed',workspace_id=launch.get('workspace_id'),task_id=launch.get('task_id'),limitations=['A conexão técnica não prova leitura humana.','Python local é necessário. O ícone não é um binário nativo assinado. Nenhuma IA foi chamada.'])
 
 def stop_console():
     from . import console as cs

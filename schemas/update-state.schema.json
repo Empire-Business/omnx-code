@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "update-state",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": 1},
+    "channel": {"type": "string", "enum": ["stable", "rc"]},
+    "installed_version": {"type": "string", "minLength": 1, "maxLength": 80},
+    "candidate_version": {"type": ["string", "null"], "maxLength": 80},
+    "status": {"type": "string", "enum": ["disabled", "checked", "no_update", "release_without_artifact", "staged", "incompatible", "unavailable"]},
+    "checked_at": {"type": "string", "minLength": 20, "maxLength": 40},
+    "artifact_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "stage_path": {"type": ["string", "null"], "maxLength": 1024},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 500},
+    "activation": {"type": "string", "enum": ["not_activated", "manual_host_selection_required"]}
+  },
+  "required": ["schema_version", "channel", "installed_version", "candidate_version", "status", "checked_at", "artifact_sha256", "stage_path", "summary", "activation"],
+  "additionalProperties": false
+}

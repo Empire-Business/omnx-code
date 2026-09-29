@@ -1,4 +1,4 @@
-"""Explicit CLI. No remote calls, auto-deploy or hidden setup. Console open explicitly starts a local service."""
+"""Explicit CLI. Remote access is limited to opt-in release checks; no auto-deploy or hidden setup."""
 from __future__ import annotations
 import argparse
 import subprocess
@@ -43,6 +43,9 @@ def parser():
     for action in ('check','plan'):
         q=u.add_parser(action);q.add_argument('--archive',required=True);q.add_argument('--expected-sha256',required=True);q.add_argument('--current-version');q.add_argument('--destination',required=True);q.add_argument('--output')
     q=u.add_parser('apply');q.add_argument('--plan',required=True);q.add_argument('--approved-digest',required=True)
+    q=u.add_parser('policy');g=q.add_mutually_exclusive_group(required=True);g.add_argument('--enable',action='store_true');g.add_argument('--disable',action='store_true');q.add_argument('--channel',choices=['stable','rc']);q.add_argument('--check-interval-hours',type=int);q.add_argument('--consent',action='store_true');q.add_argument('--expected-sha256')
+    q=u.add_parser('auto-check');q.add_argument('--force',action='store_true')
+    q=u.add_parser('remote-check')
     d=sub.add_parser('decision').add_subparsers(dest='action',required=True)
     q=d.add_parser('list');q.add_argument('--status');q.add_argument('--type')
     q=d.add_parser('show');q.add_argument('id')
@@ -61,6 +64,16 @@ def parser():
     s=sub.add_parser('session').add_subparsers(dest='action',required=True)
     q=s.add_parser('check');q.add_argument('id')
     q=s.add_parser('save');q.add_argument('id');q.add_argument('--task-id',required=True);q.add_argument('--paths',nargs='+',required=True);q.add_argument('--next-action',required=True);q.add_argument('--context',default='');q.add_argument('--expected-sha256')
+    hooks=sub.add_parser('hooks').add_subparsers(dest='action',required=True)
+    for action in ('install','remove'):
+        q=hooks.add_parser(action);q.add_argument('host',choices=['claude','codex']);q.add_argument('--trust-root',action='store_true');q.add_argument('--expected-agents-sha256',required=True)
+    mods=sub.add_parser('model').add_subparsers(dest='action',required=True)
+    q=mods.add_parser('configure');q.add_argument('profile',choices=['deterministic','economical','balanced','advanced']);q.add_argument('--model',dest='model_name');q.add_argument('--effort',choices=['low','medium','high','xhigh']);q.add_argument('--expected-sha256')
+    q=mods.add_parser('choose');q.add_argument('--risk',choices=['low','medium','high','critical'],default='medium');q.add_argument('--ambiguity',choices=['low','medium','high'],default='medium');q.add_argument('--verification',choices=['script','objective','judgment'],default='objective');q.add_argument('--no-reasoning',action='store_true')
+    q=mods.add_parser('recommend');q.add_argument('--task-id',required=True);q.add_argument('--risk',choices=['low','medium','high','critical']);q.add_argument('--ambiguity',choices=['low','medium','high'],default='medium');q.add_argument('--verification',choices=['script','objective','judgment'],default='objective');q.add_argument('--no-reasoning',action='store_true')
+    vis=sub.add_parser('visual').add_subparsers(dest='action',required=True)
+    q=vis.add_parser('inspect');q.add_argument('--reference',required=True)
+    h=sub.add_parser('hook');h.add_argument('name',choices=['claude','codex']);h.add_argument('event',choices=sorted(set([*('UserPromptSubmit','PostToolUse','Stop','Interrupt','SessionEnd'),'console-open'])));h.add_argument('--managed-by',choices=['omnx'],required=True);h.add_argument('--session-hash');h.add_argument('--task-id')
     q=sub.add_parser('host');q.add_argument('name',choices=['claude','codex']);q.add_argument('--execute',action='store_true');q.add_argument('--trust-root',action='store_true');q.add_argument('--expected-agents-sha256');q.add_argument('host_args',nargs=argparse.REMAINDER)
     return p
 
@@ -75,12 +88,38 @@ def verify_package():
     require(idx.get('algorithm')=='sha256','invalid_inventory','Inventário inválido.')
     fs=RootFS(PACKAGE)
     for path,h in idx['files'].items():require(fs.hash(path)==h,'package_modified','Arquivo de pacote foi alterado.',3,path=path)
-    actual={p.relative_to(PACKAGE).as_posix() for p in PACKAGE.rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.name!='integrity.json'}
+    actual={p.relative_to(PACKAGE).as_posix() for p in PACKAGE.rglob('*') if p.is_file() and not ({'.git','__pycache__'}&set(p.parts)) and p.name!='integrity.json'}
     require(actual==set(idx['files']),'unexpected_package_file','Há arquivo inesperado no pacote.',3)
     return result('Bytes correspondem ao inventário. Isto não valida assinatura/autoria.',files_verified=len(actual))
 
 def dispatch(a):
     if a.command=='verify-package':return verify_package()
+    if a.command=='hook':
+        from . import automation
+        if a.event=='console-open':
+            require(a.root and a.session_hash and re.fullmatch(r'[0-9a-f]{24}',a.session_hash),'hook_context','Contexto de abertura incompleto.')
+            require(a.task_id and re.fullmatch(r'TASK-[A-Za-z0-9][A-Za-z0-9-]{1,90}',a.task_id),'hook_context','Task de abertura inválida.')
+            return automation.console_open(RootFS(a.root),a.name,a.session_hash,a.task_id)
+        raw=sys.stdin.buffer.read(automation.MAX_INPUT+1)
+        require(len(raw)<=automation.MAX_INPUT,'hook_input_limit','Evento de hook excede o limite local.')
+        payload=load_data(raw);return automation.handle_payload(a.name,a.event,payload)
+    if a.command=='hooks':
+        require(a.root,'root_required','Informe --root para instalar hooks no projeto selecionado.')
+        from . import automation
+        return automation.install_hooks(RootFS(a.root),a.host,a.expected_agents_sha256,a.trust_root,remove=a.action=='remove')
+    if a.command=='model':
+        require(a.root,'root_required','Informe --root para configurar ou recomendar perfil de modelo.')
+        from . import model_policy
+        fs=RootFS(a.root)
+        if a.action=='configure':return model_policy.configure(fs,a.profile,a.model_name,a.effort,a.expected_sha256)
+        if a.action=='choose':
+            config,_=model_policy.read(fs)
+            return result('Recomendação mecânica; nada foi selecionado ou chamado.',recommendation=model_policy.choose(risk=a.risk,ambiguity=a.ambiguity,verification=a.verification,reasoning_needed=not a.no_reasoning,configured=config))
+        return model_policy.recommend(fs,a.task_id,a.risk,a.ambiguity,a.verification,not a.no_reasoning)
+    if a.command=='visual':
+        require(a.root,'root_required','Informe --root para inspecionar a referência dentro do projeto selecionado.')
+        from . import previews
+        return previews.inspect_png(RootFS(a.root),a.reference)
     if a.command=='route':
         refs=['references/routing.md']
         if a.ux in ('UX2','UX3'):refs.append('references/ux.md')
@@ -89,7 +128,13 @@ def dispatch(a):
         return result('Rota baseada na classificação fornecida; reavalie o diff real.',references=refs,auditor_required=a.security in ('S2','S3'),historical_mockup_sync=False,production_authority_required=a.operation=='O3')
     if a.command=='update':
         from . import distribution as d
-        return d.apply(external_data(a.plan),a.approved_digest) if a.action=='apply' else d.plan(a.archive,a.expected_sha256,a.destination,a.current_version)
+        if a.action=='apply':return d.apply(external_data(a.plan),a.approved_digest)
+        if a.action in ('check','plan'):return d.plan(a.archive,a.expected_sha256,a.destination,a.current_version)
+        from . import updates
+        require(a.root,'root_required','Informe --root para a política ou consulta automática local.')
+        fs=RootFS(a.root)
+        if a.action=='policy':return updates.configure(fs,a.enable if not a.disable else False,a.channel,a.check_interval_hours,a.consent,a.expected_sha256)
+        return updates.auto_check(fs,force=True if a.action=='remote-check' else a.force)
     if a.command=='audit' and a.action in ('catalog','validate-request','response-template'):
         from . import audit
         if a.action=='catalog':return result('Selecione controles; isto não cria plano universal.',controls=[c for c in audit.registry()['controls'] if not a.family or c['id'].startswith('SEC-'+a.family+'-')])
@@ -180,13 +225,20 @@ def dispatch(a):
 def main():
     try:
         args=parser().parse_args();out=dispatch(args)
+        if args.command=='hook':
+            if out.get('status')=='warning':print(out['summary'],file=sys.stderr)
+            return 0
         code=5 if out.get('decision')=='blocked' or out.get('status')=='needs_review' else 0
         if out.get('decision')=='blocked':out['status']='blocked';out['code']='GATE_BLOCKED'
         emit(out,getattr(args,'output',None));return code
     except MethodError as e:
+        if 'args' in locals() and args.command=='hook':
+            print('Registro OMNX indisponível; o host continua sem bloqueio.',file=sys.stderr);return 0
         emit({'status':'error','code':e.code,'summary':e.summary,'changed_paths':[],'limitations':[],'details':e.details});return e.exit_code
     except KeyboardInterrupt:
         emit({'status':'cancelled','code':'CANCELLED','summary':'Execução interrompida; consulte journal quando houver mutação iniciada.','changed_paths':[],'limitations':[]});return 8
     except (OSError,ValueError,KeyError,TypeError) as e:
+        if 'args' in locals() and args.command=='hook':
+            print('Registro OMNX indisponível; o host continua sem bloqueio.',file=sys.stderr);return 0
         # Do not echo raw parser errors, paths or secret-bearing input.
         emit({'status':'error','code':'RUNTIME_ERROR','summary':'Falha local. Nenhum sucesso é inferido; verifique permissões, entradas e journal.','changed_paths':[],'limitations':[],'error_type':type(e).__name__});return 7

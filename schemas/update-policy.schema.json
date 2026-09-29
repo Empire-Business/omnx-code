@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "update-policy",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": 1},
+    "enabled": {"type": "boolean"},
+    "channel": {"type": "string", "enum": ["stable", "rc"]},
+    "check_interval_hours": {"type": "integer", "minimum": 1, "maximum": 168},
+    "consented_at": {"type": "string", "minLength": 20, "maxLength": 40},
+    "consent_scope": {"type": "string", "const": "availability-check-and-stage-official-release"}
+  },
+  "required": ["schema_version", "enabled", "channel", "check_interval_hours", "consented_at", "consent_scope"],
+  "additionalProperties": false
+}

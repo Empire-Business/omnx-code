@@ -1,0 +1,47 @@
+{
+  "executed_at": "2026-09-28T23:30:22+00:00",
+  "python": "3.12.14",
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "package_version": "2.2.0-rc.1",
+  "runs_per_size": 1,
+  "measurements": [
+    {
+      "tasks": 500,
+      "cold_seconds": 0.2548,
+      "warm_seconds": 0.0851,
+      "one_change_seconds": 0.0643,
+      "cold_metadata_reads": 500,
+      "unchanged_metadata_reads": 0,
+      "one_change_metadata_reads": 1,
+      "summary_bytes": 1109,
+      "compact_prompt_characters": 1086,
+      "partial": false
+    },
+    {
+      "tasks": 2000,
+      "cold_seconds": 1.0662,
+      "warm_seconds": 0.1248,
+      "one_change_seconds": 0.118,
+      "cold_metadata_reads": 2000,
+      "unchanged_metadata_reads": 0,
+      "one_change_metadata_reads": 1,
+      "summary_bytes": 1111,
+      "compact_prompt_characters": 1086,
+      "partial": false
+    },
+    {
+      "tasks": 10000,
+      "cold_seconds": 4.6431,
+      "warm_seconds": 0.5914,
+      "one_change_seconds": 0.5973,
+      "cold_metadata_reads": 10000,
+      "unchanged_metadata_reads": 0,
+      "one_change_metadata_reads": 1,
+      "summary_bytes": 1113,
+      "compact_prompt_characters": 1086,
+      "partial": false
+    }
+  ],
+  "model_tokens_actual": null,
+  "scope": "Synthetic project projection only, single run per size. Not a browser-load, multi-user, slow-disk, Windows/macOS or token benchmark."
+}

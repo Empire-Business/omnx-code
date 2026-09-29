@@ -50,7 +50,7 @@ function title(titleText, subtitle, action=null) {return el('div',{class:'hero'}
 function stat(number,label) {return el('div',{class:'stat'},el('strong',{text:number}),el('span',{text:label}));}
 function versionBadge(p) {
   const v=p.version_status||{};
-  const text={current:'Método atual nesta instalação',outdated:'Atualização local disponível',newer:'Projeto usa versão mais nova',unknown:'Versão não identificada',invalid:'Versão inválida'}[v.status]||'Versão não identificada';
+  const text={current:'Projeto alinhado ao pacote instalado',outdated:'Projeto adotou versão anterior',newer:'Projeto usa versão mais nova',unknown:'Adoção do projeto não identificada',invalid:'Versão inválida'}[v.status]||'Adoção do projeto não identificada';
   return badge(text,v.status==='outdated'?'blue':v.status==='current'?'good':'neutral');
 }
 function errorsPanel(p) {
@@ -61,10 +61,10 @@ function errorsPanel(p) {
     button('Ver diagnóstico',()=>diagnostic(p)));
 }
 function projectCard(p) {
-  const c=p.counts||{},counts=c.by_status||{};
+  const c=p.counts||{},counts=c.by_status||{},presence=p.console_presence||{},update=p.update_state||{};
   return el('article',{class:'card project-card'},
     el('div',{class:'project-top'},el('span',{class:'project-icon',text:(p.name||'P').slice(0,1).toUpperCase()}),el('div',{},el('h3',{text:p.name}),el('small',{class:'muted',text:shortPath(p.path)}))),
-    el('div',{class:'badges'},versionBadge(p),p.read_only?badge('Somente leitura'):null),
+    el('div',{class:'badges'},versionBadge(p),update.status==='staged'?badge('Candidato '+update.candidate_version+' · ativação pendente','blue'):update.status==='unavailable'?badge('Consulta de versão indisponível'):null,p.read_only?badge('Somente leitura'):null,presence.client_connected?badge('Console conectado nesta máquina','good'):badge('Sem sinal recente do Console')),
     !p.available?el('p',{class:'muted',text:'Pasta indisponível. Localize novamente; nenhum arquivo foi apagado.'}):
       el('div',{class:'project-counts'},el('span',{},el('b',{text:counts.in_progress||0}),' em execução'),el('span',{},el('b',{text:counts.blocked||0}),' bloqueadas'),el('span',{},el('b',{text:c.pending_decisions||0}),' decisões')),
     el('div',{class:'project-actions'},button('Abrir projeto',()=>chooseProject(p.workspace_id),'primary',{disabled:!p.available}),button('Remover da lista',()=>removeProject(p),'text-button')));
@@ -77,7 +77,7 @@ async function refresh(force=false) {
     const select=$('#projectSelect');select.replaceChildren(el('option',{value:'',text:'Todos os projetos'}));
     for(const p of S.projects)select.append(el('option',{value:p.workspace_id,text:p.name+' · '+shortPath(p.path)}));
     if(!S.projects.some(p=>p.workspace_id===S.selected))S.selected='';select.value=S.selected;
-    $('#consoleVersion').textContent='OMNX '+data.overview.bundle_version;
+    $('#consoleVersion').textContent='OMNX '+data.overview.bundle_version+' · Console '+data.overview.console_version;
     $('#decisionBadge').textContent=data.overview.pending_decisions||'';
     $('#freshness').textContent='Estado lido em '+dateLabel(data.refreshed_at)+' · Não representa presença da IA em tempo real';
     S.detail=null;await render();
@@ -173,6 +173,15 @@ async function taskModal(p,id,target=null) {
     const actions=el('div',{class:'actions'},button(t.authorization.status==='authorized'&&!['done','cancelled'].includes(t.status)?'Copiar prompt para continuar':'Copiar prompt para investigar',()=>promptModal(p,id),'primary'),button('Pedir explicação à IA',()=>promptModal(p,id,'explain')));
     const parts=[el('h2',{text:t.title}),el('div',{class:'badges'},badge(labels[t.status]),badge(t.authorization.status==='authorized'?'Execução autorizada':'Sem autorização de execução')),el('p',{class:'muted',text:p.name+' · '+shortPath(p.path)}),el('h3',{text:'Escopo registrado'}),el('div',{class:'body-text',text:t.body}),el('h3',{text:'Para considerar pronto'}),el('ul',{},...t.acceptance.map(a=>el('li',{text:a}))),actions];
     if(t.blocked_reason)parts.splice(3,0,el('div',{class:'notice',text:'Bloqueio: '+t.blocked_reason}));
+    const activity=t.activity;
+    parts.push(el('div',{class:'subpanel'},el('h3',{text:'Atividade da sessão'}),
+      activity?el('div',{},el('p',{text:(activity.fresh?'Sinal recente':'Sem atividade recente')+' · '+activity.host+' · '+activity.session_ref+' · '+(activity.stage||'etapa não confirmada')}),el('p',{class:'muted',text:activity.fresh?activity.signal:'A tarefa segue em '+(labels[t.status]||t.status)+'; atividade do host não está confirmada.'}),el('p',{class:'muted',text:'Último sinal: '+dateLabel(activity.last_signal_at)}),el('p',{text:'Próximo passo: '+activity.next_step}),el('p',{class:'muted',text:'Console nesta máquina: '+(p.console_presence?.client_connected?'cliente conectado':'sem sinal recente')+' · servidor '+activity.console_server_status+' · navegador '+activity.browser_status})):el('p',{class:'muted',text:'Atividade de sessão não confirmada. O estado da Task vem do registro canônico.'}),
+      t.model_policy?el('p',{class:'muted',text:'Modelo · perfil '+t.model_policy.profile+' · solicitado '+(t.model_policy.requested_model||'não configurado')+' · efetivo '+(t.model_policy.effective_model||'não observado')+' · esforço efetivo '+(t.model_policy.effective_effort||'não observado')+' · custo '+(t.model_policy.cost_status==='unknown'?'desconhecido':t.model_policy.cost_status)}):null));
+    parts.push(el('div',{class:'subpanel'},el('h3',{text:'Versões'}),
+      el('p',{class:'muted',text:'Pacote/Console carregado: '+$('#consoleVersion').textContent}),
+      el('p',{class:'muted',text:'Projeto adotado: '+(p.version_status?.adopted||'não identificado')}),
+      el('p',{class:'muted',text:'Candidato: '+(p.update_state?.status==='staged'?p.update_state.candidate_version:'nenhum preparado')}),
+      el('p',{class:'muted',text:'Skill já carregada na sessão do host: não confirmada pelo host'})));
     if(!p.read_only&&t.authorization.status==='authorized'&&(moves[t.status]||[]).length){
       const select=el('select',{'aria-label':'Novo estado'},el('option',{value:'',text:'Escolha o próximo estado'}),...moves[t.status].map(s=>el('option',{value:s,text:labels[s]})));
       if(target&&(moves[t.status]||[]).includes(target))select.value=target;
@@ -246,7 +255,7 @@ async function diagnostic(p) {try{const d=await api('/api/diagnostics?'+query({w
 async function bootstrap() {
   // Fragment is not sent in HTTP requests. Remove it before loading project data.
   const fragment=new URLSearchParams(location.hash.slice(1));const key=fragment.get('key');history.replaceState(null,'',location.pathname);
-  try {const session=key?await api('/api/session',{method:'POST',headers:{'Content-Type':'application/json','X-OMNX-Bootstrap':key},body:'{}'}):await api('/api/session');S.csrf=session.csrf;await refresh();}
+  try {const session=key?await api('/api/session',{method:'POST',headers:{'Content-Type':'application/json','X-OMNX-Bootstrap':key},body:'{}'}):await api('/api/session');S.csrf=session.csrf;const context=session.launch_context||{};if(context.workspace_id)S.selected=context.workspace_id;if(context.task_id)S.view='tasks';await refresh();if(context.task_id){const p=selected();if(p?.available)await taskModal(p,context.task_id);}}
   catch(e){$('#freshness').textContent='Sessão local não pareada';$('#content').replaceChildren(empty('Abra o Console pelo ícone ou comando OMNX',e.message+' Não compartilhe a chave de abertura.'));}
 }
 $$('.nav').forEach(n=>n.addEventListener('click',()=>{S.view=n.dataset.view;render();}));

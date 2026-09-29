@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "scope": "OMNX 2.2.0-rc.1 daily workflow behavior",
+  "note": "Acceptance cases only. Model/host/browser evaluations remain not_run unless an explicit record is supplied.",
+  "cases": [
+    {
+      "id": "DAILY-001",
+      "area": "png",
+      "scenario": "A PNG has an unusual aspect ratio and its sidebar label conflicts with the current PRD name.",
+      "expected": "Preserve visual hierarchy, use the PRD name and route, and adapt responsive layout without zoom or hidden overflow.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_png_inspection_reports_pixels_without_guessing_viewport"]
+    },
+    {
+      "id": "DAILY-002",
+      "area": "image-to-html",
+      "scenario": "A visual change is implemented with image-to-html unavailable or optional helpers missing.",
+      "expected": "Use the OMNX integration profile, existing stack/assets, and a safe available fallback; do not claim conversion or add a parallel frontend.",
+      "model_evaluation_status": "not_run"
+    },
+    {
+      "id": "DAILY-003",
+      "area": "host-start",
+      "scenario": "A trusted direct host session begins a clear implementation without a wrapper.",
+      "expected": "Create/reuse one canonical Task, attempt Console open once, and keep implementation going when browser launch is false.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_clear_implementation_creates_canonical_task_and_minimal_journal", "test_hook_installation_preserves_user_hooks_and_is_idempotent"]
+    },
+    {
+      "id": "DAILY-004",
+      "area": "read-only",
+      "scenario": "A user requests only explanation or review with project hooks installed.",
+      "expected": "Do not create a Task, journal, update request, or Console launch.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_read_only_prompt_does_not_create_task_or_console_state"]
+    },
+    {
+      "id": "DAILY-005",
+      "area": "parallel-sessions",
+      "scenario": "Two host sessions start implementation simultaneously in one worktree, or one session identity appears in two clones.",
+      "expected": "Parallel sessions and worktree journals remain separate; bounded retries recover temporary metadata lock contention.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_parallel_sessions_and_replay_keep_tasks_separate", "test_same_host_session_in_two_worktrees_keeps_local_journals"]
+    },
+    {
+      "id": "DAILY-006",
+      "area": "interruption",
+      "scenario": "Host interrupt or session end arrives, then the user returns after a long idle period.",
+      "expected": "Leave a checkpoint, preserve Task state, and show stale activity as unconfirmed.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_interruption_checkpoint_and_canonical_status_mirror", "test_stale_signal_is_not_presented_as_live_activity"]
+    },
+    {
+      "id": "DAILY-007",
+      "area": "updates",
+      "scenario": "Update checking is disabled or network is unavailable.",
+      "expected": "Keep installed runtime usable and do not initiate a request without opt-in.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_default_update_policy_is_disabled_and_offline"]
+    },
+    {
+      "id": "DAILY-008",
+      "area": "updates",
+      "scenario": "An RC is published while channel is stable, or an asset has an incorrect digest.",
+      "expected": "Keep RC out of stable and reject bytes that do not match the release digest.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_channel_selection_keeps_rc_out_of_stable", "test_bad_digest_fails_without_activation"]
+    },
+    {
+      "id": "DAILY-009",
+      "area": "staging",
+      "scenario": "A compatible update is downloaded during a session.",
+      "expected": "Validate and stage beside the active version; do not switch the host or project lock mid-session.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_stage_candidate_without_activating_current_package"]
+    },
+    {
+      "id": "DAILY-010",
+      "area": "model-policy",
+      "scenario": "A short task changes an authorization or isolation boundary.",
+      "expected": "Recommend advanced based on risk, while keeping requested/effective model and cost separately observable.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_model_profiles_escalate_for_risk_and_use_scripts_for_determinism"]
+    },
+    {
+      "id": "DAILY-011",
+      "area": "model-policy",
+      "scenario": "The configured model or effort is not supported by the current host.",
+      "expected": "Mark effective selection unknown and use only an authorized host choice without repeated cheap retries.",
+      "model_evaluation_status": "not_run"
+    },
+    {
+      "id": "DAILY-012",
+      "area": "console-ui",
+      "scenario": "The Console modal is open during the existing periodic refresh.",
+      "expected": "Keep selection/focus/scroll stable and distinguish Task state, session signal, client presence, and package versions.",
+      "model_evaluation_status": "not_run"
+    },
+    {
+      "id": "DAILY-013",
+      "area": "recovery",
+      "scenario": "Console launch fails after Task recording succeeds.",
+      "expected": "Preserve Task and journal; report browser/client state honestly and do not block implementation.",
+      "model_evaluation_status": "not_run"
+    },
+    {
+      "id": "DAILY-014",
+      "area": "package",
+      "scenario": "A release archive is extracted into a clean directory.",
+      "expected": "Package manifest, Console manifest and file inventory agree; project schema remains compatible.",
+      "model_evaluation_status": "not_run"
+    },
+    {
+      "id": "DAILY-015",
+      "area": "updates",
+      "scenario": "No release is newer, or the official request times out.",
+      "expected": "Keep the installed version and report no update or unavailable without blocking project work.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_no_new_release_keeps_installed_version", "test_timeout_marks_unavailable_and_preserves_runtime"]
+    },
+    {
+      "id": "DAILY-016",
+      "area": "updates",
+      "scenario": "A candidate does not support the adopted project schema.",
+      "expected": "Mark it incompatible and keep it out of the staged package path.",
+      "model_evaluation_status": "not_run",
+      "mechanical_coverage": ["test_incompatible_project_schema_is_not_staged"]
+    }
+  ]
+}

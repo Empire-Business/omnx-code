@@ -7,3 +7,5 @@ Condições entre campos/arquivos também são verificadas pelo runtime e não c
 Schemas de risk-decision e release documentam registros opcionais de integração. Nenhum deles concede
 permissão por conter uma string; esta release não transforma exceção em waiver automático ou publica
 uma aplicação por validar um JSON. Referência externa confiável permanece necessária.
+
+Schemas de model-policy, automation-session, update-policy e update-state cobrem perfil local, sinal de sessão e estado de consulta/staging. Task tem campos opcionais automation_ref e model_policy. Projeto mantém schema 1; esses campos não alteram formato de adoção existente nem autorizam efeito externo.

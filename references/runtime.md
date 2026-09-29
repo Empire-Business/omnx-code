@@ -1,13 +1,13 @@
 # CLI, schemas e limites mecânicos
 
-Python 3.10+. Entrada `scripts/omnx.py`; root explícito para projeto. Sem pip/rede no runtime.
+Python 3.10+. Entrada `scripts/omnx.py`; root explícito para projeto. Sem pip; rede opcional limitada à consulta de releases depois de consentimento local.
 PyYAML puro 6.0.3 está incluído com licença. Parser rejeita chaves duplicadas, aliases, tags executáveis,
 profundidade/tamanho excessivo e tipos desconhecidos. Frontmatter de Task usa parser real, não regex de YAML.
 Validador JSON Schema implementa o subconjunto usado pelos schemas empacotados; não é motor genérico completo.
 
 Comandos: doctor; method verify/adopt; init (gera plano); task list/show/create/update/transition/archive;
 migrate inventory/plan/apply/status/resume/rollback; audit catalog/snapshot/request/response-template/
-validate-request/validate-response/persist/scan; gate; update check/plan/apply; session save/check; host; verify-package.
+validate-request/validate-response/persist/scan; gate; update check/plan/apply/policy/auto-check/remote-check; session save/check; hooks install/remove; model configure/choose/recommend; visual inspect; hook interno; host; verify-package.
 Consulte --help do comando para flags exatas. Init e migrate plan não aplicam mudanças.
 
 Entradas estruturadas podem ser arquivos JSON ou YAML seguro onde indicado; todas as escritas são explícitas.
@@ -27,6 +27,8 @@ Locks são locais/cooperantes. Não alegar proteção contra processo hostil com
 Schemas adicionais de release e decisão de risco são registros para integrar ao fluxo humano/CI;
 não existe comando que publique, conceda exceção, rotacione segredo ou autentique consentimento por texto.
 Valores de autoridade são referências, não assinatura. Campos de evidência não executam testes por si só.
+
+Schemas de model-policy e automation-session definem mapeamento local de perfil e journal mínimo por sessão. update-policy e update-state separam consentimento de consulta/staging de uma versão ativa. Task aceita automation_ref e model_policy opcionais. Nenhum campo de perfil executa ou seleciona uma IA.
 
 ## Console e Decision rc.2
 

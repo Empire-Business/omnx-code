@@ -1,3 +1,5 @@
-# Validação do Console — rc.2
+# Validação do Console 1.1.0-rc.1
 
-Consulte `VALIDATION.md` para a rodada atual e os relatórios JSON referenciados. Relatórios da rc.1 estão em `history/`; não representam homologação da nova interface.
+A suíte local completa executou 268 testes, sem falhas/erros, incluindo HTTP loopback por cliente Python, estado da sessão, versão/candidato, launcher com navegador indisponível e encerramento seguro.
+
+Playwright/Chromium não estão instalados; não houve teste DOM, browser→HTTP ou screenshots desta interface. Hooks reais Codex/Claude e leitura humana também não foram homologados. Consulte VALIDATION.md e browser-status-2.2.0-rc.1.json.

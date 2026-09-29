@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "package": "omnx-code",
+  "version": "2.2.0-rc.1",
+  "status": "blocked_missing_dependency",
+  "runner": "tests/browser/run.py",
+  "attempted_at": "2026-09-28T23:21:22.585474+00:00",
+  "browser": "not_started",
+  "transport": "not_run",
+  "reason": "ModuleNotFoundError: No module named playwright",
+  "screenshots": [],
+  "scope": "Neither real HTTP browser coverage nor isolated DOM coverage ran. Python unit/HTTP integration suite and JavaScript syntax check are reported separately."
+}

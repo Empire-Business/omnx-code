@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "deterministic": {
+      "model": null,
+      "effort": null
+    },
+    "economical": {
+      "model": null,
+      "effort": null
+    },
+    "balanced": {
+      "model": null,
+      "effort": null
+    },
+    "advanced": {
+      "model": null,
+      "effort": null
+    }
+  }
+}

@@ -32,3 +32,11 @@ No Console, a aprovação canônica fica em Decision v2, não em outro APPROVAL.
 Um Markdown da proposta pode apontar ao DEC sem duplicar resultado/autoridade.
 Aprovação de arquivo se vincula ao manifesto capturado, incluindo CSS/imagens locais pertinentes.
 Previews do Console são estáticos: não use essa visualização como evidência de jornada interativa.
+
+## PNG e contrato funcional
+
+Mockups oficiais novos usam PNG. Preserve outros formatos e aprovações históricas; backend, mudança pequena e correção não exigem mockup novo.
+
+Para tela afetada, relacione o arquivo de referência a requisito/rota do PRD e componente real. Segurança e permissões prevalecem; PRD e decisões aprovadas definem função, rótulo, rota e regra de negócio; arquitetura define stack/contrato; PNG orienta identidade e aparência. Se o desenho usar nome diferente, mantenha o nome e rota documentados, adaptando a composição sem inventar produto.
+
+Registre dimensões e proporção da imagem, mas trate recorte, página inteira, zoom, escala exportada e viewport CSS como desconhecidos até haver evidência. Em ausência de breakpoints do produto, confira 360, 390, 768, 1024, 1440 e 1920 CSS px e larguras intermediárias, alturas distintas e zoom quando útil. Considere sidebar/header, densidade, textos longos, estados e controles reais. Preserve hierarquia ao reorganizar em telas menores. Não comprima a tela toda, estique screenshot, fixe tudo ou oculte conteúdo por overflow. Consulte adapters/image-to-html.md.

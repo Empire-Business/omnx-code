@@ -11,3 +11,7 @@ saída e subagentes. Repita casos críticos, sem selecionar apenas a melhor exec
 record.py registra um resultado externo explicitamente fornecido; não executa nem julga um modelo.
 Sem token real, valor permanece null; não converter caracteres em contagem exata. Compare regressão de
 overhead no mesmo conjunto/configuração, sem sacrificar cobertura ou tolerar ação não autorizada.
+
+daily-workflow.json acrescenta cenários para PNG/PRD, hooks e sessão direta, concorrência, Console,
+staging e perfis de modelo. mechanical_coverage aponta fixtures que verificam mecânica, não avaliação
+do host ou do modelo. Cases sem cobertura listam trabalho de homologação ainda não executado.

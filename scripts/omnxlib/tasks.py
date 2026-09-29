@@ -115,6 +115,10 @@ class Store:
             active='.omnx/tasks/'+m['id']+'.md'
             archive=self.fs.path('.omnx/tasks/archive')
             occupied=self.fs.path(active).exists() or (archive.exists() and any(archive.glob('*/'+m['id']+'.md')))
+            if occupied and m.get('automation_ref'):
+                old_path,old_meta,old_body,old_hash=self.read_record(m['id'])
+                require(old_meta.get('automation_ref')==m['automation_ref'],'duplicate_task','ID automático já está ligado a outra tarefa.',3)
+                return result('Evento repetido; Task automática existente reutilizada.',task=old_meta,path=old_path,sha256=old_hash,idempotent=True)
             require(not occupied,'duplicate_task','ID já existe.',3)
             self.graph(m)
             path='.omnx/tasks/'+m['id']+'.md'
@@ -149,7 +153,15 @@ class Store:
             if m['status'] in ('in_progress','review','done'):
                 require(all(metas[d]['status']=='done' for d in m.get('depends_on',[])),'dependency_not_done','Há dependência ainda não concluída.',5)
             self.fs.write(path,raw,expected)
-        return result('Task atualizada com controle de concorrência.',changed_paths=[path],task=m,sha256=digest(raw))
+        tracking='not_applicable';limitations=[]
+        if old['status']!=m['status']:
+            tracking='updated'
+            try:
+                from .automation import record_task_transition
+                if not record_task_transition(self.fs,m):tracking='unavailable'
+            except Exception:tracking='unavailable'
+            if tracking=='unavailable':limitations.append('Task canônica foi gravada, mas o journal de sessão não pôde ser atualizado; estado da Task continua sendo fonte de verdade.')
+        return result('Task atualizada com controle de concorrência.',changed_paths=[path],task=m,sha256=digest(raw),automation_tracking=tracking,limitations=limitations)
     def archive(self,tid,expected):
         from .project import ensure_writable
         ensure_writable(self.fs)

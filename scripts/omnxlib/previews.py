@@ -7,6 +7,7 @@ from __future__ import annotations
 import html
 import posixpath
 import re
+import struct
 from html.parser import HTMLParser
 from pathlib import PurePosixPath
 from urllib.parse import urlsplit, unquote
@@ -19,6 +20,15 @@ MAX_ASSET = 8 * 1024 * 1024
 MAX_BUNDLE = 24 * 1024 * 1024
 MAX_FILES = 150
 MIME = {'.html':'text/html; charset=utf-8', '.htm':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.webp':'image/webp', '.gif':'image/gif', '.woff':'font/woff', '.woff2':'font/woff2', '.ttf':'font/ttf', '.otf':'font/otf'}
+
+def inspect_png(fs,rel):
+    """Read PNG header facts only; viewport, crop, and export scale need evidence."""
+    portable_path(rel);require(PurePosixPath(rel).suffix.lower()=='.png','png_required','A referência oficial nova deve ser PNG.',4)
+    raw=fs.read(rel,MAX_ASSET);require(raw is not None,'missing_subject','PNG não encontrado.',4)
+    require(len(raw)>=33 and raw[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>I',raw[8:12])[0]==13 and raw[12:16]==b'IHDR','invalid_png','Cabeçalho PNG inválido.')
+    width,height=struct.unpack('>II',raw[16:24])
+    require(1<=width<=50000 and 1<=height<=50000 and width*height<=1_000_000_000,'png_dimensions','Dimensões PNG fora do limite seguro.')
+    return result('Dimensões PNG lidas; pixels não equivalem automaticamente a CSS pixels.',reference=rel,width=width,height=height,aspect_ratio=round(width/height,6),bytes=len(raw),possible_crop='unknown',capture_type='unknown',export_scale='unknown',css_viewport='not_inferred',visual_content_inspected=False,guidance=['Confirme se é viewport, página inteira ou recorte antes de comparar.','Preserve tokens e hierarquia; adapte a composição a cada largura suportada.','PRD, decisões e rotas documentadas prevalecem sobre rótulos ou rotas desenhados.'])
 
 def walk_files(fs, directory, *, maximum=20000, depth_limit=16):
     """Never follow links; maximum bounds files visited, not just matches returned."""

@@ -33,3 +33,11 @@ Documentação externa pode mudar. Protocolo concreto deve ser confirmado quando
 implementada. Esta entrega não testa Asaas, Hotmart, Supabase, Claude Code ou Codex em serviço real.
 
 Instalação/invocação consultadas: https://code.claude.com/docs/en/skills e https://learn.chatgpt.com/docs/build-skills
+
+## Adendo — 28 de setembro de 2026
+
+- Codex hooks e trust da configuração local: [documentação oficial](https://learn.chatgpt.com/docs/hooks?translationFallback=de-DE).
+- Eventos, payload e escopo local de hooks Claude: [documentação oficial](https://code.claude.com/docs/en/hooks).
+- Resposta de release asset e campo digest SHA-256: [REST API oficial do GitHub](https://docs.github.com/en/rest/releases/assets?apiVersion=2026-03-10). Consulta local usa origem oficial, sem credenciais.
+- Conversão visual: [Empire-Business/image-to-html, revisão d18ba1626b23786adc44c19d58046ea6abd4758d](https://github.com/Empire-Business/image-to-html/tree/d18ba1626b23786adc44c19d58046ea6abd4758d). O frontmatter expõe a skill como img-to-html. A branch/referência to-wireframe estava indisponível na revisão consultada; auxiliares de imagem/fontes são opcionais e não foram executados.
+- Não houve PNG de aplicação nesta alteração; nenhuma conversão visual, comparação de screenshot ou homologação real de host é alegada.

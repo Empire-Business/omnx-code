@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0-rc.1 — Console 1.1.0-rc.1
+
+- Hooks de projeto Codex/Claude opt-in registram início, atividade limitada, interrupção, encerramento e checkpoint sem copiar conversa, argumentos ou código.
+- Sessões de implementação criam/reutilizam uma Task canônica idempotente, tentam abrir o Console uma vez e preservam sinais separados para tarefa, sessão e cliente local.
+- PNG como referência padrão para novos mockups; comando de leitura de dimensões e perfil OMNX do image-to-html documentam precedência de PRD/rotas e adaptação responsiva.
+- Política de release opt-in consulta Stable por padrão, filtra RC, valida compatibilidade e SHA-256 do GitHub, e prepara candidato lado a lado sem ativação no host.
+- Política configurável de perfis determinístico/econômico/equilibrado/avançado registra modelo e esforço solicitados, sem alegar seleção, custo ou uso efetivo não observados.
+- `console open` informa estados separados para servidor, navegador e conexão técnica; a UI mostra atividade recente, política de modelo e candidato preparado.
+- Preservada compatibilidade do schema de projeto 1 e dos contratos do auditor 2.0; schemas novos cobrem sessões, modelos e updates.
+- Limite conhecido: host não oferece forma uniforme de trocar a skill/modelo da sessão ativa ou apontar todas as próximas sessões para o candidato; ativação segue seleção explícita no caminho versionado.
+
 ## 2.1.0-rc.2 — Console 1.0.0-rc.2
 
 - Corrige inicialização JavaScript, elimina handlers interpolados e restringe previews a capabilities registradas.
