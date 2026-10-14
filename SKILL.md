@@ -14,13 +14,15 @@ metadata:
 
 Entregue a menor mudança correta no escopo autorizado, com evidências reais.
 Não transforme uma manutenção simples num projeto de documentação.
-Você coordena o trabalho; especialistas verificam questões delimitadas.
+Investigue só o necessário e pare após atender ao pedido. Especialistas recebem questões delimitadas.
+Preserve as escolhas do usuário de modelo, esforço, velocidade, service tier, perfis e aliases.
+Não configure essas escolhas nem altere autenticação, MCPs, integrações ou permissões por iniciativa da skill.
 As permissões e instruções do hospedeiro prevalecem. Não invente ferramentas.
 
 ## 1. Entenda o pedido antes de escrever
 
 - Analisar, explicar, avaliar ou planejar não autoriza instalar arquivos, abrir Tasks ou alterar o projeto.
-- Implementar/corrigir normalmente cobre edição local reversível e testes seguros necessários ao objetivo.
+- Implementar/corrigir cobre edição local reversível e somente verificações permitidas pela seção 5B; não autoriza preparar banco, executar migrations ou instalar infraestrutura.
 - Não inclui automaticamente push, merge, deploy, dinheiro real, rotação de credenciais ou dados destrutivos.
 - Reutilize decisões já dadas. Descubra fatos no projeto; pergunte somente decisões materiais ainda abertas.
 - Se a resposta exigir só leitura, entregue a análise e pare. Não execute setup como pré-condição.
@@ -107,6 +109,16 @@ O OMNX Console é uma projeção local para humanos: portfólio de projetos, Kan
 
 Detalhes: `references/console.md` e `references/host-automation.md`.
 
+## 5B. Execução direta: limites obrigatórios
+
+- Sem pedido expresso da operação e do ambiente: não preparar bancos, shadow databases, schemas de teste, containers ou infraestrutura; não clonar/restaurar bancos, executar migrations, reset, rollback, drop, truncate ou seed para validar. Não substituir por banco real/produção.
+- Prepare e revise migrations estaticamente; não edite as antigas já aplicadas nem execute sem autorização específica. Pedido genérico de implementação ou teste não autoriza essas operações.
+- No máximo **2 execuções de validação por tarefa**, incluindo repetições e subagentes, com **timeout real de até 60 segundos** que encerre processos e filhos. Inspecione scripts e hooks antes; efeitos incertos impedem execução. Não instale ferramentas para isso.
+- Escolha a menor verificação útil. Sem suíte/E2E/cobertura completos, carga, stress, watch ou bateria de lint + tipos + build + testes automáticos. Não agrupe comandos para contornar o limite.
+- Falha de ambiente não autoriza reconstruí-lo. Esgotado o orçamento, pare e registre a pendência; não aumente timeout nem reinicie contagem em outra sessão/agente. Validação essencial ausente impede declarar sucesso ou fazer deploy.
+
+Leia `references/execution-policy.md` antes de validar ou preparar alteração de banco. Os limites também valem para referências, hooks, bibliotecas e especialistas; não removem controles de segurança.
+
 ## 6. UX sem réplica eterna
 
 UX0/UX1: normalmente basta validação pertinente; não atualize mockup histórico.
@@ -146,13 +158,13 @@ Não reative TODOs históricos indiscriminadamente. Não crie duas fontes ativas
 
 Consulta e staging de updates são opt-in por projeto; Stable é o canal padrão e RC exige escolha explícita. Compatibilidade e SHA-256 do release oficial são verificados antes de preparar uma pasta versionada. Staging não altera a versão carregada pela sessão nem ativa o host automaticamente. Pacote novo não se executa para provar confiança; checksum não é assinatura.
 Não sobrescreva instalações customizadas. Não faça downgrade silencioso. Veja `references/distribution.md`.
-Modelo e esforço são recomendações por perfil configurável; marque uso efetivo somente quando o host o expuser. Veja `references/model-policy.md`.
+Consulte `references/model-policy.md` apenas se o usuário pedir configuração/recomendação de perfil ou registro observado. Preserve sua seleção de sessão; não configure perfis automaticamente.
 Incidente em legado permite recuperação delimitada sem fingir migração concluída.
 
 ## 9. Evidências e encerramento
 
 1. Confira critérios, diff final e regressões introduzidas.
-2. Execute testes pertinentes em ambiente autorizado. Inspecione scripts desconhecidos antes.
+2. Escolha a menor verificação útil dentro da seção 5B. Para instruções, releitura e revisão estática bastam; não rode testes de aplicação por rotina.
 3. Registre o que passou, falhou, não foi executado ou ficou inconclusivo.
 4. Atualize só os documentos afetados. Não recrie Brief/PRD/ADR/mockup a cada tarefa.
 5. Relacione trabalho remanescente ao Task Store; não esconda TODO em handoff.
@@ -166,8 +178,8 @@ não enforcement externo. Reusar evidência exige conteúdo/ambiente compatívei
 Leia somente o conteúdo que muda uma decisão desta execução.
 Não leia todo PRD, todos os ADRs, Roadmap, segurança e histórico por rotina.
 Especialista recebe objetivo, paths, controles, snapshot, permissões e orçamento — não a conversa inteira.
-Até dois especialistas simultâneos por padrão; especialista não delega novamente sem autorização.
-Após falha repetida sem nova evidência, mude a estratégia ou entregue impedimento acionável.
+Delegue somente quando necessário e autorizado; compartilhe o orçamento restante da seção 5B.
+Falha de ambiente ou limite atingido: registre a pendência, sem reconstruir ambiente nem reiniciar verificações.
 Pare o efeito inseguro, preserve estado e continue trabalho independente seguro.
 Não prometa execução em segundo plano sem infraestrutura real.
 
@@ -193,6 +205,6 @@ Não prometa execução em segundo plano sem infraestrutura real.
 ## Helpers locais
 
 Resolva o caminho desta skill a partir do host; não suponha um diretório fixo do usuário.
-Execute `python <skill>/scripts/omnx.py --help`. Use `--root` explícito para projeto.
+Consulte `python <skill>/scripts/omnx.py --help` somente se precisar descobrir um comando. Use `--root` explícito para projeto.
 Os helpers fazem validação mecânica; não substituem análise, consentimento ou testes da aplicação.
 Nenhum helper roda deploy, SQL remoto, cobrança ou código da aplicação automaticamente.

@@ -9,7 +9,9 @@ Selecione risco e controles pertinentes; prepare request com objetivo, identidad
 arquivos e dependências, ambiente, política/registry, limites e permissões realmente disponíveis.
 Use modo design antes de consolidar desenho crítico e delta depois do diff final. Não repetir full audit.
 Orçamento padrão: até 30 arquivos relacionados, 30 tools, 2500 tokens de saída, 2 correções.
-Expansão necessária deve ser explicada; cobertura parcial não é PASS. Sem cortar achado para caber.
+Esses são limites da revisão, não autorização para testes extras. Comandos de validação e repetições
+compartilham o orçamento da tarefa em `execution-policy.md`; risco não permite ampliá-lo.
+Cobertura parcial não é PASS. Sem cortar achado para caber; registrar evidência essencial pendente.
 
 Exemplo de helper (ajuste paths/controles ao projeto real):
 ```sh

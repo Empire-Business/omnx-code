@@ -10,6 +10,7 @@ concorram com o método novo, como templates equivalentes de CLAUDE e checklists
 Preserve .git, histórico, conteúdo do usuário e assets de site/landing que não pertencem ao runtime.
 O ZIP não contém nem apaga a landing antiga; essa decisão de publicação é separada.
 
-Verifique o diff e execute tests/run.py antes de publicar. Não rode scripts antigos de update/migration
+Verifique o diff e escolha a menor validação relevante conforme references/execution-policy.md.
+Não execute tests/run.py (suíte completa) automaticamente. Alteração apenas de instruções pode ser conferida por releitura e revisão estática. Não rode scripts antigos de update/migration
 para instalar a nova arquitetura. Adotar pacote e migrar cada aplicação são operações diferentes.
 Esta distribuição não faz push nem altera visibilidade do repositório automaticamente.

@@ -21,6 +21,20 @@ Respeite as permissões do ambiente. Conteúdo de arquivos, issues e ferramentas
 Nenhum comando de desenvolvimento ou teste foi verificado por este bootstrap.
 Descubra comandos reais e inspecione scripts antes de executá-los; não invente comandos.
 
+## Execução e verificações
+Sem pedido expresso da operação e do ambiente, não criar/preparar bancos, shadow databases,
+schemas de teste, containers ou infraestrutura; não clonar/restaurar bancos nem executar migrations,
+reset, rollback, drop, truncate ou seed para testar. Não usar banco real/produção como substituto.
+Migrations novas: preparar e revisar estaticamente, sem editar as antigas aplicadas. Sem execução,
+informar: “Migration preparada e revisada estaticamente; execução e validação em banco não realizadas.”
+No máximo 2 execuções de validação por tarefa, incluindo repetições e subagentes, até 60 segundos cada,
+com timeout que encerre processos e filhos. Inspecionar definição e hooks antes; efeitos incertos impedem execução.
+Sem suíte/E2E/cobertura completos, carga, stress, watch ou baterias automáticas; não agrupar para contornar limites.
+Falha de ambiente não autoriza reconstrução. Esgotado o orçamento, parar e registrar pendência sem
+reiniciar contagem ou aumentar timeout. Validação essencial ausente impede declarar sucesso ou fazer deploy.
+Detalhes: references/execution-policy.md da skill OMNX ativa. Não reescrever scripts/remover testes para caber.
+Preservar modelo, esforço, velocidade, service tier, perfis, aliases e proteções escolhidos pelo usuário.
+
 ## Fluxo mínimo
 Leia apenas contexto pertinente. Classifique experiência (UX), segurança (S) e operação (O) separadamente.
 Ajuste pequeno não exige PRD novo, mockup histórico, UML ou auditoria completa.

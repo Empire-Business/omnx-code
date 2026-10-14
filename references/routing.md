@@ -21,6 +21,8 @@ O2: efeito remoto delimitado não produtivo ou consumo de serviço; autoridade d
 O3: produção, dinheiro, privilégio, destruição, rotação ou irreversibilidade; autoridade específica.
 `git push` com auto-deploy pode ser O3. `npm test` pode executar código arbitrário ou chamar produção.
 
+A classificação não aumenta o orçamento nem autoriza banco/infraestrutura. Aplique `execution-policy.md` em todas as rotas.
+
 ## Rotas
 Análise → leitura → resposta. Ajuste → Task compacta → edição → teste pertinente.
 Feature conhecida → requisito/critério → impacto → implementação/testes → documentos afetados.
