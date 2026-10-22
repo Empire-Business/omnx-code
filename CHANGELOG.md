@@ -1,5 +1,9 @@
 # Changelog
 
+## Não lançado
+
+- Nova `references/orchestration.md`: economia de tokens, subagentes com contexto mínimo, descoberta de LLMs disponíveis (Claude Code, Codex, Kimi Code etc.) e roteamento por dificuldade, com limites de segurança.
+
 ## 2.2.0-rc.1 — Console 1.1.0-rc.1
 
 - Hooks de projeto Codex/Claude opt-in registram início, atividade limitada, interrupção, encerramento e checkpoint sem copiar conversa, argumentos ou código.

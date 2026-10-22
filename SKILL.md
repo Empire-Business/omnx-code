@@ -179,6 +179,9 @@ Leia somente o conteúdo que muda uma decisão desta execução.
 Não leia todo PRD, todos os ADRs, Roadmap, segurança e histórico por rotina.
 Especialista recebe objetivo, paths, controles, snapshot, permissões e orçamento — não a conversa inteira.
 Delegue somente quando necessário e autorizado; compartilhe o orçamento restante da seção 5B.
+Economize tokens: busque antes de ler, leia por trecho, não repita contexto e peça retornos curtos.
+Sempre que possível organize o trabalho em subagentes, cada um com apenas o contexto da sua subtarefa.
+Oriente tarefas pelos LLMs disponíveis no ambiente (Claude Code, Codex, Kimi Code, qualquer CLI/agente já instalado e autenticado), do mais barato ao mais capaz conforme a dificuldade; leia `references/orchestration.md`.
 Falha de ambiente ou limite atingido: registre a pendência, sem reconstruir ambiente nem reiniciar verificações.
 Pare o efeito inseguro, preserve estado e continue trabalho independente seguro.
 Não prometa execução em segundo plano sem infraestrutura real.
@@ -197,6 +200,7 @@ Não prometa execução em segundo plano sem infraestrutura real.
 | Migrar legado | `references/migration.md` |
 | Interrupção/incidente/concorrência | `references/recovery.md` |
 | Hooks, journal de sessão e Console no início | `references/host-automation.md` |
+| Subagentes, roteamento entre LLMs e economia de tokens | `references/orchestration.md` |
 | Modelo, esforço e custo observado | `references/model-policy.md` |
 | PNG e perfil image-to-html na stack do projeto | `adapters/image-to-html.md` |
 | CLI e schemas | `references/runtime.md` |
